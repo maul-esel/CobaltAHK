@@ -1,0 +1,6 @@
+bin
+Debug
+*.exe
+*.dll
+*.mdb
+*.userprefs
