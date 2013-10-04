@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>10.0.0</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{27920BA7-FA6A-4AC5-9972-F205267BCCC4}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <RootNamespace>CobaltAHK</RootNamespace>
+    <AssemblyName>CobaltAHK</AssemblyName>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug</OutputPath>
+    <DefineConstants>DEBUG;</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>none</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release</OutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="Microsoft.Scripting">
+      <HintPath>..\..\Codeplex-DLR-1.0\Src\Runtime\Microsoft.Scripting\%24%28SolutionDir%29..\Bin\40\Microsoft.Scripting.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Core" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AssemblyInfo.cs" />
+    <Compile Include="CobaltAHK.cs" />
+    <Compile Include="Parser.cs" />
+    <Compile Include="SourceReader.cs" />
+    <Compile Include="Lexer\LexerException.cs" />
+    <Compile Include="Lexer\Token.cs" />
+    <Compile Include="Lexer\Lexer.cs" />
+    <Compile Include="Lexer\LexerBase.cs" />
+    <Compile Include="Lexer\ExpressionLexer.cs" />
+    <Compile Include="Lexer\TraditionalLexer.cs" />
+    <Compile Include="Lexer\RootLexer.cs" />
+    <Compile Include="Operator.cs" />
+    <Compile Include="Expressions\Expression.cs" />
+    <Compile Include="Expressions\ExpressionChain.cs" />
+    <Compile Include="Expressions\Traditional.cs" />
+    <Compile Include="SourcePosition.cs" />
+    <Compile Include="Extensions.cs" />
+    <Compile Include="Expressions\Literals.cs" />
+    <Compile Include="Syntax\Syntax.cs" />
+    <Compile Include="Syntax\BuiltinVariable.cs" />
+    <Compile Include="Syntax\NumberType.cs" />
+    <Compile Include="Syntax\Directive.cs" />
+    <Compile Include="Expressions\Flow.cs" />
+    <Compile Include="Syntax\ParameterModifier.cs" />
+    <Compile Include="ExpressionTree\Generator.cs" />
+    <Compile Include="ExpressionTree\Scope.cs" />
+    <Compile Include="Expressions\Definitions.cs" />
+    <Compile Include="Lexer\State.cs" />
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <ItemGroup>
+    <Folder Include="Lexer\" />
+    <Folder Include="Expressions\" />
+    <Folder Include="Syntax\" />
+    <Folder Include="ExpressionTree\" />
+  </ItemGroup>
+  <ProjectExtensions>
+    <MonoDevelop>
+      <Properties>
+        <Policies>
+          <TextStylePolicy inheritsSet="Mono" inheritsScope="text/plain" scope="text/x-csharp" />
+          <CSharpFormattingPolicy BeforeMethodDeclarationParentheses="False" inheritsSet="Mono" inheritsScope="text/x-csharp" scope="text/x-csharp" />
+        </Policies>
+      </Properties>
+    </MonoDevelop>
+  </ProjectExtensions>
+</Project>
