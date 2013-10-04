@@ -15,10 +15,12 @@ namespace CobaltAHK
 		public void Execute(TextReader code)
 		{
 			var expressions = parser.Parse(code);
+#if DEBUG
 			Console.WriteLine(String.Format("{0} expressions", expressions.Length));
 			foreach (var e in expressions) {
 				Console.WriteLine("\t" + e.ToString());
 			}
+#endif
 
 #if EXECUTE
 			var scope = new ExpressionTree.Scope();
