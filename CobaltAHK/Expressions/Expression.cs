@@ -104,7 +104,15 @@ namespace CobaltAHK.Expressions
 
 	public class BuiltinVariableExpression : VariableExpression
 	{
-		public BuiltinVariableExpression(SourcePosition pos, Syntax.BuiltinVariable var) : base(pos) { }
+		public BuiltinVariableExpression(SourcePosition pos, Syntax.BuiltinVariable var)
+		: base(pos)
+		{
+			variable = var;
+		}
+
+		private readonly Syntax.BuiltinVariable variable;
+
+		public Syntax.BuiltinVariable Variable { get { return variable; } }
 	}
 
 	#endregion
