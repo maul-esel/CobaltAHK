@@ -13,12 +13,26 @@ namespace CobaltAHK.ExpressionTree
 				// todo
 			} else if (expr is CommandCallExpression) {
 				// todo
+			} else if (expr is FunctionCallExpression) {
+				return GenerateFunctionCall((FunctionCallExpression)expr, scope, settings);
 			} else if (expr is FunctionDefinitionExpression) {
 				return GenerateFunctionDefinition((FunctionDefinitionExpression)expr, scope, settings);
 			} else if (expr is ClassDefinitionExpression) {
 				// todo
 			}
 			throw new NotImplementedException();
+		}
+
+		private static DLR.Expression GenerateFunctionCall(FunctionCallExpression func, Scope scope, ScriptSettings settings)
+		{
+			var lambda = scope.ResolveFunction(func.Name);
+
+			var prms = new List<DLR.Expression>();
+			foreach (var p in func.Parameters) {
+				prms.Add(Generate(p, scope, settings));
+			}
+
+			return DLR.Expression.Invoke(lambda, prms);
 		}
 
 		private static DLR.Expression GenerateFunctionDefinition(FunctionDefinitionExpression func, Scope scope, ScriptSettings settings)
