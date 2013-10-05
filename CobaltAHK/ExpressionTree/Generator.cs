@@ -33,8 +33,8 @@ namespace CobaltAHK.ExpressionTree
 			var t = typeof(IEnumerable<object>);
 			var constructor = typeof(CobaltAHKObject).GetConstructor(new[] { t, t });
 
-			var keys = DLR.Expression.NewArrayInit(typeof(object), obj.Dictionary.Keys.Select(e => Generate(e, scope, settings)));
-			var values = DLR.Expression.NewArrayInit(typeof(object), obj.Dictionary.Values.Select(e => Generate(e, scope, settings)));
+			var keys = ExpressionArray(obj.Dictionary.Keys, scope, settings);
+			var values = ExpressionArray(obj.Dictionary.Values, scope, settings);
 			return DLR.Expression.New(constructor, keys, values);
 		}
 
@@ -43,8 +43,13 @@ namespace CobaltAHK.ExpressionTree
 			var t = typeof(IEnumerable<object>);
 			var constructor = typeof(List<object>).GetConstructor(new[] { t });
 
-			var values = DLR.Expression.NewArrayInit(typeof(object), arr.List.Select(e => DLR.Expression.Convert(Generate(e, scope, settings), typeof(object))));
-			return DLR.Expression.New(constructor, values);
+			return DLR.Expression.New(constructor, ExpressionArray(arr.List, scope, settings));
+		}
+
+		private static DLR.Expression ExpressionArray(IEnumerable<Expression> exprs, Scope scope, ScriptSettings settings)
+		{
+			return DLR.Expression.NewArrayInit(typeof(object),
+			                                   exprs.Select(e => DLR.Expression.Convert(Generate(e, scope, settings), typeof(object))));
 		}
 
 		private static DLR.Expression GenerateFunctionCall(FunctionCallExpression func, Scope scope, ScriptSettings settings)
