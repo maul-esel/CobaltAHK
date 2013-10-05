@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Globalization;
 
 namespace CobaltAHK.Expressions
 {
@@ -22,7 +23,31 @@ namespace CobaltAHK.Expressions
 
 	public class NumberLiteralExpression : ValueLiteralExpression
 	{
-		public NumberLiteralExpression(SourcePosition pos, string val, Syntax.NumberType type) : base(pos) { }
+		public NumberLiteralExpression(SourcePosition pos, string val, Syntax.NumberType type)
+		: base(pos)
+		{
+			strVal = val;
+			numType = type;
+		}
+
+		private readonly string strVal;
+
+		private readonly Syntax.NumberType numType;
+
+		public object GetValue()
+		{
+			switch (numType) {
+				case Syntax.NumberType.Integer:
+					return uint.Parse(strVal);
+				case Syntax.NumberType.Hexadecimal:
+					return uint.Parse(strVal.Substring(2), NumberStyles.AllowHexSpecifier);
+				case Syntax.NumberType.Decimal:
+					return double.Parse(strVal, NumberStyles.AllowDecimalPoint);
+				case Syntax.NumberType.Scientific:
+					return double.Parse(strVal, NumberStyles.AllowDecimalPoint | NumberStyles.AllowExponent);
+			}
+			throw new System.Exception(); // todo
+		}
 	}
 
 	public class ObjectLiteralExpression : ValueLiteralExpression
