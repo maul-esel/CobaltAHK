@@ -52,11 +52,27 @@ namespace CobaltAHK.Expressions
 
 	public class ObjectLiteralExpression : ValueLiteralExpression
 	{
-		public ObjectLiteralExpression(SourcePosition pos, IDictionary<ValueExpression, ValueExpression> obj) : base(pos) { }
+		public ObjectLiteralExpression(SourcePosition pos, IDictionary<ValueExpression, ValueExpression> obj)
+		: base(pos)
+		{
+			dict = obj;
+		}
+
+		private readonly IDictionary<ValueExpression, ValueExpression> dict;
+
+		public IDictionary<ValueExpression, ValueExpression> Dictionary { get { return dict; } }
 	}
 
 	public class ArrayLiteralExpression : ValueLiteralExpression
 	{
-		public ArrayLiteralExpression(SourcePosition pos, IEnumerable<ValueExpression> arr) : base(pos) { }
+		public ArrayLiteralExpression(SourcePosition pos, IEnumerable<ValueExpression> arr)
+		: base(pos)
+		{
+			list = arr;
+		}
+
+		private readonly IEnumerable<ValueExpression> list;
+
+		public IEnumerable<ValueExpression> List { get { return list; } }
 	}
 }

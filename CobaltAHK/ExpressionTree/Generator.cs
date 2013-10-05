@@ -20,8 +20,31 @@ namespace CobaltAHK.ExpressionTree
 				return DLR.Expression.Constant(((StringLiteralExpression)expr).String);
 			} else if (expr is NumberLiteralExpression) {
 				return DLR.Expression.Constant(((NumberLiteralExpression)expr).GetValue());
+			} else if (expr is ObjectLiteralExpression) {
+				return GenerateObjectLiteral((ObjectLiteralExpression)expr, scope, settings);
+			} else if (expr is ArrayLiteralExpression) {
+				return GenerateArrayLiteral((ArrayLiteralExpression)expr, scope, settings);
 			}
 			throw new NotImplementedException();
+		}
+
+		private static DLR.Expression GenerateObjectLiteral(ObjectLiteralExpression obj, Scope scope, ScriptSettings settings)
+		{
+			var t = typeof(IEnumerable<object>);
+			var constructor = typeof(CobaltAHKObject).GetConstructor(new[] { t, t });
+
+			var keys = DLR.Expression.NewArrayInit(typeof(object), obj.Dictionary.Keys.Select(e => Generate(e, scope, settings)));
+			var values = DLR.Expression.NewArrayInit(typeof(object), obj.Dictionary.Values.Select(e => Generate(e, scope, settings)));
+			return DLR.Expression.New(constructor, keys, values);
+		}
+
+		private static DLR.Expression GenerateArrayLiteral(ArrayLiteralExpression arr, Scope scope, ScriptSettings settings)
+		{
+			var t = typeof(IEnumerable<object>);
+			var constructor = typeof(List<object>).GetConstructor(new[] { t });
+
+			var values = DLR.Expression.NewArrayInit(typeof(object), arr.List.Select(e => DLR.Expression.Convert(Generate(e, scope, settings), typeof(object))));
+			return DLR.Expression.New(constructor, values);
 		}
 
 		private static DLR.Expression GenerateFunctionCall(FunctionCallExpression func, Scope scope, ScriptSettings settings)

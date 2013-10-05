@@ -64,6 +64,7 @@
     <Compile Include="Expressions\Definitions.cs" />
     <Compile Include="Lexer\State.cs" />
     <Compile Include="ExpressionTree\ScriptSettings.cs" />
+    <Compile Include="CobaltAHKObject.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
