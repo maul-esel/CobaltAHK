@@ -54,7 +54,7 @@ namespace CobaltAHK.ExpressionTree
 				}
 				types.Add(type);
 			}
-			types.Add(typeof(object)); // return value
+			types.Add(typeof(void)); // return value
 
 			var funcBody = new List<DLR.Expression>();
 			foreach (var e in func.Body) {
@@ -62,8 +62,8 @@ namespace CobaltAHK.ExpressionTree
 			}
 
 			var funcType = DLR.Expression.GetFuncType(types.ToArray());
-			var function = DLR.Expression.Lambda(funcType, DLR.Expression.Block(funcBody), func.Name, prms);
-			scope.AddFunction(func.Name, function);
+			var function = DLR.Expression.Lambda(funcType, DLR.Expression.Block(funcBody), func.Name, prms); // todo: use Label instead of Block? (see dlr-overview p. 35)
+			scope.AddFunction(func.Name, function); // todo: can't call itself, because body is generated before function is complete
 
 			return function;
 		}
