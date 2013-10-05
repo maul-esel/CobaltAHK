@@ -1,23 +1,47 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection;
 
 namespace CobaltAHK.ExpressionTree
 {
 	public class Scope
 	{
-		public Scope() : this(null) { }
+		public Scope() : this(null)
+		{
+			LoadBuiltinFunctions();
+		}
 
 		public Scope(Scope parentScope) {
 			parent = parentScope;
-#if DEBUG
-			var param = Expression.Parameter(typeof(string), "str");
-			var msgbox = Expression.Lambda<Action<string>>(
-				Expression.Call(typeof(IronAHK.Rusty.Core).GetMethod("MsgBox", new[] { typeof(string) }), param),
-				param
-			);
-			AddFunction("MsgBox", msgbox);
-#endif
+		}
+
+		private void LoadBuiltinFunctions()
+		{
+			var flags = BindingFlags.Static | BindingFlags.Public | BindingFlags.DeclaredOnly;
+			var methods = typeof(IronAHK.Rusty.Core).GetMethods(flags);
+
+			foreach (var method in methods) {
+				var paramList = method.GetParameters();
+				if (HasFunction(method.Name) || paramList.Any(p => p.ParameterType.IsByRef)) {
+					continue; // skips byRef and overloads // todo: support overloads!
+				}
+
+				var prms = new List<ParameterExpression>(paramList.Length);
+				var types = new List<Type>(paramList.Length + 1);
+
+				foreach (var p in paramList) {
+					prms.Add(Expression.Parameter(p.ParameterType, p.Name));
+					types.Add(p.ParameterType);
+				}
+				types.Add(method.ReturnType);
+
+				var lambda = Expression.Lambda(Expression.GetFuncType(types.ToArray()),
+				                               Expression.Call(method, prms),
+				                               prms);
+				AddFunction(method.Name, lambda);
+			}
 		}
 
 		private readonly Scope parent;
@@ -28,6 +52,11 @@ namespace CobaltAHK.ExpressionTree
 
 		public void AddFunction(string name, LambdaExpression func) {
 			functions[name.ToLower()] = func;
+		}
+
+		public bool HasFunction(string name)
+		{
+			return functions.ContainsKey(name.ToLower());
 		}
 
 		public LambdaExpression ResolveFunction(string name)
@@ -55,7 +84,6 @@ namespace CobaltAHK.ExpressionTree
 			}
 			return variables[name.ToLower()];
 		}
-		// todo: RootScope() initialized with builtin functions and commands
 	}
 
 	public class FunctionNotFoundException : System.Exception
