@@ -528,6 +528,9 @@ namespace CobaltAHK
 				var value = ParseExpressionChain(lexer, new[] { Token.Comma, Token.CloseBrace }).ToExpression();
 
 				dict[key] = value;
+				if (lexer.PeekToken() == Token.Comma) {
+					lexer.GetToken();
+				}
 				token = lexer.PeekToken();
 			}
 			AssertToken(lexer.GetToken(), Token.CloseBrace);
