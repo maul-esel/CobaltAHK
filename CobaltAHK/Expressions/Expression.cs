@@ -33,6 +33,8 @@ namespace CobaltAHK.Expressions
 
 		private readonly Syntax.Directive directive;
 
+		public Syntax.Directive Directive { get { return directive; } }
+
 		private readonly IEnumerable<ValueExpression> parameters;
 
 #if DEBUG
