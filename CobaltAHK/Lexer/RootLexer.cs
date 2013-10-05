@@ -54,7 +54,7 @@ namespace CobaltAHK
 		private Token ReadTextToken()
 		{
 			char ch = reader.Peek();
-			if (!IsIdChar(ch) || IsNumeric(ch)) {
+			if (!IsIdChar(ch) || IsDigit(ch)) {
 				throw new LexerException(reader.Position, ch.ToString()); // todo: type
 			}
 

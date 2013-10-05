@@ -98,7 +98,7 @@ namespace CobaltAHK
 					}
 					// todo: operators & | ^ && || ...
 				default:
-					if (IsNumeric(ch)) {
+					if (IsDigit(ch)) {
 						return ReadNumber();
 					}
 					return ReadIdOrOperator();
@@ -108,7 +108,7 @@ namespace CobaltAHK
 		private Token ReadIdOrOperator()
 		{
 			char ch = reader.Peek();
-			if (IsNumeric(ch)) {
+			if (IsDigit(ch)) {
 				throw new LexerException(reader.Position); // todo: type
 			}
 
@@ -163,14 +163,14 @@ namespace CobaltAHK
 			// todo: support binary and octal, as #AHKv2 does
 
 			char first = reader.Peek();
-			if (!IsNumeric(first)) {
+			if (!IsDigit(first)) {
 				throw new InvalidNumberException(reader.Position);
 			}
 
 			int i = 1, dec = -1, exp = -1, minus = -1;
 			bool hex = false;
 			var number = ReadUntilTerminators(numberTerminators, false, ch => {
-				if (!IsNumeric(ch)) {
+				if (!IsDigit(ch)) {
 					if (ch == 'x' && i == 2 && first == '0') { // a hexadecimal integer (i == 2 implies !dec)
 						hex = true;
 					} else if (ch == '.' && i > 1 && !hex) { // a decimal (or scientific)

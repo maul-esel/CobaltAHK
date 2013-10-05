@@ -17,10 +17,9 @@ namespace CobaltAHK
 
 		#region type checks
 
-		// todo: consider using builtin System.Char methods
-		protected bool IsNumeric(char ch)
+		protected bool IsDigit(char ch)
 		{
-			return ch >= '0' && ch <= '9';
+			return ch >= '0' && ch <= '9'; // cannot use char.IsDigit() here!
 		}
 
 		protected bool IsAlpha(char ch)
@@ -30,7 +29,7 @@ namespace CobaltAHK
 
 		protected bool IsAlphaNumeric(char ch)
 		{
-			return IsAlpha(ch) || IsNumeric(ch);
+			return IsAlpha(ch) || IsDigit(ch);
 		}
 
 		private char[] whitespace = new[] { ' ', '\t' };
