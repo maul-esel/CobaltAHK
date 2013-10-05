@@ -45,7 +45,7 @@ namespace CobaltAHK.ExpressionTree
 
 		public void AddVariable(string name, ParameterExpression variable)
 		{
-			variables.Add(name.ToLower(), variable);
+			variables[name.ToLower()] = variable;
 		}
 
 		public ParameterExpression ResolveVariable(string name)
