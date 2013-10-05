@@ -9,9 +9,6 @@ namespace CobaltAHK
 			True,
 			False,
 
-			A_Space,
-			A_Tab,
-
 			A_WorkingDir,
 			A_ScriptDir,
 			A_ScriptName,
@@ -23,7 +20,6 @@ namespace CobaltAHK
 			A_ThisLabel,
 			A_AhkVersion,
 			A_AhkPath,
-			A_IsUnicode,
 			A_IsCompiled,
 			A_ExitReason,
 
