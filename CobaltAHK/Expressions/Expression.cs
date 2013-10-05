@@ -66,7 +66,20 @@ namespace CobaltAHK.Expressions
 
 	public class FunctionCallExpression : ValueExpression
 	{
-		public FunctionCallExpression(SourcePosition pos, string name, IEnumerable<ValueExpression> parameters) : base(pos) { }
+		public FunctionCallExpression(SourcePosition pos, string funcName, IEnumerable<ValueExpression> prms)
+		: base(pos)
+		{
+			name = funcName;
+			parameters = prms;
+		}
+
+		private readonly string name;
+
+		public string Name { get { return name; } }
+
+		private readonly IEnumerable<ValueExpression> parameters;
+
+		public IEnumerable<ValueExpression> Parameters { get { return parameters; } }
 	}
 
 	#region variables
