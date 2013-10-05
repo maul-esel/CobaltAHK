@@ -83,4 +83,10 @@
       </Properties>
     </MonoDevelop>
   </ProjectExtensions>
+  <ItemGroup>
+    <ProjectReference Include="..\IronAHK\Rusty\Rusty.csproj">
+      <Project>{818030A8-5FFE-4CA1-8248-0940C72EA47A}</Project>
+      <Name>Rusty</Name>
+    </ProjectReference>
+  </ItemGroup>
 </Project>

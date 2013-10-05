@@ -1,0 +1,3 @@
+[submodule "IronAHK"]
+	path = IronAHK
+	url = https://github.com/maul-esel/IronAHK.git
