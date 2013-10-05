@@ -42,7 +42,8 @@ namespace CobaltAHK
 
 		protected bool IsIdChar(char ch)
 		{
-			return IsAlphaNumeric(ch) || ch == '#' || ch == '_' || ch == '@' || ch == '$';
+			return IsAlphaNumeric(ch) || ch == '_';
+
 		}
 
 		#endregion
