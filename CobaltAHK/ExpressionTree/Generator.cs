@@ -19,6 +19,8 @@ namespace CobaltAHK.ExpressionTree
 				return GenerateFunctionDefinition((FunctionDefinitionExpression)expr, scope, settings);
 			} else if (expr is ClassDefinitionExpression) {
 				// todo
+			} else if (expr is StringLiteralExpression) {
+				return DLR.Expression.Constant(((StringLiteralExpression)expr).String);
 			}
 			throw new NotImplementedException();
 		}

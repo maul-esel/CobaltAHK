@@ -9,7 +9,15 @@ namespace CobaltAHK.Expressions
 
 	public class StringLiteralExpression : ValueLiteralExpression
 	{
-		public StringLiteralExpression(SourcePosition pos, string val) : base(pos) { }
+		public StringLiteralExpression(SourcePosition pos, string val)
+		: base(pos)
+		{
+			str = val;
+		}
+
+		private readonly string str;
+
+		public string String { get { return str; } }
 	}
 
 	public class NumberLiteralExpression : ValueLiteralExpression
