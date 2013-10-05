@@ -50,7 +50,6 @@
     <Compile Include="Operator.cs" />
     <Compile Include="Expressions\Expression.cs" />
     <Compile Include="Expressions\ExpressionChain.cs" />
-    <Compile Include="Expressions\Traditional.cs" />
     <Compile Include="SourcePosition.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="Expressions\Literals.cs" />

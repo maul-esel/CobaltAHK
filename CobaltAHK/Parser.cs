@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 
 using CobaltAHK.Expressions;
-using Traditional = CobaltAHK.Expressions.Traditional;
 
 namespace CobaltAHK
 {
@@ -98,7 +97,7 @@ namespace CobaltAHK
 
 		#endregion
 
-		private CommandCallExpression ParseCommand(Lexer lexer, IdToken command)
+		private FunctionCallExpression ParseCommand(Lexer lexer, IdToken command)
 		{
 			lexer.PushState(Lexer.State.Traditional);
 			if (lexer.PeekToken() == Token.Comma) {
@@ -107,7 +106,7 @@ namespace CobaltAHK
 
 			var parameters = ParseParameters(lexer);
 			lexer.PopState();
-			return new CommandCallExpression(lexer.Position, command.Text, parameters);
+			return new FunctionCallExpression(lexer.Position, command.Text, parameters);
 		}
 
 		private DirectiveExpression ParseDirective(Lexer lexer)
@@ -213,80 +212,49 @@ namespace CobaltAHK
 
 		#region traditional
 
-		private IEnumerable<Traditional.SimpleExpression> ValidateDirectiveParams(IEnumerable<Traditional.Expression> parameters, Syntax.Directive directive)
+		private IEnumerable<ValueExpression> ValidateDirectiveParams(IEnumerable<ValueExpression> parameters, Syntax.Directive directive)
 		{
-			var list = new List<Traditional.SimpleExpression>();
+			var list = new List<ValueExpression>();
 
 			foreach (var param in parameters) {
-				if (param is Traditional.ForceExpressionExpression) {
-					throw new Exception(); // todo
-
-				} else if (param is Traditional.CustomVariableExpression) {
-					throw new Exception(); // todo
-
-				} else if (param is Traditional.BuiltinVariableExpression) {
+				if (param is BuiltinVariableExpression) {
 					if (directive != Syntax.Directive.Include) {
 						throw new Exception(); // todo
 					}
 
-					var variable = (Traditional.BuiltinVariableExpression)param;
+					var variable = (BuiltinVariableExpression)param;
 					if (!variable.Variable.IsAllowedInInclude()) {
 						throw new Exception(); // todo
 					}
 
-				} else if (param is Traditional.CombinedStringExpression) {
-					ValidateDirectiveParams(((Traditional.CombinedStringExpression)param).Expressions, directive);
+				} else if (param is BinaryExpression && ((BinaryExpression)param).Operator == Operator.Concatenate) { // (implicit, traditional) concat
+					ValidateDirectiveParams(((BinaryExpression)param).Expressions, directive);
+
+				} else {
+					throw new Exception(); // todo
 				}
 
-				list.Add((Traditional.SimpleExpression)param);
+				list.Add(param);
 			}
 
 			return list.ToArray();
 		}
 
-		private Traditional.VariableExpression GetVariableTraditional(VariableToken token, SourcePosition pos)
-		{
-			if (Syntax.IsBuiltinVariable(token.Text)) {
-				return new Traditional.BuiltinVariableExpression(pos, Syntax.GetBuiltinVariable(token.Text));
-			} else {
-				return new Traditional.CustomVariableExpression(pos, token.Text);
-			}
-		}
-
-		private static bool IsEmptyString(Traditional.SimpleExpression expr)
-		{
-			return expr is Traditional.StringExpression && ((Traditional.StringExpression)expr).String.Trim() == String.Empty;
-		}
-
-		private Traditional.SimpleExpression CombineTraditionalExpressions(Traditional.SimpleExpression currentExpr, Traditional.SimpleExpression newExpr)
-		{
-			if (currentExpr == null) {
-				return IsEmptyString(newExpr) ? null : newExpr;
-
-			} else if (currentExpr is Traditional.CombinedStringExpression) {
-				((Traditional.CombinedStringExpression)currentExpr).Append(newExpr);
-				return currentExpr;
-
-			} else {
-				return new Traditional.CombinedStringExpression(currentExpr.Position, new[] { currentExpr, newExpr });
-			}
-		}
-
-		private Traditional.Expression[] ParseParameters(Lexer lexer)
+		private ValueExpression[] ParseParameters(Lexer lexer)
 		{
 			lexer.PushState(Lexer.State.Traditional);
-			var list = new List<Traditional.Expression>();
+			var list = new List<ValueExpression>();
 
 			var token = lexer.PeekToken();
-			Traditional.Expression currentParam = null;
+			ExpressionChain currentParam = new ExpressionChain();
 			while (true) {
 				bool consumed = false;
 				if (token == Token.EOF || token is SingleCommentToken) {
-					if (currentParam == null && list.Count > 0) { // throw, but not if there are no params at all
+					if (currentParam.Length == 0 && list.Count > 0) { // throw, but not if there are no params at all
 						throw new Exception(); // todo
 
-					} else if (currentParam != null) {
-						list.Add(currentParam);
+					} else if (currentParam.Length > 0) {
+						list.Add(currentParam.ToExpression());
 					}
 
 					currentParam = null;
@@ -299,13 +267,13 @@ namespace CobaltAHK
 					var pos = lexer.Position;
 					bool concat = lexer.PeekToken() == Token.Comma; // todo: concat with a comment in between // possibly: expression queue
 
-					if (currentParam == null && !concat && list.Count > 0) { // throw, but not if there are no params at all
+					if (currentParam.Length == 0 && !concat && list.Count > 0) { // throw, but not if there are no params at all
 						throw new Exception(); // todo
 					}
 
 					if (!concat) {
-						if (currentParam != null) {
-							list.Add(currentParam);
+						if (currentParam.Length > 0) {
+							list.Add(currentParam.ToExpression());
 							currentParam = null;
 						}
 
@@ -316,30 +284,36 @@ namespace CobaltAHK
 					}
 
 				} else if (token == Token.Comma) {
-					list.Add(currentParam); // appends NULL for empty parameters
-					currentParam = null;
+					if (currentParam.Length == 0) {
+						list.Add(null); // append NULL for empty parameters
+					} else {
+						list.Add(currentParam.ToExpression());
+					}
+					currentParam = new ExpressionChain();
 
 				} else if (token == Token.ForceExpression) {
-					if (currentParam != null) {
+					if (currentParam.Length > 0) {
 						throw new Exception("ForceExpression must be first"); // todo
 					}
 
 					lexer.GetToken();
 					consumed = true;
 
-					var expr = ParseExpressionChain(lexer, new[] { Token.Comma }).ToExpression();
-					currentParam = new Traditional.ForceExpressionExpression(lexer.Position, expr);
+					currentParam.Append(ParseExpressionChain(lexer, new[] { Token.Comma }).ToExpression());
 
 				} else if (token is TraditionalStringToken) {
-					// todo: ensure currentParam is not ForceExpressionExpression
+					// todo: ensure currentParam is not forced expression
 					var str = (TraditionalStringToken)token;
-					var expr = new Traditional.StringExpression(lexer.Position, str.Text);
-					currentParam = CombineTraditionalExpressions((Traditional.SimpleExpression)currentParam, expr);
+					if (str.Text.Trim() == String.Empty && currentParam.Length == 0) {
+						continue; // ignore leading whitespace
+					}
+					var expr = new StringLiteralExpression(lexer.Position, str.Text);
+					currentParam.Append(expr);
 
 				} else if (token is VariableToken) {
-					// todo: ensure currentParam is not ForceExpressionExpression
-					var expr = GetVariableTraditional((VariableToken)token, lexer.Position);
-					currentParam = CombineTraditionalExpressions((Traditional.SimpleExpression)currentParam, expr);
+					// todo: ensure currentParam is not forced expression
+					var expr = GetVariable(((VariableToken)token).Text, lexer.Position);
+					currentParam.Append(expr);
 
 				} else {
 					throw new Exception("unsupported token: " + token); // todo

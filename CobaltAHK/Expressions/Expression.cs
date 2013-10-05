@@ -24,7 +24,7 @@ namespace CobaltAHK.Expressions
 
 	public class DirectiveExpression : Expression
 	{
-		public DirectiveExpression(SourcePosition pos, Syntax.Directive dir, IEnumerable<Traditional.SimpleExpression> prms)
+		public DirectiveExpression(SourcePosition pos, Syntax.Directive dir, IEnumerable<ValueExpression> prms)
 		: base(pos)
 		{
 			directive = dir;
@@ -33,7 +33,7 @@ namespace CobaltAHK.Expressions
 
 		private readonly Syntax.Directive directive;
 
-		private readonly IEnumerable<Traditional.SimpleExpression> parameters;
+		private readonly IEnumerable<ValueExpression> parameters;
 
 #if DEBUG
 		public override string ToString()
@@ -50,11 +50,6 @@ namespace CobaltAHK.Expressions
 	public class IfDirectiveExpression : Expression
 	{
 		public IfDirectiveExpression(SourcePosition pos, ValueExpression cond) : base(pos) { }
-	}
-
-	public class CommandCallExpression : Expression
-	{
-		public CommandCallExpression(SourcePosition pos, string name, IEnumerable<Traditional.Expression> parameters) : base(pos) { }
 	}
 
 	#region value expressions
