@@ -13,6 +13,8 @@ namespace CobaltAHK.ExpressionTree
 				return GenerateFunctionCall((FunctionCallExpression)expr, scope, settings);
 			} else if (expr is FunctionDefinitionExpression) {
 				return GenerateFunctionDefinition((FunctionDefinitionExpression)expr, scope, settings);
+			} else if (expr is CustomVariableExpression) {
+				return scope.ResolveVariable(((CustomVariableExpression)expr).Name);
 			} else if (expr is StringLiteralExpression) {
 				return DLR.Expression.Constant(((StringLiteralExpression)expr).String);
 			} else if (expr is NumberLiteralExpression) {
