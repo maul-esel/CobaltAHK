@@ -7,21 +7,21 @@ namespace CobaltAHK.ExpressionTree
 {
 	public static class Generator
 	{
-		public static DLR.Expression Generate(Expression expr, Scope scope)
+		public static DLR.Expression Generate(Expression expr, Scope scope, ScriptSettings settings)
 		{
 			if (expr is DirectiveExpression) {
 				// todo
 			} else if (expr is CommandCallExpression) {
 				// todo
 			} else if (expr is FunctionDefinitionExpression) {
-				return GenerateFunctionDefinition((FunctionDefinitionExpression)expr, scope);
+				return GenerateFunctionDefinition((FunctionDefinitionExpression)expr, scope, settings);
 			} else if (expr is ClassDefinitionExpression) {
 				// todo
 			}
 			throw new NotImplementedException();
 		}
 
-		private static DLR.Expression GenerateFunctionDefinition(FunctionDefinitionExpression func, Scope scope)
+		private static DLR.Expression GenerateFunctionDefinition(FunctionDefinitionExpression func, Scope scope, ScriptSettings settings)
 		{
 			var funcScope = new Scope();
 
@@ -40,7 +40,7 @@ namespace CobaltAHK.ExpressionTree
 
 			var funcBody = new List<DLR.Expression>();
 			foreach (var e in func.Body) {
-				funcBody.Add(Generate(e, funcScope));
+				funcBody.Add(Generate(e, funcScope, settings));
 			}
 
 			var funcType = DLR.Expression.GetFuncType(types.ToArray());
