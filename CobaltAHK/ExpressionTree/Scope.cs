@@ -11,10 +11,10 @@ namespace CobaltAHK.ExpressionTree
 		public Scope(Scope parentScope) {
 			parent = parentScope;
 #if DEBUG
-			var msgbox = Expression.Lambda<Action>(
-				Expression.Block(
-					Expression.Call(typeof(IronAHK.Rusty.Core).GetMethod("MsgBox", new[] { typeof(string) }), Expression.Constant("MSGBOX dummy"))
-				)
+			var param = Expression.Parameter(typeof(string), "str");
+			var msgbox = Expression.Lambda<Action<string>>(
+				Expression.Call(typeof(IronAHK.Rusty.Core).GetMethod("MsgBox", new[] { typeof(string) }), param),
+				param
 			);
 			AddFunction("MsgBox", msgbox);
 #endif
