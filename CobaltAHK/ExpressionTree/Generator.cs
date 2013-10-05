@@ -9,16 +9,10 @@ namespace CobaltAHK.ExpressionTree
 	{
 		public static DLR.Expression Generate(Expression expr, Scope scope, ScriptSettings settings)
 		{
-			if (expr is DirectiveExpression) {
-				// todo
-			} else if (expr is CommandCallExpression) {
-				// todo
-			} else if (expr is FunctionCallExpression) {
+			if (expr is FunctionCallExpression) {
 				return GenerateFunctionCall((FunctionCallExpression)expr, scope, settings);
 			} else if (expr is FunctionDefinitionExpression) {
 				return GenerateFunctionDefinition((FunctionDefinitionExpression)expr, scope, settings);
-			} else if (expr is ClassDefinitionExpression) {
-				// todo
 			} else if (expr is StringLiteralExpression) {
 				return DLR.Expression.Constant(((StringLiteralExpression)expr).String);
 			}
