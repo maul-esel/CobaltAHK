@@ -29,12 +29,16 @@ namespace CobaltAHK.ExpressionTree
 			var types = new List<Type>(prms.Count + 1);
 
 			foreach (var p in func.Parameters) {
-				// todo: default values and modifiers (warning: ParameterExpression.IsByRef can't help here :( )
+				// todo: default values
 				var param = DLR.Expression.Parameter(typeof(object), p.Name);
 				prms.Add(param);
 				funcScope.AddVariable(p.Name, param);
 
-				types.Add(typeof(object));
+				var type = typeof(object);
+				if (p.Modifier.HasFlag(Syntax.ParameterModifier.ByRef)) {
+					type = type.MakeByRefType();
+				}
+				types.Add(type);
 			}
 			types.Add(typeof(object)); // return value
 
