@@ -28,9 +28,9 @@ namespace CobaltAHK.ExpressionTree
 		{
 			var lambda = scope.ResolveFunction(func.Name);
 
-			var prms = new List<DLR.Expression>();
-			foreach (var p in func.Parameters) {
-				prms.Add(Generate(p, scope, settings));
+			var prms = func.Parameters.Select(p => Generate(p, scope, settings)).ToList();
+			if (lambda.Parameters.Count != prms.Count()) {
+				throw new Exception(); // todo
 			}
 
 			return DLR.Expression.Invoke(lambda, prms);
