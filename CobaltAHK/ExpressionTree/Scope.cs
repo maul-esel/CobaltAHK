@@ -10,7 +10,22 @@ namespace CobaltAHK.ExpressionTree
 
 		public Scope(Scope parentScope) {
 			parent = parentScope;
+#if DEBUG
+			var msgbox = Expression.Lambda<Action>(
+				Expression.Block(
+					Expression.Call(typeof(Scope).GetMethod("MsgBox", new[] { typeof(string) }), Expression.Constant("MSGBOX dummy"))
+				)
+			);
+			AddFunction("MsgBox", msgbox);
+#endif
 		}
+
+#if DEBUG
+		public static void MsgBox(string text)
+		{
+			Console.WriteLine(text);
+		}
+#endif
 
 		private readonly Scope parent;
 
@@ -47,7 +62,6 @@ namespace CobaltAHK.ExpressionTree
 			}
 			return variables[name.ToLower()];
 		}
-
 		// todo: RootScope() initialized with builtin functions and commands
 	}
 }
