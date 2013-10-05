@@ -672,7 +672,7 @@ namespace CobaltAHK
 			AssertToken(lexer.GetToken(), Token.Newline); // todo: is newline enforced?
 
 			var body = new List<Expression>();
-			lexer.PushState(Lexer.State.Root); // this should allow nested functions - must be properly handled or disallowed
+			lexer.PushState(Lexer.State.Root);
 
 			var token = lexer.PeekToken();
 			while (token != Token.CloseBrace) {
@@ -685,7 +685,10 @@ namespace CobaltAHK
 					continue;
 				}
 
-				body.Add(ParseExpression(lexer)); // consumes tokens
+				var expr = ParseExpression(lexer); // consumes tokens
+				ValidateExpressionInDefinition(expr);
+				body.Add(expr);
+
 				token = lexer.PeekToken();
 			}
 			lexer.GetToken(); // swallow the closing brace
@@ -693,6 +696,14 @@ namespace CobaltAHK
 
 			lexer.PopState();
 			return body.ToArray();
+		}
+
+		private void ValidateExpressionInDefinition(Expression expr)
+		{
+			if (expr is DirectiveExpression) {
+				throw new Exception(); // todo
+			}
+			// this currently allows nested functions and classes - must be properly handled or disallowed
 		}
 
 		#endregion
