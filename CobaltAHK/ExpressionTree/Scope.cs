@@ -13,19 +13,12 @@ namespace CobaltAHK.ExpressionTree
 #if DEBUG
 			var msgbox = Expression.Lambda<Action>(
 				Expression.Block(
-					Expression.Call(typeof(Scope).GetMethod("MsgBox", new[] { typeof(string) }), Expression.Constant("MSGBOX dummy"))
+					Expression.Call(typeof(IronAHK.Rusty.Core).GetMethod("MsgBox", new[] { typeof(string) }), Expression.Constant("MSGBOX dummy"))
 				)
 			);
 			AddFunction("MsgBox", msgbox);
 #endif
 		}
-
-#if DEBUG
-		public static void MsgBox(string text)
-		{
-			Console.WriteLine(text);
-		}
-#endif
 
 		private readonly Scope parent;
 
