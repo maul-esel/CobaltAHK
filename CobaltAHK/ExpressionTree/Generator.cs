@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using DLR = System.Linq.Expressions;
 using CobaltAHK.Expressions;
 
@@ -41,6 +42,7 @@ namespace CobaltAHK.ExpressionTree
 
 			var prms = new List<DLR.ParameterExpression>();
 			var types = new List<Type>(prms.Count + 1);
+			var funcBody = new List<DLR.Expression>();
 
 			foreach (var p in func.Parameters) {
 				// todo: default values
@@ -54,18 +56,47 @@ namespace CobaltAHK.ExpressionTree
 				}
 				types.Add(type);
 			}
-			types.Add(typeof(void)); // return value
+			types.Add(typeof(object)); // return value
 
-			var funcBody = new List<DLR.Expression>();
+			var endOfFunc = DLR.Expression.Label(typeof(object));
 			foreach (var e in func.Body) {
-				funcBody.Add(Generate(e, funcScope, settings));
+				DLR.Expression expr;
+				if (IsReturn(e)) {
+					expr = MakeReturn((FunctionCallExpression)e, scope, settings, funcBody, endOfFunc);
+				} else {
+					expr = Generate(e, funcScope, settings);
+				}
+				funcBody.Add(expr);
 			}
+			funcBody.Add(DLR.Expression.Label(endOfFunc, DLR.Expression.Constant(null))); // default return value is null
 
-			var funcType = DLR.Expression.GetFuncType(types.ToArray());
-			var function = DLR.Expression.Lambda(funcType, DLR.Expression.Block(funcBody), func.Name, prms); // todo: use Label instead of Block? (see dlr-overview p. 35)
-			scope.AddFunction(func.Name, function); // todo: can't call itself, because body is generated before function is complete
+			var function = DLR.Expression.Lambda(
+				DLR.Expression.GetFuncType(types.ToArray()),
+				DLR.Expression.Block(prms, funcBody),
+				func.Name,
+				prms
+			);
+
+			scope.AddFunction(func.Name, function);
 
 			return function;
+		}
+
+		private static bool IsReturn(Expression expr)
+		{
+			return expr is FunctionCallExpression && ((FunctionCallExpression)expr).Name.ToLower() == "return";
+		}
+
+		private static DLR.Expression MakeReturn(FunctionCallExpression expr, Scope scope, ScriptSettings settings, IList<DLR.Expression> body, DLR.LabelTarget target)
+		{
+			var prms = expr.Parameters.ToArray();
+			if (prms.Length == 0) {
+				return DLR.Expression.Return(target);
+			}
+			for (var i = 0; i < prms.Length - 1; i++) {
+				body.Add(Generate(prms[i], scope, settings));
+			}
+			return DLR.Expression.Return(target, Generate(prms[prms.Length - 1], scope, settings));
 		}
 	}
 }
