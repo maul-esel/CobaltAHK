@@ -38,7 +38,7 @@ namespace CobaltAHK.ExpressionTree
 			} else if (parent != null) {
 				return parent.ResolveFunction(name);
 			}
-			throw new Exception(); // todo
+			throw new FunctionNotFoundException(name);
 		}
 
 		private readonly IDictionary<string, ParameterExpression> variables = new Dictionary<string, ParameterExpression>();
@@ -56,5 +56,10 @@ namespace CobaltAHK.ExpressionTree
 			return variables[name.ToLower()];
 		}
 		// todo: RootScope() initialized with builtin functions and commands
+	}
+
+	public class FunctionNotFoundException : System.Exception
+	{
+		public FunctionNotFoundException(string func) : base("Function '" + func + "' was not found!") { }
 	}
 }
