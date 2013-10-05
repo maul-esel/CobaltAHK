@@ -32,7 +32,6 @@ namespace CobaltAHK.ExpressionTree
 			if (lambda.Parameters.Count != prms.Count()) {
 				throw new Exception(); // todo
 			}
-
 			return DLR.Expression.Invoke(lambda, prms);
 		}
 
@@ -96,7 +95,8 @@ namespace CobaltAHK.ExpressionTree
 			for (var i = 0; i < prms.Length - 1; i++) {
 				body.Add(Generate(prms[i], scope, settings));
 			}
-			return DLR.Expression.Return(target, Generate(prms[prms.Length - 1], scope, settings));
+			var val = Generate(prms[prms.Length - 1], scope, settings);
+			return DLR.Expression.Return(target, DLR.Expression.Convert(val, typeof(object)));
 		}
 	}
 }
