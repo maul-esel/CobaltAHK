@@ -65,7 +65,7 @@ namespace CobaltAHK.ExpressionTree
 
 		private static DLR.Expression GenerateFunctionDefinition(FunctionDefinitionExpression func, Scope scope, ScriptSettings settings)
 		{
-			var funcScope = new Scope();
+			var funcScope = new FunctionScope(scope);
 
 			var prms = new List<DLR.ParameterExpression>();
 			var types = new List<Type>(prms.Count + 1);
