@@ -80,10 +80,59 @@ namespace CobaltAHK.ExpressionTree
 
 		public virtual ParameterExpression ResolveVariable(string name)
 		{
-			if (!variables.ContainsKey(name.ToLower())) {
+			if (!HasVariable(name)) {
+				if (parent != null) {
+					return parent.ResolveVariable(name);
+				}
 				AddVariable(name, Expression.Parameter(typeof(object), name));
 			}
 			return variables[name.ToLower()];
+		}
+
+		public virtual Expression ResolveBuiltinVariable(Syntax.BuiltinVariable variable)
+		{
+			// todo: Expression.Dynamic
+			throw new NotImplementedException();
+		}
+	}
+
+	public class FunctionScope : Scope
+	{
+		public FunctionScope(Scope parent) : base(parent) { }
+
+		public override ParameterExpression ResolveVariable(string name) // override, because we can't just use parent scope vars
+		{
+			if (!HasVariable(name)) {
+				// todo: except if declared as global / caller, or super-global
+				AddVariable(name, Expression.Parameter(typeof(object), name));
+			}
+			return variables[name.ToLower()];
+		}
+	}
+
+	public class LoopScope : Scope
+	{
+		public LoopScope(Scope parent) : base(parent) { }
+
+		public override Expression ResolveBuiltinVariable(Syntax.BuiltinVariable variable)
+		{
+			if (variable == Syntax.BuiltinVariable.A_Index) {
+				// todo
+			}
+			return base.ResolveBuiltinVariable(variable);
+		}
+	}
+
+	public class LoopFilesScope : LoopScope
+	{
+		public LoopFilesScope(Scope parent) : base(parent) { }
+
+		public override Expression ResolveBuiltinVariable(Syntax.BuiltinVariable variable)
+		{
+			if (variable == Syntax.BuiltinVariable.A_LoopFileName) { // todo: etc.
+				// todo
+			}
+			return base.ResolveBuiltinVariable(variable);
 		}
 	}
 
