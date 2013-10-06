@@ -28,13 +28,8 @@ namespace CobaltAHK.ExpressionTree
 					continue; // skips byRef and overloads // todo: support overloads!
 				}
 
-				var prms = new List<ParameterExpression>(paramList.Length);
-				var types = new List<Type>(paramList.Length + 1);
-
-				foreach (var p in paramList) {
-					prms.Add(Expression.Parameter(p.ParameterType, p.Name));
-					types.Add(p.ParameterType);
-				}
+				var prms  = paramList.Select(p => Expression.Parameter(p.ParameterType, p.Name)).ToArray();
+				var types = paramList.Select(p => p.ParameterType).ToList();
 				types.Add(method.ReturnType);
 
 				var lambda = Expression.Lambda(Expression.GetFuncType(types.ToArray()),
