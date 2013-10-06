@@ -24,9 +24,10 @@ namespace CobaltAHK.ExpressionTree
 			var methods = typeof(IronAHK.Rusty.Core).GetMethods(flags);
 
 			foreach (var method in methods) {
+				// todo: filter by attribute?
 				var paramList = method.GetParameters();
 				if (HasFunction(method.Name) || paramList.Any(p => p.ParameterType.IsByRef)) {
-					continue; // skips byRef and overloads // todo: support overloads!
+					continue; // skips byRef and overloads // todo: support both!
 				}
 
 				var prms  = paramList.Select(p => Expression.Parameter(p.ParameterType, p.Name)).ToArray();
@@ -70,6 +71,7 @@ namespace CobaltAHK.ExpressionTree
 
 		public virtual void AddVariable(string name, ParameterExpression variable)
 		{
+			// todo: add VariableScope param; depending on it add it on parent scope or here (and override)
 			variables[name.ToLower()] = variable;
 		}
 
@@ -94,6 +96,11 @@ namespace CobaltAHK.ExpressionTree
 			// todo: Expression.Dynamic
 			throw new NotImplementedException();
 		}
+
+		public virtual void OverrideBuiltinVariable(Syntax.BuiltinVariable variable, ParameterExpression value) // used for A_Index etc.
+		{
+			// todo
+		}
 	}
 
 	public class FunctionScope : Scope
@@ -103,7 +110,7 @@ namespace CobaltAHK.ExpressionTree
 		public override ParameterExpression ResolveVariable(string name) // override, because we can't just use parent scope vars
 		{
 			if (!HasVariable(name)) {
-				// todo: except if declared as global / caller, or super-global
+				// todo: except if declared as global / caller, or super-global in ancestor scope
 				AddVariable(name, Expression.Parameter(typeof(object), name));
 			}
 			return variables[name.ToLower()];
