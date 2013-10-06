@@ -73,6 +73,11 @@ namespace CobaltAHK.ExpressionTree
 			variables[name.ToLower()] = variable;
 		}
 
+		protected virtual bool HasVariable(string name)
+		{
+			return variables.ContainsKey(name.ToLower());
+		}
+
 		public virtual ParameterExpression ResolveVariable(string name)
 		{
 			if (!variables.ContainsKey(name.ToLower())) {
