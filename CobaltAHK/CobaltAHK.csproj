@@ -65,6 +65,7 @@
     <Compile Include="Lexer\State.cs" />
     <Compile Include="ExpressionTree\ScriptSettings.cs" />
     <Compile Include="CobaltAHKObject.cs" />
+    <Compile Include="Syntax\VariableScope.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
