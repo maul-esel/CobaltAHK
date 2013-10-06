@@ -13,7 +13,8 @@ namespace CobaltAHK.ExpressionTree
 			LoadBuiltinFunctions();
 		}
 
-		public Scope(Scope parentScope) {
+		public Scope(Scope parentScope)
+		{
 			parent = parentScope;
 		}
 
@@ -39,24 +40,24 @@ namespace CobaltAHK.ExpressionTree
 			}
 		}
 
-		private readonly Scope parent;
+		protected readonly Scope parent;
 
 		public bool IsRoot { get { return parent == null; } }
 
-		private readonly IDictionary<string, LambdaExpression> functions = new Dictionary<string, LambdaExpression>();
+		protected readonly IDictionary<string, LambdaExpression> functions = new Dictionary<string, LambdaExpression>();
 
-		public void AddFunction(string name, LambdaExpression func) {
+		public virtual void AddFunction(string name, LambdaExpression func) {
 			functions[name.ToLower()] = func;
 		}
 
-		public bool HasFunction(string name)
+		protected virtual bool HasFunction(string name)
 		{
 			return functions.ContainsKey(name.ToLower());
 		}
 
-		public LambdaExpression ResolveFunction(string name)
+		public virtual LambdaExpression ResolveFunction(string name)
 		{
-			if (functions.ContainsKey(name.ToLower())) {
+			if (HasFunction(name)) {
 				return functions[name.ToLower()];
 
 			} else if (parent != null) {
@@ -65,14 +66,14 @@ namespace CobaltAHK.ExpressionTree
 			throw new FunctionNotFoundException(name);
 		}
 
-		private readonly IDictionary<string, ParameterExpression> variables = new Dictionary<string, ParameterExpression>();
+		protected readonly IDictionary<string, ParameterExpression> variables = new Dictionary<string, ParameterExpression>();
 
-		public void AddVariable(string name, ParameterExpression variable)
+		public virtual void AddVariable(string name, ParameterExpression variable)
 		{
 			variables[name.ToLower()] = variable;
 		}
 
-		public ParameterExpression ResolveVariable(string name)
+		public virtual ParameterExpression ResolveVariable(string name)
 		{
 			if (!variables.ContainsKey(name.ToLower())) {
 				AddVariable(name, Expression.Parameter(typeof(object), name));
