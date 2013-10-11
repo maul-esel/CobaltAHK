@@ -186,6 +186,7 @@ namespace CobaltAHK
 						throw new InvalidNumberException(reader.Position, ch.ToString());
 					}
 				}
+				i++;
 			});
 
 			// catch unterminated hex ("0x") or dec (e.g. "12.") or scientific (e.g. "12.3e" or "12.3e-")
