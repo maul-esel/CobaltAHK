@@ -164,16 +164,43 @@ namespace CobaltAHK.ExpressionTree
 
 		private static DLR.Expression GenerateBinaryExpression(DLR.Expression left, Operator op, DLR.Expression right)
 		{
+			// todo: correct conversion workaround for math operations
+
 			if (op == Operator.Concatenate) {
 				var concat = typeof(string).GetMethod("Concat", new[] { typeof(string), typeof(string) });
 				return DLR.Expression.Call(concat, MakeString(left), MakeString(right));
 
-			} else if (op == Operator.Assign) {
-				return DLR.Expression.Assign(left, DLR.Expression.Convert(right, left.Type));
-
 			} else if (op == Operator.ConcatenateAssign) {
 				return GenerateBinaryExpression(left, Operator.Assign, GenerateBinaryExpression(left, Operator.Concatenate, right)); // `a .= b` <=> `a := a . b`
+
+			} else if (op == Operator.Add) {
+				return DLR.Expression.Add(DLR.Expression.Convert(left, right.Type), right);
+
+			} else if (op == Operator.AddAssign) {
+				return DLR.Expression.AddAssign(DLR.Expression.Convert(left, right.Type), right);
+
+			} else if (op == Operator.Subtract) {
+				return DLR.Expression.Subtract(DLR.Expression.Convert(left, right.Type), right);
+
+			} else if (op == Operator.SubtractAssign) {
+				return DLR.Expression.SubtractAssign(DLR.Expression.Convert(left, right.Type), right);
+
+			} else if (op == Operator.Multiply) {
+				return DLR.Expression.Multiply(DLR.Expression.Convert(left, right.Type), right);
+
+			} else if (op == Operator.MultiplyAssign) {
+				return DLR.Expression.MultiplyAssign(DLR.Expression.Convert(left, right.Type), right);
+
+			} else if (op == Operator.TrueDivide) {
+				return DLR.Expression.Divide(DLR.Expression.Convert(left, right.Type), right);
+
+			} else if (op == Operator.TrueDivideAssign) {
+				return DLR.Expression.DivideAssign(DLR.Expression.Convert(left, right.Type), right);
+
+			} else if (op == Operator.Assign) {
+				return DLR.Expression.Assign(left, DLR.Expression.Convert(right, left.Type));
 			}
+
 			throw new NotImplementedException();
 		}
 
