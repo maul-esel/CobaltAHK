@@ -71,7 +71,7 @@ namespace CobaltAHK.ExpressionTree
 			if (HasFunction(name)) {
 				return functions[name.ToLower()];
 
-			} else if (parent != null) {
+			} else if (!IsRoot) {
 				return parent.ResolveFunction(name);
 			}
 			throw new FunctionNotFoundException(name);
@@ -97,7 +97,7 @@ namespace CobaltAHK.ExpressionTree
 		public virtual ParameterExpression ResolveVariable(string name)
 		{
 			if (!HasVariable(name)) {
-				if (parent != null) {
+				if (!IsRoot) {
 					return parent.ResolveVariable(name);
 				}
 				AddVariable(name, Expression.Parameter(typeof(object), name));
