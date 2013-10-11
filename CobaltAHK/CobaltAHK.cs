@@ -25,6 +25,9 @@ namespace CobaltAHK
 #if EXECUTE
 			var scope = new ExpressionTree.Scope();
 			var settings = new ScriptSettings();
+
+			ExpressionTree.Preprocessor.Process(expressions, scope, settings);
+
 			var et = new List<Expression>();
 			foreach (var e in expressions) {
 				et.Add(ExpressionTree.Generator.Generate(e, scope, settings));
