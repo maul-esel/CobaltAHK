@@ -159,19 +159,27 @@ namespace CobaltAHK.ExpressionTree
 			var left  = Generate(expr.Expressions.ElementAt(0), scope, settings);
 			var right = Generate(expr.Expressions.ElementAt(1), scope, settings);
 
-			if (expr.Operator == Operator.Concatenate) {
-				var str = typeof(string);
-				var concat = typeof(string).GetMethod("Concat", new[] { str, str });
+			return GenerateBinaryExpression(left, expr.Operator, right);
+		}
+
+		private static DLR.Expression GenerateBinaryExpression(DLR.Expression left, Operator op, DLR.Expression right)
+		{
+			if (op == Operator.Concatenate) {
+				var concat = typeof(string).GetMethod("Concat", new[] { typeof(string), typeof(string) });
 				return DLR.Expression.Call(concat, MakeString(left), MakeString(right));
 
-			} else if (expr.Operator == Operator.Assign) {
+			} else if (op == Operator.Assign) {
 				return DLR.Expression.Assign(left, DLR.Expression.Convert(right, left.Type));
+
+			} else if (op == Operator.ConcatenateAssign) {
+				return GenerateBinaryExpression(left, Operator.Assign, GenerateBinaryExpression(left, Operator.Concatenate, right)); // `a .= b` <=> `a := a . b`
 			}
 			throw new NotImplementedException();
 		}
 
-		private static DLR.Expression MakeString(DLR.Expression expr)
+		private static DLR.Expression MakeString(DLR.Expression expr) // todo: handle uninitialized vars
 		{
+			// todo: try usual convert, fallback to ToString()
 			return DLR.Expression.Call(expr, typeof(object).GetMethod("ToString"));
 		}
 	}

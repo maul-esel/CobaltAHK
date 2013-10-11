@@ -47,7 +47,10 @@ namespace CobaltAHK
 				
 				case '.':
 					reader.Read();
-					if (whitespace && IsWhitespace(reader.Peek())) {
+					if (reader.Peek() == '=') {
+						reader.Read();
+						return OperatorToken.GetToken(Operator.ConcatenateAssign);
+					} else if (whitespace && IsWhitespace(reader.Peek())) {
 						return OperatorToken.GetToken(Operator.Concatenate);
 					} else if (!whitespace && !IsWhitespace(reader.Peek())) {
 						return OperatorToken.GetToken(Operator.ObjectAccess);
