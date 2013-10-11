@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Dynamic;
 using System.Linq;
 using DLR = System.Linq.Expressions;
 using CobaltAHK.Expressions;
@@ -54,6 +55,13 @@ namespace CobaltAHK.ExpressionTree
 
 		private static DLR.Expression GenerateFunctionCall(FunctionCallExpression func, Scope scope, ScriptSettings settings)
 		{
+			if (!scope.FunctionExists(func.Name)) {
+				throw new Exception("Unknown function: " + func.Name); // todo
+
+			} else if (!scope.IsFunctionDefined(func.Name)) {
+				return GenerateDynamicFunctionCall(func, scope, settings);
+			}
+
 			var lambda = scope.ResolveFunction(func.Name);
 
 			var prms = GenerateParams(func, scope, settings);
@@ -61,6 +69,18 @@ namespace CobaltAHK.ExpressionTree
 				throw new Exception(); // todo
 			}
 			return DLR.Expression.Invoke(lambda, prms);
+		}
+
+		private static DLR.Expression GenerateDynamicFunctionCall(FunctionCallExpression func, Scope scope, ScriptSettings settings)
+		{
+			var args = new List<DLR.Expression>(func.Parameters.Count() + 1);
+			args.Add(DLR.Expression.Constant(func.Name));
+			args.AddRange(GenerateParams(func, scope, settings));
+			// todo: store param count in scope and validate?
+
+			var binder = new FunctionCallBinder(new CallInfo(func.Parameters.Count()), scope); // todo: cache instances?
+
+			return DLR.Expression.Dynamic(binder, typeof(object), args);
 		}
 
 		private static IEnumerable<DLR.Expression> GenerateParams(FunctionCallExpression func, Scope scope, ScriptSettings settings)
