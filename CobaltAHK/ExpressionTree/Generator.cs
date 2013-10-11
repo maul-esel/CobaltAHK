@@ -163,6 +163,9 @@ namespace CobaltAHK.ExpressionTree
 				var str = typeof(string);
 				var concat = typeof(string).GetMethod("Concat", new[] { str, str });
 				return DLR.Expression.Call(concat, MakeString(left), MakeString(right));
+
+			} else if (expr.Operator == Operator.Assign) {
+				return DLR.Expression.Assign(left, DLR.Expression.Convert(right, left.Type));
 			}
 			throw new NotImplementedException();
 		}
