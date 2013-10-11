@@ -45,6 +45,22 @@ namespace CobaltAHK.ExpressionTree
 
 		public bool IsRoot { get { return parent == null; } }
 
+		#region scopes
+
+		protected readonly IDictionary<Expressions.Expression, Scope> scopes = new Dictionary<Expressions.Expression, Scope>();
+
+		public void AddScope(Expressions.Expression source, Scope scope)
+		{
+			scopes[source] = scope;
+		}
+
+		public Scope GetScope(Expressions.Expression source)
+		{
+			return scopes[source];
+		}
+
+		#endregion
+
 		#region functions
 
 		protected readonly IDictionary<string, LambdaExpression> functions = new Dictionary<string, LambdaExpression>();
