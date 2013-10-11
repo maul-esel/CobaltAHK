@@ -21,8 +21,6 @@ namespace CobaltAHK
 				Console.WriteLine("\t" + e.ToString());
 			}
 #endif
-
-#if EXECUTE
 			var scope = new ExpressionTree.Scope();
 			var settings = new ScriptSettings();
 
@@ -36,7 +34,6 @@ namespace CobaltAHK
 			var lambda = Expression.Lambda<Action>(Expression.Block(et));
 			var exec = lambda.Compile();
 			exec();
-#endif
 		}
 
 		private Parser parser = new Parser();
