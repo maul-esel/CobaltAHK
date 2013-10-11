@@ -83,6 +83,11 @@ namespace CobaltAHK.ExpressionTree
 			return functions.ContainsKey(name.ToLower());
 		}
 
+		public virtual bool FunctionExists(string name)
+		{
+			return HasFunction(name) || (!IsRoot && parent.FunctionExists(name));
+		}
+
 		public virtual bool IsFunctionDefined(string name)
 		{
 			if (!HasFunction(name)) {
