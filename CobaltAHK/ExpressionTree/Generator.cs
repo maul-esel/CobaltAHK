@@ -17,6 +17,8 @@ namespace CobaltAHK.ExpressionTree
 				return GenerateFunctionDefinition((FunctionDefinitionExpression)expr, scope, settings);
 			} else if (expr is CustomVariableExpression) {
 				return scope.ResolveVariable(((CustomVariableExpression)expr).Name);
+			} else if (expr is BinaryExpression) {
+				return GenerateBinaryExpression((BinaryExpression)expr, scope, settings);
 			} else if (expr is StringLiteralExpression) {
 				return DLR.Expression.Constant(((StringLiteralExpression)expr).String);
 			} else if (expr is NumberLiteralExpression) {
@@ -150,6 +152,19 @@ namespace CobaltAHK.ExpressionTree
 			}
 			var val = Generate(prms[prms.Length - 1], scope, settings);
 			return DLR.Expression.Return(target, DLR.Expression.Convert(val, typeof(object)));
+		}
+
+		private static DLR.Expression GenerateBinaryExpression(BinaryExpression expr, Scope scope, ScriptSettings settings)
+		{
+			var left  = Generate(expr.Expressions.ElementAt(0), scope, settings);
+			var right = Generate(expr.Expressions.ElementAt(1), scope, settings);
+
+			if (expr.Operator == Operator.Concatenate) {
+				var str = typeof(string);
+				var concat = typeof(string).GetMethod("Concat", new[] { str, str });
+				return DLR.Expression.Call(concat, left, right);
+			}
+			throw new NotImplementedException();
 		}
 	}
 }
