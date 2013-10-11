@@ -162,9 +162,14 @@ namespace CobaltAHK.ExpressionTree
 			if (expr.Operator == Operator.Concatenate) {
 				var str = typeof(string);
 				var concat = typeof(string).GetMethod("Concat", new[] { str, str });
-				return DLR.Expression.Call(concat, left, right);
+				return DLR.Expression.Call(concat, MakeString(left), MakeString(right));
 			}
 			throw new NotImplementedException();
+		}
+
+		private static DLR.Expression MakeString(DLR.Expression expr)
+		{
+			return DLR.Expression.Call(expr, typeof(object).GetMethod("ToString"));
 		}
 	}
 }
