@@ -45,15 +45,25 @@ namespace CobaltAHK.ExpressionTree
 
 		public bool IsRoot { get { return parent == null; } }
 
+		#region functions
+
 		protected readonly IDictionary<string, LambdaExpression> functions = new Dictionary<string, LambdaExpression>();
 
+		public virtual void AddFunctionName(string name)
+		{
+			functions.Add(name.ToLower(), null);
+		}
+
 		public virtual void AddFunction(string name, LambdaExpression func) {
+			if (!functions.ContainsKey(name.ToLower())) {
+				throw new Exception(); // todo
+			}
 			functions[name.ToLower()] = func;
 		}
 
 		protected virtual bool HasFunction(string name)
 		{
-			return functions.ContainsKey(name.ToLower());
+			return functions.ContainsKey(name.ToLower()) && functions[name.ToLower()] != null;
 		}
 
 		public virtual LambdaExpression ResolveFunction(string name)
@@ -66,6 +76,10 @@ namespace CobaltAHK.ExpressionTree
 			}
 			throw new FunctionNotFoundException(name);
 		}
+
+		#endregion
+
+		#region variables
 
 		protected readonly IDictionary<string, ParameterExpression> variables = new Dictionary<string, ParameterExpression>();
 
@@ -101,6 +115,8 @@ namespace CobaltAHK.ExpressionTree
 		{
 			// todo
 		}
+
+		#endregion
 	}
 
 	public class FunctionScope : Scope
