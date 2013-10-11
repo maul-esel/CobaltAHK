@@ -31,7 +31,7 @@ namespace CobaltAHK
 				et.Add(ExpressionTree.Generator.Generate(e, scope, settings));
 			}
 
-			var lambda = Expression.Lambda<Action>(Expression.Block(et));
+			var lambda = Expression.Lambda<Action>(Expression.Block(scope.GetVariables(), et));
 			var exec = lambda.Compile();
 			exec();
 		}

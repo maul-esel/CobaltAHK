@@ -118,6 +118,11 @@ namespace CobaltAHK.ExpressionTree
 
 		protected readonly IDictionary<string, ParameterExpression> variables = new Dictionary<string, ParameterExpression>();
 
+		public virtual IEnumerable<ParameterExpression> GetVariables()
+		{
+			return variables.Values;
+		}
+
 		public virtual void AddVariable(string name, ParameterExpression variable)
 		{
 			// todo: add VariableScope param; depending on it add it on parent scope or here (and override)
