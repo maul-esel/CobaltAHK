@@ -77,15 +77,28 @@ namespace CobaltAHK.ExpressionTree
 			functions[name.ToLower()] = func;
 		}
 
-		protected virtual bool HasFunction(string name)
+		public virtual bool HasFunction(string name)
 		{
-			return functions.ContainsKey(name.ToLower()) && functions[name.ToLower()] != null;
+			return functions.ContainsKey(name.ToLower());
+		}
+
+		public virtual bool IsFunctionDefined(string name)
+		{
+			if (!HasFunction(name)) {
+				throw new Exception(); // todo
+			}
+			return functions[name.ToLower()] != null;
 		}
 
 		public virtual LambdaExpression ResolveFunction(string name)
 		{
 			if (HasFunction(name)) {
-				return functions[name.ToLower()];
+				if (IsFunctionDefined(name)) {
+					return functions[name.ToLower()];
+
+				} else { // name is stored, but func not yet generated
+					throw new UndefinedFunctionException(name); // todo
+				}
 
 			} else if (!IsRoot) {
 				return parent.ResolveFunction(name);
@@ -178,5 +191,10 @@ namespace CobaltAHK.ExpressionTree
 	public class FunctionNotFoundException : System.Exception
 	{
 		public FunctionNotFoundException(string func) : base("Function '" + func + "' was not found!") { }
+	}
+
+	public class UndefinedFunctionException : System.Exception
+	{
+		public UndefinedFunctionException(string func) : base("Function '" + func + "' is registered, but not yet defined!") { }
 	}
 }
