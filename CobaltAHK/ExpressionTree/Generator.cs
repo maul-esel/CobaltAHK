@@ -56,11 +56,16 @@ namespace CobaltAHK.ExpressionTree
 		{
 			var lambda = scope.ResolveFunction(func.Name);
 
-			var prms = func.Parameters.Select(p => Generate(p, scope, settings)).ToList();
+			var prms = GenerateParams(func, scope, settings);
 			if (lambda.Parameters.Count != prms.Count()) {
 				throw new Exception(); // todo
 			}
 			return DLR.Expression.Invoke(lambda, prms);
+		}
+
+		private static IEnumerable<DLR.Expression> GenerateParams(FunctionCallExpression func, Scope scope, ScriptSettings settings)
+		{
+			return func.Parameters.Select(p => Generate(p, scope, settings));
 		}
 
 		private static DLR.Expression GenerateFunctionDefinition(FunctionDefinitionExpression func, Scope scope, ScriptSettings settings)
