@@ -90,16 +90,16 @@ namespace CobaltAHK.ExpressionTree
 
 		public virtual bool IsFunctionDefined(string name)
 		{
-			if (!HasFunction(name)) {
+			if (IsRoot && !HasFunction(name)) {
 				throw new Exception(); // todo
 			}
-			return functions[name.ToLower()] != null;
+			return HasFunction(name) ? functions[name.ToLower()] != null : parent.IsFunctionDefined(name);
 		}
 
 		public virtual LambdaExpression ResolveFunction(string name)
 		{
 			if (HasFunction(name)) {
-				if (IsFunctionDefined(name)) {
+				if (functions[name.ToLower()] != null) {
 					return functions[name.ToLower()];
 
 				} else { // name is stored, but func not yet generated
