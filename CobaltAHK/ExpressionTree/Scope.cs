@@ -21,7 +21,7 @@ namespace CobaltAHK.ExpressionTree
 		private void LoadBuiltinFunctions()
 		{
 			var flags = BindingFlags.Static | BindingFlags.Public | BindingFlags.DeclaredOnly;
-			var methods = typeof(IronAHK.Rusty.Core).GetMethods(flags);
+			var methods = typeof(IronAHK.Rusty.Core).GetMethods(flags).Where(m => !m.IsSpecialName);
 
 			foreach (var method in methods) {
 				// todo: filter by attribute?
