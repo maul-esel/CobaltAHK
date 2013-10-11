@@ -37,6 +37,7 @@ namespace CobaltAHK.ExpressionTree
 				var lambda = Expression.Lambda(Expression.GetFuncType(types.ToArray()),
 				                               Expression.Call(method, prms),
 				                               prms);
+				AddFunctionName(method.Name);
 				AddFunction(method.Name, lambda);
 			}
 		}
