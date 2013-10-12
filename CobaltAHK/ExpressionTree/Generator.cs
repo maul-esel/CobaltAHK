@@ -7,41 +7,48 @@ using CobaltAHK.Expressions;
 
 namespace CobaltAHK.ExpressionTree
 {
-	public static class Generator
+	public class Generator
 	{
-		public static DLR.Expression Generate(Expression expr, Scope scope, ScriptSettings settings)
+		public Generator(ScriptSettings config)
+		{
+			settings = config;
+		}
+
+		private readonly ScriptSettings settings;
+
+		public DLR.Expression Generate(Expression expr, Scope scope)
 		{
 			if (expr is FunctionCallExpression) {
-				return GenerateFunctionCall((FunctionCallExpression)expr, scope, settings);
+				return GenerateFunctionCall((FunctionCallExpression)expr, scope);
 			} else if (expr is FunctionDefinitionExpression) {
-				return GenerateFunctionDefinition((FunctionDefinitionExpression)expr, scope, settings);
+				return GenerateFunctionDefinition((FunctionDefinitionExpression)expr, scope);
 			} else if (expr is CustomVariableExpression) {
 				return scope.ResolveVariable(((CustomVariableExpression)expr).Name);
 			} else if (expr is BinaryExpression) {
-				return GenerateBinaryExpression((BinaryExpression)expr, scope, settings);
+				return GenerateBinaryExpression((BinaryExpression)expr, scope);
 			} else if (expr is StringLiteralExpression) {
 				return DLR.Expression.Constant(((StringLiteralExpression)expr).String);
 			} else if (expr is NumberLiteralExpression) {
 				return DLR.Expression.Constant(((NumberLiteralExpression)expr).GetValue());
 			} else if (expr is ObjectLiteralExpression) {
-				return GenerateObjectLiteral((ObjectLiteralExpression)expr, scope, settings);
+				return GenerateObjectLiteral((ObjectLiteralExpression)expr, scope);
 			} else if (expr is ArrayLiteralExpression) {
-				return GenerateArrayLiteral((ArrayLiteralExpression)expr, scope, settings);
+				return GenerateArrayLiteral((ArrayLiteralExpression)expr, scope);
 			}
 			throw new NotImplementedException();
 		}
 
-		private static DLR.Expression GenerateObjectLiteral(ObjectLiteralExpression obj, Scope scope, ScriptSettings settings)
+		private DLR.Expression GenerateObjectLiteral(ObjectLiteralExpression obj, Scope scope)
 		{
 			var t = typeof(IEnumerable<object>);
 			var constructor = typeof(CobaltAHKObject).GetConstructor(new[] { t, t });
 
-			var keys = ExpressionArray(obj.Dictionary.Keys, scope, settings);
-			var values = ExpressionArray(obj.Dictionary.Values, scope, settings);
+			var keys = ExpressionArray(obj.Dictionary.Keys, scope);
+			var values = ExpressionArray(obj.Dictionary.Values, scope);
 			return DLR.Expression.New(constructor, keys, values);
 		}
 
-		private static DLR.Expression GenerateArrayLiteral(ArrayLiteralExpression arr, Scope scope, ScriptSettings settings)
+		private DLR.Expression GenerateArrayLiteral(ArrayLiteralExpression arr, Scope scope)
 		{
 			var t = typeof(IEnumerable<object>);
 			var constructor = typeof(List<object>).GetConstructor(new[] { t });
@@ -49,35 +56,35 @@ namespace CobaltAHK.ExpressionTree
 			return DLR.Expression.New(constructor, ExpressionArray(arr.List, scope, settings));
 		}
 
-		private static DLR.Expression ExpressionArray(IEnumerable<Expression> exprs, Scope scope, ScriptSettings settings)
+		private DLR.Expression ExpressionArray(IEnumerable<Expression> exprs, Scope scope)
 		{
 			return DLR.Expression.NewArrayInit(typeof(object),
-			                                   exprs.Select(e => DLR.Expression.Convert(Generate(e, scope, settings), typeof(object))));
+			                                   exprs.Select(e => DLR.Expression.Convert(Generate(e, scope), typeof(object))));
 		}
 
-		private static DLR.Expression GenerateFunctionCall(FunctionCallExpression func, Scope scope, ScriptSettings settings)
+		private DLR.Expression GenerateFunctionCall(FunctionCallExpression func, Scope scope)
 		{
 			if (!scope.FunctionExists(func.Name)) {
 				throw new Exception("Unknown function: " + func.Name); // todo
 
 			} else if (!scope.IsFunctionDefined(func.Name)) {
-				return GenerateDynamicFunctionCall(func, scope, settings);
+				return GenerateDynamicFunctionCall(func, scope);
 			}
 
 			var lambda = scope.ResolveFunction(func.Name);
 
-			var prms = GenerateParams(func, scope, settings);
+			var prms = GenerateParams(func, scope);
 			if (lambda.Parameters.Count != prms.Count()) {
 				throw new Exception(); // todo
 			}
 			return DLR.Expression.Invoke(lambda, prms);
 		}
 
-		private static DLR.Expression GenerateDynamicFunctionCall(FunctionCallExpression func, Scope scope, ScriptSettings settings)
+		private DLR.Expression GenerateDynamicFunctionCall(FunctionCallExpression func, Scope scope)
 		{
 			var args = new List<DLR.Expression>(func.Parameters.Count() + 1);
 			args.Add(DLR.Expression.Constant(func.Name));
-			args.AddRange(GenerateParams(func, scope, settings));
+			args.AddRange(GenerateParams(func, scope));
 			// todo: store param count in scope and validate?
 
 			var binder = new FunctionCallBinder(new CallInfo(func.Parameters.Count()), scope); // todo: cache instances?
@@ -85,12 +92,12 @@ namespace CobaltAHK.ExpressionTree
 			return DLR.Expression.Dynamic(binder, typeof(object), args);
 		}
 
-		private static IEnumerable<DLR.Expression> GenerateParams(FunctionCallExpression func, Scope scope, ScriptSettings settings)
+		private IEnumerable<DLR.Expression> GenerateParams(FunctionCallExpression func, Scope scope)
 		{
-			return func.Parameters.Select(p => Generate(p, scope, settings));
+			return func.Parameters.Select(p => Generate(p, scope)); // todo: convert param types
 		}
 
-		private static DLR.Expression GenerateFunctionDefinition(FunctionDefinitionExpression func, Scope scope, ScriptSettings settings)
+		private DLR.Expression GenerateFunctionDefinition(FunctionDefinitionExpression func, Scope scope)
 		{
 			var funcScope = scope.GetScope(func); // get the scope created by the preprocessor
 
@@ -116,9 +123,9 @@ namespace CobaltAHK.ExpressionTree
 			foreach (var e in func.Body) {
 				DLR.Expression expr;
 				if (IsReturn(e)) {
-					expr = MakeReturn((FunctionCallExpression)e, scope, settings, funcBody, endOfFunc);
+					expr = MakeReturn((FunctionCallExpression)e, scope, funcBody, endOfFunc);
 				} else {
-					expr = Generate(e, funcScope, settings);
+					expr = Generate(e, funcScope);
 				}
 				funcBody.Add(expr);
 			}
@@ -136,33 +143,33 @@ namespace CobaltAHK.ExpressionTree
 			return function;
 		}
 
-		private static bool IsReturn(Expression expr)
+		private bool IsReturn(Expression expr)
 		{
 			return expr is FunctionCallExpression && ((FunctionCallExpression)expr).Name.ToLower() == "return";
 		}
 
-		private static DLR.Expression MakeReturn(FunctionCallExpression expr, Scope scope, ScriptSettings settings, IList<DLR.Expression> body, DLR.LabelTarget target)
+		private DLR.Expression MakeReturn(FunctionCallExpression expr, Scope scope, IList<DLR.Expression> body, DLR.LabelTarget target)
 		{
 			var prms = expr.Parameters.ToArray();
 			if (prms.Length == 0) {
 				return DLR.Expression.Return(target);
 			}
 			for (var i = 0; i < prms.Length - 1; i++) {
-				body.Add(Generate(prms[i], scope, settings));
+				body.Add(Generate(prms[i], scope));
 			}
-			var val = Generate(prms[prms.Length - 1], scope, settings);
+			var val = Generate(prms[prms.Length - 1], scope);
 			return DLR.Expression.Return(target, DLR.Expression.Convert(val, typeof(object)));
 		}
 
-		private static DLR.Expression GenerateBinaryExpression(BinaryExpression expr, Scope scope, ScriptSettings settings)
+		private DLR.Expression GenerateBinaryExpression(BinaryExpression expr, Scope scope)
 		{
-			var left  = Generate(expr.Expressions.ElementAt(0), scope, settings);
-			var right = Generate(expr.Expressions.ElementAt(1), scope, settings);
+			var left  = Generate(expr.Expressions.ElementAt(0), scope);
+			var right = Generate(expr.Expressions.ElementAt(1), scope);
 
 			return GenerateBinaryExpression(left, expr.Operator, right);
 		}
 
-		private static DLR.Expression GenerateBinaryExpression(DLR.Expression left, Operator op, DLR.Expression right)
+		private DLR.Expression GenerateBinaryExpression(DLR.Expression left, Operator op, DLR.Expression right)
 		{
 			// todo: correct conversion workaround for math operations
 
@@ -196,7 +203,6 @@ namespace CobaltAHK.ExpressionTree
 
 			} else if (op == Operator.TrueDivideAssign) {
 				return DLR.Expression.DivideAssign(DLR.Expression.Convert(left, right.Type), right);
-
 			} else if (op == Operator.Assign) {
 				return DLR.Expression.Assign(left, DLR.Expression.Convert(right, left.Type));
 			}
@@ -204,7 +210,7 @@ namespace CobaltAHK.ExpressionTree
 			throw new NotImplementedException();
 		}
 
-		private static DLR.Expression MakeString(DLR.Expression expr) // todo: handle uninitialized vars
+		private DLR.Expression MakeString(DLR.Expression expr) // todo: handle uninitialized vars
 		{
 			// todo: try usual convert, fallback to ToString()
 			return DLR.Expression.Call(expr, typeof(object).GetMethod("ToString"));
