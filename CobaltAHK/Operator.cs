@@ -91,6 +91,38 @@ namespace CobaltAHK
 		public static readonly Operator BitShiftRightAssign     = new  BinaryOperator(">>=", 1);
 		public static readonly Operator AltObjAccess            = new  BinaryOperator("[",   0); // todo: is precedence correct? e.g. `f . a[b]` => `(f . a)[b]` ?
 
+		private static readonly IDictionary<Operator, Operator> compoundAssigns = new Dictionary<Operator, Operator>() {
+			{ Operator.ConcatenateAssign,   Operator.Concatenate   },
+			{ Operator.AddAssign,           Operator.Add           },
+			{ Operator.SubtractAssign,      Operator.Subtract      },
+			{ Operator.MultiplyAssign,      Operator.Multiply      },
+			{ Operator.TrueDivideAssign,    Operator.TrueDivide    },
+			{ Operator.FloorDivideAssign,   Operator.FloorDivide   },
+			{ Operator.BitwiseOrAssign,     Operator.BitwiseOr     },
+			{ Operator.BitwiseAndAssign,    Operator.BitwiseAnd    },
+			{ Operator.BitwiseXorAssign,    Operator.BitwiseXor    },
+			{ Operator.BitShiftLeftAssign,  Operator.BitShiftLeft  },
+			{ Operator.BitShiftRightAssign, Operator.BitShiftRight }
+		};
+
+		public static bool IsCompoundAssignment(Operator op)
+		{
+			return compoundAssigns.ContainsKey(op);
+		}
+
+		public static Operator CompoundGetUnderlyingOperator(Operator op)
+		{
+			return compoundAssigns[op];
+		}
+
+		public static bool IsArithmetic(Operator op)
+		{
+			return op == Operator.Add        || op == Operator.FloorDivide
+			    || op == Operator.Multiply   || op == Operator.Subtract
+			    || op == Operator.TrueDivide || op == Operator.Power
+			    || (IsCompoundAssignment(op) && IsArithmetic(CompoundGetUnderlyingOperator(op)));
+		}
+
 		private class OperatorComparer : IComparer<Operator>
 		{
 			public int Compare(Operator first, Operator second)
