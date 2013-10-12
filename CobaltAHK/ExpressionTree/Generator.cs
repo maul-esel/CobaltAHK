@@ -211,10 +211,37 @@ namespace CobaltAHK.ExpressionTree
 			throw new NotImplementedException();
 		}
 
-		private DLR.Expression MakeString(DLR.Expression expr) // todo: handle uninitialized vars
+		private DLR.Expression MakeString(DLR.Expression expr)
 		{
-			// todo: try usual convert, fallback to ToString()
-			return DLR.Expression.Call(expr, typeof(object).GetMethod("ToString"));
+			DLR.Expression convert;
+
+			var cultureToString = expr.Type.GetMethod("ToString", new[] { typeof(IFormatProvider) });
+			if (CanConvert(expr.Type, typeof(string))) {
+				convert = DLR.Expression.Convert(expr, typeof(string));
+
+			} else if (cultureToString != null) {
+				convert = DLR.Expression.Call(expr, cultureToString, DLR.Expression.Constant(System.Globalization.CultureInfo.InvariantCulture.NumberFormat));
+
+			} else {
+				convert = DLR.Expression.Call(expr, expr.Type.GetMethod("ToString", Type.EmptyTypes));
+			}
+
+			return DLR.Expression.Condition(DLR.Expression.Equal(DLR.Expression.Convert(expr, typeof(object)), DLR.Expression.Constant(null)), // handle null values
+			                                DLR.Expression.Constant(""),
+			                                convert);
+		}
+
+		private bool CanConvert(Type from, Type to)
+		{
+			// original code taken from http://stackoverflow.com/questions/292437/#answer-4640305
+			var input = DLR.Expression.Parameter(from);
+			try {
+				// If this succeeds then we can cast 'from' type to 'to' type using implicit coercion
+				DLR.Expression.Lambda(DLR.Expression.Convert(input, to), input).Compile();
+			} catch (InvalidOperationException) {
+				return false;
+			}
+			return true;
 		}
 	}
 }
