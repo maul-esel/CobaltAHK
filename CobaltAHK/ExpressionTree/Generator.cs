@@ -184,7 +184,10 @@ namespace CobaltAHK.ExpressionTree
 				return CompoundAssigment((DLR.ParameterExpression)left, left, op, right, scope); // `a .= b` <=> `a := a . b`
 
 			} else if (op == Operator.Assign) {
-				return DLR.Expression.Assign(left, DLR.Expression.Convert(right, left.Type));
+				if (left is DLR.ParameterExpression) {
+					left = RetypeVariable((DLR.ParameterExpression)left, right.Type, scope);
+				}
+				return DLR.Expression.Assign(left, right);
 			}
 
 			throw new NotImplementedException();
