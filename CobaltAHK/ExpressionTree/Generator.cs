@@ -178,8 +178,8 @@ namespace CobaltAHK.ExpressionTree
 				var concat = typeof(string).GetMethod("Concat", new[] { typeof(string), typeof(string) });
 				return DLR.Expression.Call(concat, MakeString(left), MakeString(right));
 
-			} else if (op == Operator.ConcatenateAssign) {
-				return GenerateBinaryExpression(left, Operator.Assign, GenerateBinaryExpression(left, Operator.Concatenate, right)); // `a .= b` <=> `a := a . b`
+			} else if (op == Operator.ConcatenateAssign) { // todo: retype to string
+				return CompoundAssigment((DLR.ParameterExpression)left, left, op, right, scope); // `a .= b` <=> `a := a . b`
 
 			} else if (op == Operator.Add) {
 				return DLR.Expression.Add(DLR.Expression.Convert(left, right.Type), right);
@@ -209,6 +209,11 @@ namespace CobaltAHK.ExpressionTree
 			}
 
 			throw new NotImplementedException();
+		}
+
+		private DLR.Expression CompoundAssigment(DLR.ParameterExpression variable, DLR.Expression left, Operator op, DLR.Expression right, Scope scope)
+		{
+			return GenerateBinaryExpression(variable, Operator.Assign, GenerateBinaryExpression(left, Operator.CompoundGetUnderlyingOperator(op), right, scope), scope);
 		}
 
 		private DLR.ParameterExpression RetypeVariable(DLR.ParameterExpression variable, Type type, Scope scope)
