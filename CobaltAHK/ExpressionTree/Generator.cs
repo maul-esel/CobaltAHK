@@ -172,7 +172,9 @@ namespace CobaltAHK.ExpressionTree
 
 		private DLR.Expression GenerateBinaryExpression(DLR.Expression left, Operator op, DLR.Expression right, Scope scope)
 		{
-			// todo: correct conversion workaround for math operations
+			if (Operator.IsArithmetic(op)) {
+				return GenerateArithmeticExpression(left, op, right, scope);
+			}
 
 			if (op == Operator.Concatenate) {
 				var concat = typeof(string).GetMethod("Concat", new[] { typeof(string), typeof(string) });
@@ -181,29 +183,6 @@ namespace CobaltAHK.ExpressionTree
 			} else if (op == Operator.ConcatenateAssign) { // todo: retype to string
 				return CompoundAssigment((DLR.ParameterExpression)left, left, op, right, scope); // `a .= b` <=> `a := a . b`
 
-			} else if (op == Operator.Add) {
-				return DLR.Expression.Add(DLR.Expression.Convert(left, right.Type), right);
-
-			} else if (op == Operator.AddAssign) {
-				return DLR.Expression.AddAssign(DLR.Expression.Convert(left, right.Type), right);
-
-			} else if (op == Operator.Subtract) {
-				return DLR.Expression.Subtract(DLR.Expression.Convert(left, right.Type), right);
-
-			} else if (op == Operator.SubtractAssign) {
-				return DLR.Expression.SubtractAssign(DLR.Expression.Convert(left, right.Type), right);
-
-			} else if (op == Operator.Multiply) {
-				return DLR.Expression.Multiply(DLR.Expression.Convert(left, right.Type), right);
-
-			} else if (op == Operator.MultiplyAssign) {
-				return DLR.Expression.MultiplyAssign(DLR.Expression.Convert(left, right.Type), right);
-
-			} else if (op == Operator.TrueDivide) {
-				return DLR.Expression.Divide(DLR.Expression.Convert(left, right.Type), right);
-
-			} else if (op == Operator.TrueDivideAssign) {
-				return DLR.Expression.DivideAssign(DLR.Expression.Convert(left, right.Type), right);
 			} else if (op == Operator.Assign) {
 				return DLR.Expression.Assign(left, DLR.Expression.Convert(right, left.Type));
 			}
@@ -215,6 +194,78 @@ namespace CobaltAHK.ExpressionTree
 		{
 			return GenerateBinaryExpression(variable, Operator.Assign, GenerateBinaryExpression(left, Operator.CompoundGetUnderlyingOperator(op), right, scope), scope);
 		}
+
+		#region arithmetic
+
+		private DLR.Expression GenerateArithmeticExpression(DLR.Expression left, Operator op, DLR.Expression right, Scope scope)
+		{
+			Type leftType = left.Type, rightType = right.Type;
+			DLR.ParameterExpression variable = null;
+			if (NegotiateArithmeticTypes(ref leftType, ref rightType)) {
+				if (leftType != left.Type) {
+					if (left is DLR.ParameterExpression && Operator.IsCompoundAssignment(op)) {
+						variable = RetypeVariable((DLR.ParameterExpression)left, leftType, scope);
+						//variable = (DLR.ParameterExpression)left;
+						// todo: keep current value
+					}
+					left = DLR.Expression.Convert(left, leftType); // todo: see below
+				}
+				if (rightType != right.Type) {
+					right = DLR.Expression.Convert(right, rightType); // todo: conversion from non-arithmetic types like string, object, ...
+				}
+			}
+
+			if (Operator.IsCompoundAssignment(op)) {
+				return CompoundAssigment(variable, left, op, right, scope);
+
+			} else if (op == Operator.Add) {
+				return DLR.Expression.Add(DLR.Expression.Convert(left, right.Type), right);
+
+			} else if (op == Operator.Subtract) {
+				return DLR.Expression.Subtract(DLR.Expression.Convert(left, right.Type), right);
+
+			} else if (op == Operator.Multiply) {
+				return DLR.Expression.Multiply(DLR.Expression.Convert(left, right.Type), right);
+
+			} else if (op == Operator.TrueDivide) {
+				return DLR.Expression.Divide(DLR.Expression.Convert(left, right.Type), right);
+
+			} else if (op == Operator.FloorDivide) {
+				var floor = typeof(Math).GetMethod("Floor", new[] { typeof(double) });
+				return DLR.Expression.Call(floor, GenerateArithmeticExpression(left, Operator.TrueDivide, right, scope));
+			}
+
+			throw new InvalidOperationException(); // todo
+		}
+
+		private bool NegotiateArithmeticTypes(ref Type left, ref Type right)
+		{
+			Type _left = left, _right = right;
+			if (!IsArithmeticType(left) && !IsArithmeticType(right)) {
+				left = right = typeof(double); // `"4" + "5" = 9.0`
+			} else if (IsArithmeticType(left) && !IsArithmeticType(right)) {
+				right = left;
+			} else if (!IsArithmeticType(left) && IsArithmeticType(right)) {
+				left = right;
+			} else if (left != right) {
+				left = right = HigherArithmeticType(left, right);
+			}
+			return _left != left || _right != right;
+		}
+
+		private static readonly Type[] arithmeticTypes = new[] { typeof(double), typeof(int), typeof(uint) };
+
+		private Type HigherArithmeticType(Type one, Type two)
+		{
+			return arithmeticTypes.First(t => t == one || t == two);
+		}
+
+		private bool IsArithmeticType(Type type)
+		{
+			return arithmeticTypes.Contains(type);
+		}
+
+		#endregion
 
 		private DLR.ParameterExpression RetypeVariable(DLR.ParameterExpression variable, Type type, Scope scope)
 		{
