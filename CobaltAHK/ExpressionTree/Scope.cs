@@ -116,17 +116,20 @@ namespace CobaltAHK.ExpressionTree
 
 		#region variables
 
+		protected readonly ISet<ParameterExpression> allVariables = new HashSet<ParameterExpression>();
+
 		protected readonly IDictionary<string, ParameterExpression> variables = new Dictionary<string, ParameterExpression>();
 
 		public virtual IEnumerable<ParameterExpression> GetVariables()
 		{
-			return variables.Values;
+			return allVariables;
 		}
 
 		public virtual void AddVariable(string name, ParameterExpression variable)
 		{
 			// todo: add VariableScope param; depending on it add it on parent scope or here (and override)
 			variables[name.ToLower()] = variable;
+			allVariables.Add(variable);
 		}
 
 		protected virtual bool HasVariable(string name)

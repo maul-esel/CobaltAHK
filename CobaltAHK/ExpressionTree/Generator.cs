@@ -211,6 +211,20 @@ namespace CobaltAHK.ExpressionTree
 			throw new NotImplementedException();
 		}
 
+		private DLR.ParameterExpression RetypeVariable(DLR.ParameterExpression variable, Type type, Scope scope)
+		{
+			if (variable.Type != type) {
+				Func<DLR.ParameterExpression, bool> match = v => v.Name == variable.Name && v.Type == type;
+				if (scope.GetVariables().Any(match)) {
+					variable = scope.GetVariables().First(match);
+				} else {
+					variable = DLR.Expression.Parameter(type, variable.Name);
+				}
+				scope.AddVariable(variable.Name, variable);
+			}
+			return variable;
+		}
+
 		private DLR.Expression MakeString(DLR.Expression expr)
 		{
 			DLR.Expression convert;
