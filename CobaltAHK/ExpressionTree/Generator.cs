@@ -162,6 +162,8 @@ namespace CobaltAHK.ExpressionTree
 			return DLR.Expression.Return(target, DLR.Expression.Convert(val, typeof(object)));
 		}
 
+		#region binary operations
+
 		private DLR.Expression GenerateBinaryExpression(BinaryExpression expr, Scope scope)
 		{
 			var left  = Generate(expr.Expressions.ElementAt(0), scope);
@@ -267,6 +269,8 @@ namespace CobaltAHK.ExpressionTree
 		{
 			return arithmeticTypes.Contains(type);
 		}
+
+		#endregion
 
 		#endregion
 
