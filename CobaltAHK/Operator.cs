@@ -87,8 +87,8 @@ namespace CobaltAHK
 		public static readonly Operator BitwiseOrAssign         = new  BinaryOperator("|=",  1);
 		public static readonly Operator BitwiseAndAssign        = new  BinaryOperator("&=",  1);
 		public static readonly Operator BitwiseXorAssign        = new  BinaryOperator("^=",  1);
-		public static readonly Operator BitwiseShiftLeftAssign  = new  BinaryOperator("<<=", 1);
-		public static readonly Operator BitwiseShiftRightAssign = new  BinaryOperator(">>=", 1);
+		public static readonly Operator BitShiftLeftAssign      = new  BinaryOperator("<<=", 1);
+		public static readonly Operator BitShiftRightAssign     = new  BinaryOperator(">>=", 1);
 		public static readonly Operator AltObjAccess            = new  BinaryOperator("[",   0); // todo: is precedence correct? e.g. `f . a[b]` => `(f . a)[b]` ?
 
 		private class OperatorComparer : IComparer<Operator>
