@@ -167,10 +167,10 @@ namespace CobaltAHK.ExpressionTree
 			var left  = Generate(expr.Expressions.ElementAt(0), scope);
 			var right = Generate(expr.Expressions.ElementAt(1), scope);
 
-			return GenerateBinaryExpression(left, expr.Operator, right);
+			return GenerateBinaryExpression(left, expr.Operator, right, scope);
 		}
 
-		private DLR.Expression GenerateBinaryExpression(DLR.Expression left, Operator op, DLR.Expression right)
+		private DLR.Expression GenerateBinaryExpression(DLR.Expression left, Operator op, DLR.Expression right, Scope scope)
 		{
 			// todo: correct conversion workaround for math operations
 
