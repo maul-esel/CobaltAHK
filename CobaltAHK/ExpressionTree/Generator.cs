@@ -50,8 +50,13 @@ namespace CobaltAHK.ExpressionTree
 
 		private DLR.Expression GenerateArrayLiteral(ArrayLiteralExpression arr, Scope scope)
 		{
+			var create = DLR.Expression.New(typeof(List<object>));
+			if (arr.List.Count() == 0) {
+				return create;
+			}
+
 			return DLR.Expression.ListInit(
-				DLR.Expression.New(typeof(List<object>)),
+				create,
 				arr.List.Select(e => DLR.Expression.Convert(Generate(e, scope), typeof(object)))
 			);
 		}
