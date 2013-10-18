@@ -48,7 +48,7 @@ namespace CobaltAHK
 
 		public uint MaxThreadsPerHotkey { get; set; } // max. 20
 
-		public bool MustDeclare { get; set; }
+		public bool MustDeclare { get; set; } // per-file!
 
 		public bool NoTrayIcon { get; set; }
 

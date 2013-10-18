@@ -64,6 +64,7 @@ namespace CobaltAHK
 				ch = reader.Peek();
 			}
 
+			// todo: also handle "return" specially (followed by expressions!)
 			if (name.ToLower() == "class") {
 				return Token.ClassDefinition;
 

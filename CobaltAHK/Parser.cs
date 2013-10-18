@@ -81,6 +81,11 @@ namespace CobaltAHK
 					ParseExpressionChain(lexer, chain);
 					return chain.ToExpression();
 				}
+				// todo: ParseExpressionSequence() parses a list of unrelated, comma-separated expressions
+				// todo: put them in the expression queue
+				// todo: re-use for ParseExpressionList()
+				// todo: BUT: may not be unrelated entirely (last expr is result!)
+				// todo: e.g. `return a := b, c := d, d.Call()` is not un-related
 				return null;
 			});
 		}

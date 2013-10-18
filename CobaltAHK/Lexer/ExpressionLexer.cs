@@ -36,7 +36,7 @@ namespace CobaltAHK
 					return Token.CloseBrace;
 				case '[':
 					reader.Read();
-					if (whitespace) { // todo: or comma, or operator, or OpenParenthesis (NOT closeParens)
+					if (whitespace) { // todo: or comma, or operator, or CloseBracket, or OpenParenthesis (NOT closeParens)
 						return Token.OpenBracket;
 					} else {
 						return OperatorToken.GetToken(Operator.AltObjAccess);
@@ -164,6 +164,7 @@ namespace CobaltAHK
 			 * scientific: 1.0e4 or -2.1E-4
 			 */
 			// todo: support binary and octal, as #AHKv2 does
+			// todo: support scientific without decimal, as #AHKv2 does
 
 			char first = reader.Peek();
 			if (!IsDigit(first)) {

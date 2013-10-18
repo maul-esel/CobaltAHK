@@ -112,10 +112,17 @@ namespace CobaltAHK.ExpressionTree
 			var funcBody = new List<DLR.Expression>();
 
 			foreach (var p in func.Parameters) {
-				// todo: default values
 				var param = DLR.Expression.Parameter(typeof(object), p.Name);
 				prms.Add(param);
 				funcScope.AddVariable(p.Name, param);
+
+				/*if (p.DefaultValue != null) {
+					// todo: init: `if (!param) { param := default }`
+					// todo: this conflicts with intentionally-passed NULL
+					// todo: instead, add overloads
+					// todo: however, especially with named parameter support, there's endless possibilities and thus endless overloads
+					// todo: instead, store default values and detect them on function call
+				}*/
 
 				var type = typeof(object);
 				if (p.Modifier.HasFlag(Syntax.ParameterModifier.ByRef)) {
