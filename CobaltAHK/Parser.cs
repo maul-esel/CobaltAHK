@@ -363,14 +363,15 @@ namespace CobaltAHK
 					chain.Append(ParseExpressionChain(lexer, new[] { Token.CloseParenthesis }).ToExpression());
 				
 				} else if (token is OperatorToken) {
-					if (((OperatorToken)token).Operator == Operator.AltObjAccess) { // special handling for f[A, B]
+					var op = ((OperatorToken)token).Operator;
+					if (op == Operator.AltObjAccess) { // special handling for f[A, B]
 						ParseAltObjAccess(lexer, chain);
 
-					} else if (((OperatorToken)token).Operator is UnaryOperator) {
+					} else if (op is UnaryOperator) {
 						throw new NotImplementedException();
 
 					} else {
-						chain.Append(((OperatorToken)token).Operator);
+						chain.Append(op);
 					}
 
 				} else {
