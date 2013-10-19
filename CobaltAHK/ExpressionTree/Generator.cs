@@ -297,7 +297,7 @@ namespace CobaltAHK.ExpressionTree
 		{
 			Type _left = left, _right = right;
 			if (!IsArithmeticType(left) && !IsArithmeticType(right)) {
-				left = right = typeof(double); // `"4" + "5" = 9.0`
+				left = right = arithmeticTypes.First();
 			} else {
 				left = right = HigherArithmeticType(left, right);
 			}
