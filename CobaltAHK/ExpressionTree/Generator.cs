@@ -222,8 +222,6 @@ namespace CobaltAHK.ExpressionTree
 				if (leftType != left.Type) {
 					if (left is DLR.ParameterExpression && Operator.IsCompoundAssignment(op)) {
 						variable = RetypeVariable((DLR.ParameterExpression)left, leftType, scope);
-						//variable = (DLR.ParameterExpression)left;
-						// todo: keep current value
 					}
 					left = DLR.Expression.Convert(left, leftType); // todo: see below
 				}
