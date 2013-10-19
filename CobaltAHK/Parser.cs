@@ -83,9 +83,6 @@ namespace CobaltAHK
 				}
 				// todo: ParseExpressionSequence() parses a list of unrelated, comma-separated expressions
 				// todo: put them in the expression queue
-				// todo: re-use for ParseExpressionList()
-				// todo: BUT: may not be unrelated entirely (last expr is result!)
-				// todo: e.g. `return a := b, c := d, d.Call()` is not un-related
 				return null;
 			});
 		}
@@ -400,7 +397,18 @@ namespace CobaltAHK
 		private ValueExpression[] ParseExpressionList(Lexer lexer, Token open, Token close)
 		{
 			lexer.PushState(Lexer.State.Expression);
+
 			AssertToken(lexer.GetToken(), open);
+			var list = ParseExpressionSequence(lexer, close);
+			AssertToken(lexer.GetToken(), close);
+
+			lexer.PopState();
+			return list;
+		}
+
+		private ValueExpression[] ParseExpressionSequence(Lexer lexer, Token abort = null)
+		{
+			lexer.PushState(Lexer.State.Expression);
 
 			var list = new List<ValueExpression>();
 			ExpressionChain currentExpr = null;
@@ -408,15 +416,16 @@ namespace CobaltAHK
 			var token = lexer.PeekToken();
 			while (true) {
 				if (token == Token.EOF) {
-					throw new UnexpectedEOFException(lexer.Position);
-				}
+					// todo: if currentExpr == null -> allow empty? or fail? (param to define?) (to allow empty, must add Expression.Empty parameter)
+					list.Add(currentExpr.ToExpression());
+					break;
 
-				if (token == Token.Comma) {
+				} else if (token == Token.Comma) {
 					// todo: if currentExpr == null -> allow empty? or fail? (param to define?) (to allow empty, must add Expression.Empty parameter)
 					list.Add(currentExpr.ToExpression());
 					currentExpr = null;
 
-				} else if (token == close) {
+				} else if (abort != null && token == abort) {
 					// todo: if currentExpr == null -> allow empty? or fail? (to allow empty, just ignore) (if list.Count == 0 -> don't fail)
 					if (currentExpr != null) {
 						list.Add(currentExpr.ToExpression());
@@ -424,7 +433,7 @@ namespace CobaltAHK
 					break;
 
 				} else {
-					currentExpr = ParseExpressionChain(lexer, new[] { Token.Comma, close });
+					currentExpr = ParseExpressionChain(lexer, new[] { Token.Comma, abort });
 					token = lexer.PeekToken();
 					continue;
 				}
@@ -433,7 +442,6 @@ namespace CobaltAHK
 				token = lexer.PeekToken();
 			}
 
-			AssertToken(lexer.GetToken(), close);
 			lexer.PopState();
 			return list.ToArray();
 		}
