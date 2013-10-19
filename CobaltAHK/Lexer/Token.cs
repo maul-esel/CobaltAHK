@@ -169,5 +169,12 @@ namespace CobaltAHK
 		}
 #endif
 	}
+
+	public class KeywordToken : EnumToken<Syntax.Keyword, KeywordToken>
+	{
+		protected KeywordToken(Syntax.Keyword kw) : base(kw) { }
+
+		public Syntax.Keyword Keyword { get { return value; } }
+	}
 }
 

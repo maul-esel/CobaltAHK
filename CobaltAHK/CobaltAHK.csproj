@@ -68,6 +68,7 @@
     <Compile Include="Syntax\VariableScope.cs" />
     <Compile Include="ExpressionTree\Preprocessor.cs" />
     <Compile Include="ExpressionTree\FunctionCallBinder.cs" />
+    <Compile Include="Syntax\Keyword.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

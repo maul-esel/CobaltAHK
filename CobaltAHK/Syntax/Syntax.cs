@@ -50,6 +50,21 @@ namespace CobaltAHK
 			throw new ArgumentException();
 		}
 
+		public static bool IsKeyword(string name)
+		{
+			Keyword k;
+			return Keyword.TryParse(name, true, out k);
+		}
+
+		public static Keyword GetKeyword(string name)
+		{
+			Keyword k;
+			if (Keyword.TryParse(name, true, out k)) {
+				return k;
+			}
+			throw new ArgumentException();
+		}
+
 		private static readonly BuiltinVariable[] variablesInInclude = new[] {
 			BuiltinVariable.A_ScriptDir,
 			BuiltinVariable.A_AppData,
