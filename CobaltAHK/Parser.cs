@@ -57,8 +57,14 @@ namespace CobaltAHK
 			} else if (token is FunctionToken) {
 				return ParseFunctionCallOrDefinition(lexer);
 
-			} else if (token == KeywordToken.GetToken(Syntax.Keyword.Class)) {
-				return ParseClassDefinition(lexer);
+			} else if (token is KeywordToken) {
+				var kw = ((KeywordToken)token).Keyword;
+				switch (kw) {
+					case Syntax.Keyword.Class:
+						return ParseClassDefinition(lexer);
+					case Syntax.Keyword.Return:
+						return ParseReturn(lexer);
+				}
 
 			} else if (token is HotkeyToken) {
 				throw new NotImplementedException("hotkey");
@@ -103,12 +109,36 @@ namespace CobaltAHK
 		{
 			lexer.PushState(Lexer.State.Traditional);
 			if (lexer.PeekToken() == Token.Comma) {
-				lexer.GetToken();// consume it so it isn't mistaked for an empty parameter
+				lexer.GetToken();// consume it so it isn't mistakened for an empty parameter
 			}
 
 			var parameters = ParseParameters(lexer);
 			lexer.PopState();
 			return new FunctionCallExpression(lexer.Position, command.Text, parameters);
+		}
+
+		private ReturnExpression ParseReturn(Lexer lexer)
+		{
+			AssertToken(lexer.GetToken(), KeywordToken.GetToken(Syntax.Keyword.Return));
+			lexer.PushState(Lexer.State.Expression);
+
+			Token endToken = null;
+			if (lexer.PeekToken() == Token.OpenParenthesis) {
+				lexer.GetToken();
+				endToken = Token.CloseParenthesis;
+			}
+
+			var exprs = ParseExpressionSequence(lexer, endToken);
+
+			if (endToken != null) {
+				AssertToken(lexer.GetToken(), endToken);
+			}
+
+			var value = exprs.Length > 0 ? exprs.Last() : null;
+			var others = exprs.Except(new[] { value });
+
+			lexer.PopState();
+			return new ReturnExpression(lexer.Position, value, others);
 		}
 
 		private DirectiveExpression ParseDirective(Lexer lexer)
