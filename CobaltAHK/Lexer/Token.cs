@@ -114,21 +114,6 @@ namespace CobaltAHK
 
 	#endregion
 
-
-	public class DirectiveToken : Token
-	{
-		public DirectiveToken(Syntax.Directive dir)
-		{
-			directive = dir;
-		}
-
-		private readonly Syntax.Directive directive;
-
-		public Syntax.Directive Directive {
-			get { return directive; }
-		}
-	}
-
 	public class HotkeyToken : Token { }
 
 	public class HotstringToken : Token { }
@@ -162,6 +147,13 @@ namespace CobaltAHK
 			);
 			return (TToken)c.Invoke(new object[] { val });
 		}
+	}
+
+	public class DirectiveToken : EnumToken<Syntax.Directive, DirectiveToken>
+	{
+		protected DirectiveToken(Syntax.Directive dir) : base(dir) { }
+
+		public Syntax.Directive Directive { get { return value; } }
 	}
 
 	public class OperatorToken : EnumToken<Operator, OperatorToken>

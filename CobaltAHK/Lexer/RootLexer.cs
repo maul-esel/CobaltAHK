@@ -95,7 +95,7 @@ namespace CobaltAHK
 			ExpectString("#");
 			var code = ReadUntilTerminators(directiveTerminators);
 			if (Syntax.IsDirective(code)) {
-				return new DirectiveToken(Syntax.GetDirective(code));
+				return DirectiveToken.GetToken(Syntax.GetDirective(code));
 			}
 			return ReadHotkey('#' + code);
 		}
