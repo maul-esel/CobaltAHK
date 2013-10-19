@@ -586,37 +586,32 @@ namespace CobaltAHK
 		/// </remarks>
 		private ValueExpression TokenToValueExpression(Lexer lexer)
 		{
-			ValueExpression expr;
-
 			var token = lexer.PeekToken();
 			if (token is FunctionToken) {
-				expr = ParseFunctionCall(lexer);
+				return ParseFunctionCall(lexer);
 
 			} else if (token is IdToken) {
 				var id = (IdToken)lexer.GetToken();
-				expr = GetVariable(id.Text, lexer.Position);
+				return GetVariable(id.Text, lexer.Position);
 			
 			} else if (token is QuotedStringToken) {
 				var str = (QuotedStringToken)lexer.GetToken();
-				expr = new StringLiteralExpression(lexer.Position, str.Text);
+				return new StringLiteralExpression(lexer.Position, str.Text);
 
 			} else if (token is NumberToken) {
 				var number = (NumberToken)lexer.GetToken();
-				expr = new NumberLiteralExpression(lexer.Position, number.Text, number.Type);
+				return new NumberLiteralExpression(lexer.Position, number.Text, number.Type);
 			
 			} else if (token == Token.OpenBracket) {
 				var arr = ParseExpressionList(lexer, Token.OpenBracket, Token.CloseBracket);
-				expr = new ArrayLiteralExpression(lexer.Position, arr);
+				return new ArrayLiteralExpression(lexer.Position, arr);
 			
 			} else if (token == Token.OpenBrace) {
 				var obj = ParseObjectLiteral(lexer);
-				expr = new ObjectLiteralExpression(lexer.Position, obj);
-
-			} else {
-				throw new Exception(token.ToString()); // todo
+				return new ObjectLiteralExpression(lexer.Position, obj);
 			}
-	
-			return expr;
+
+			throw new Exception(token.ToString()); // todo
 		}
 
 		private void ParseAltObjAccess(Lexer lexer, ExpressionChain chain)
