@@ -261,11 +261,7 @@ namespace CobaltAHK.ExpressionTree
 			Type _left = left, _right = right;
 			if (!IsArithmeticType(left) && !IsArithmeticType(right)) {
 				left = right = typeof(double); // `"4" + "5" = 9.0`
-			} else if (IsArithmeticType(left) && !IsArithmeticType(right)) {
-				right = left;
-			} else if (!IsArithmeticType(left) && IsArithmeticType(right)) {
-				left = right;
-			} else if (left != right) {
+			} else {
 				left = right = HigherArithmeticType(left, right);
 			}
 			return _left != left || _right != right;
