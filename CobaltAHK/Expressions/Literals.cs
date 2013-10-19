@@ -42,9 +42,9 @@ namespace CobaltAHK.Expressions
 				case Syntax.NumberType.Hexadecimal:
 					return uint.Parse(strVal.Substring(2), NumberStyles.AllowHexSpecifier);
 				case Syntax.NumberType.Decimal:
-					return double.Parse(strVal, NumberStyles.AllowDecimalPoint);
+					return double.Parse(strVal, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture.NumberFormat);
 				case Syntax.NumberType.Scientific:
-					return double.Parse(strVal, NumberStyles.AllowDecimalPoint | NumberStyles.AllowExponent);
+					return double.Parse(strVal, NumberStyles.AllowDecimalPoint | NumberStyles.AllowExponent, CultureInfo.InvariantCulture.NumberFormat);
 			}
 			throw new System.Exception(); // todo
 		}
