@@ -169,6 +169,7 @@ namespace CobaltAHK
 
 			AssertToken(token, Token.OpenBrace);
 			var expressions = ParseBlock(lexer, e => ValidateExpressionInDefinition(e));
+			AssertToken(lexer.GetToken(), Token.Newline, Token.EOF);
 
 			IEnumerable<FunctionDefinitionExpression> methods;
 			FilterClassBodyExpressions(expressions, out methods);
@@ -220,6 +221,8 @@ namespace CobaltAHK
 			Expression result;
 			if (token == Token.OpenBrace) { // function definition
 				var body = ParseBlock(lexer, e => ValidateExpressionInDefinition(e));
+				AssertToken(lexer.GetToken(), Token.Newline, Token.EOF);
+
 				var prms = ValidateFunctionDefParams(parameters);
 				result = new FunctionDefinitionExpression(lexer.Position, func.Text, prms, body);
 
@@ -716,7 +719,6 @@ namespace CobaltAHK
 				token = lexer.PeekToken();
 			}
 			lexer.GetToken(); // swallow the closing brace
-			AssertToken(lexer.GetToken(), Token.Newline, Token.EOF);
 
 			lexer.PopState();
 			return body.ToArray();
