@@ -594,6 +594,9 @@ namespace CobaltAHK
 				var id = (IdToken)lexer.GetToken();
 				return GetVariable(id.Text, lexer.Position);
 			
+			} else if (token is ValueKeywordToken) {
+				return new ValueKeywordExpression(lexer.Position, ((ValueKeywordToken)token).Keyword);
+
 			} else if (token is QuotedStringToken) {
 				var str = (QuotedStringToken)lexer.GetToken();
 				return new StringLiteralExpression(lexer.Position, str.Text);

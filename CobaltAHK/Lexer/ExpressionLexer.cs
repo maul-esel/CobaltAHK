@@ -133,9 +133,9 @@ namespace CobaltAHK
 
 			if (reader.Peek() == '(') {
 				return new FunctionToken(name);
-			}
-
-			if (Operator.IsOperator(name)) {
+			} else if (Syntax.IsValueKeyword(name)) {
+				return ValueKeywordToken.GetToken(Syntax.GetValueKeyword(name));
+			} else if (Operator.IsOperator(name)) {
 				return OperatorToken.GetToken(Operator.GetOperator(name));
 			} else { // variables
 				return new IdToken(name);

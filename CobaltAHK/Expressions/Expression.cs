@@ -97,6 +97,19 @@ namespace CobaltAHK.Expressions
 		public IEnumerable<ValueExpression> Parameters { get { return parameters; } }
 	}
 
+	public class ValueKeywordExpression : ValueExpression
+	{
+		public ValueKeywordExpression(SourcePosition pos, Syntax.ValueKeyword kw)
+		: base(pos)
+		{
+			keyword = kw;
+		}
+
+		private readonly Syntax.ValueKeyword keyword;
+
+		public Syntax.ValueKeyword Keyword { get { return keyword; } }
+	}
+
 	#region variables
 
 	public abstract class VariableExpression : ValueExpression

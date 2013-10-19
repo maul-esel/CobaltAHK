@@ -6,9 +6,6 @@ namespace CobaltAHK
 	{
 		public enum BuiltinVariable
 		{
-			True,
-			False,
-
 			A_WorkingDir,
 			A_ScriptDir,
 			A_ScriptName,

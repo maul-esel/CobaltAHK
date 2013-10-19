@@ -60,6 +60,16 @@ namespace CobaltAHK
 			return GetEnumFromName<Keyword>(name);
 		}
 
+		public static bool IsValueKeyword(string name)
+		{
+			return IsEnumName<ValueKeyword>(name);
+		}
+
+		public static ValueKeyword GetValueKeyword(string name)
+		{
+			return GetEnumFromName<ValueKeyword>(name);
+		}
+
 		private static readonly BuiltinVariable[] variablesInInclude = new[] {
 			BuiltinVariable.A_ScriptDir,
 			BuiltinVariable.A_AppData,
