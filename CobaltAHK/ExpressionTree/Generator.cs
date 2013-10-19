@@ -24,6 +24,12 @@ namespace CobaltAHK.ExpressionTree
 				return GenerateFunctionDefinition((FunctionDefinitionExpression)expr, scope);
 			} else if (expr is CustomVariableExpression) {
 				return scope.ResolveVariable(((CustomVariableExpression)expr).Name);
+			} else if (expr is ValueKeywordExpression) {
+				switch (((ValueKeywordExpression)expr).Keyword) {
+					case Syntax.ValueKeyword.False: return DLR.Expression.Constant(false);
+					case Syntax.ValueKeyword.True:  return DLR.Expression.Constant(true);
+					case Syntax.ValueKeyword.Null:  return DLR.Expression.Constant(null);
+				}
 			} else if (expr is BinaryExpression) {
 				return GenerateBinaryExpression((BinaryExpression)expr, scope);
 			} else if (expr is StringLiteralExpression) {
