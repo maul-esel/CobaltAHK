@@ -96,18 +96,25 @@ namespace CobaltAHK.ExpressionTree
 			}
 		}
 
-		private DLR.Expression MakeBoolean(DLR.Expression expr)
+		private DLR.Expression MakeBoolean(DLR.Expression expr) // todo
 		{
-			return DLR.Expression.Condition(
-				DLR.Expression.OrElse(
-					DLR.Expression.Equal(expr, DLR.Expression.Constant(null)),
-					DLR.Expression.OrElse(
-						DLR.Expression.Equal(expr, DLR.Expression.Constant("")),
-						DLR.Expression.Equal(expr, DLR.Expression.Convert(DLR.Expression.Constant(0), typeof(object)))
+			var tmp = DLR.Expression.Parameter(typeof(object));
+			return DLR.Expression.Block(new[] { tmp },
+				DLR.Expression.Assign(tmp, DLR.Expression.Convert(expr, typeof(object))),
+				DLR.Expression.Condition(
+					DLR.Expression.TypeIs(tmp, typeof(bool)),
+					DLR.Expression.Convert(tmp, typeof(bool)),
+					DLR.Expression.AndAlso(
+						DLR.Expression.NotEqual(tmp, DLR.Expression.Constant(null, typeof(object))),
+						DLR.Expression.AndAlso(
+							DLR.Expression.NotEqual(tmp, DLR.Expression.Constant("", typeof(object))),
+					                DLR.Expression.AndAlso(
+								DLR.Expression.NotEqual(tmp, DLR.Expression.Constant(false, typeof(object))),
+								DLR.Expression.NotEqual(tmp, DLR.Expression.Constant(0, typeof(object)))
+							)
+						)
 					)
-				),
-				DLR.Expression.Constant(false),
-				DLR.Expression.Constant(true)
+				)
 			);
 		}
 
