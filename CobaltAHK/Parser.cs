@@ -386,7 +386,6 @@ namespace CobaltAHK
 					break;
 
 				} else if (token == Token.Newline) {
-					Console.WriteLine(lexer.GetToken());
 					consumed = true;
 
 					var pos = lexer.Position;
