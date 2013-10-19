@@ -92,7 +92,12 @@ namespace CobaltAHK
 					} else {
 						return OperatorToken.GetToken(ch == '*' ? Operator.Multiply : Operator.TrueDivide);
 					}
-					// todo: FloorDivide && FloorDivideAssign
+				case '?':
+					reader.Read();
+					if (!whitespace || !IsWhitespace(reader.Peek())) {
+						throw new Exception(); // todo
+					}
+					return OperatorToken.GetToken(Operator.Ternary);
 				case ':':
 					reader.Read();
 					if (reader.Peek() == '=') {

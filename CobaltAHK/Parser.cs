@@ -469,6 +469,7 @@ namespace CobaltAHK
 		{
 			lexer.PushState(Lexer.State.Expression);
 			var token = lexer.PeekToken();
+			bool ternary = false;
 
 			while (token != Token.EOF) {
 				if (token == Token.Newline) {
@@ -496,9 +497,13 @@ namespace CobaltAHK
 						throw new NotImplementedException();
 
 					} else {
+						if (op == Operator.Ternary) {
+							ternary = true;
+						}
 						chain.Append(op);
 					}
-
+				} else if (token == Token.Colon && ternary) {
+					ternary = false;
 				} else {
 					chain.Append(TokenToValueExpression(lexer));
 					token = lexer.PeekToken();

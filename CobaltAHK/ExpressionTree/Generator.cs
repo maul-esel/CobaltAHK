@@ -32,6 +32,8 @@ namespace CobaltAHK.ExpressionTree
 				}
 			} else if (expr is BinaryExpression) {
 				return GenerateBinaryExpression((BinaryExpression)expr, scope);
+			} else if (expr is TernaryExpression) {
+				return GenerateTernaryExpression((TernaryExpression)expr, scope);
 			} else if (expr is StringLiteralExpression) {
 				return DLR.Expression.Constant(((StringLiteralExpression)expr).String);
 			} else if (expr is NumberLiteralExpression) {
@@ -222,6 +224,15 @@ namespace CobaltAHK.ExpressionTree
 				return DLR.Expression.Return(target, DLR.Expression.Convert(val, typeof(object)));
 			}
 			return DLR.Expression.Return(target, DLR.Expression.Constant(null));
+		}
+
+		private DLR.Expression GenerateTernaryExpression(TernaryExpression expr, Scope scope)
+		{
+			var cond = Generate(expr.Expressions.ElementAt(0), scope);
+			var ifTrue = Generate(expr.Expressions.ElementAt(1), scope);
+			var ifFalse = Generate(expr.Expressions.ElementAt(2), scope);
+
+			return DLR.Expression.Condition(MakeBoolean(cond), ifTrue, ifFalse);
 		}
 
 		#region binary operations
