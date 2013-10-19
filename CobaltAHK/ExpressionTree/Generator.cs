@@ -165,7 +165,7 @@ namespace CobaltAHK.ExpressionTree
 				var val = Generate(expr.Value, scope);
 				return DLR.Expression.Return(target, DLR.Expression.Convert(val, typeof(object)));
 			}
-			return DLR.Expression.Return(target);
+			return DLR.Expression.Return(target, DLR.Expression.Constant(null));
 		}
 
 		#region binary operations
