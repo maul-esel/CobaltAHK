@@ -12,7 +12,10 @@ namespace CobaltAHK
 			Continue,
 			Try,
 			Catch,
-			Throw
+			Throw,
+
+			If,
+			Else
 		}
 	}
 }

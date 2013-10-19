@@ -42,6 +42,9 @@ namespace CobaltAHK
 						default:
 							throw new UnexpectedCodeException(reader.Position, ": or =", reader.Peek().ToString());
 					}
+				case '{':
+					reader.Read();
+					return Token.OpenBrace;
 				case '}':
 					reader.Read();
 					return Token.CloseBrace;

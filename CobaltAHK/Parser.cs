@@ -64,6 +64,10 @@ namespace CobaltAHK
 						return ParseClassDefinition(lexer);
 					case Syntax.Keyword.Return:
 						return ParseReturn(lexer);
+					case Syntax.Keyword.If:
+						return ParseIf(lexer);
+					case Syntax.Keyword.Else:
+						throw new InvalidOperationException(); // todo
 				}
 
 			} else if (token is HotkeyToken) {
@@ -115,6 +119,89 @@ namespace CobaltAHK
 			var parameters = ParseParameters(lexer);
 			lexer.PopState();
 			return new FunctionCallExpression(lexer.Position, command.Text, parameters);
+		}
+
+		private BlockExpression ParseIf(Lexer lexer)
+		{
+			AssertToken(lexer.PeekToken(), KeywordToken.GetToken(Syntax.Keyword.If));
+			var before = lexer.Position;
+			var token = lexer.PeekToken();
+
+			var branches = new List<ControlFlowExpression>();
+			while (token is KeywordToken
+			       && (((KeywordToken)token).Keyword == Syntax.Keyword.If || ((KeywordToken)token).Keyword == Syntax.Keyword.Else)) {
+				branches.Add(ParseControlFlowBranch(lexer));
+
+				before = lexer.Position;
+				SkipNewline(lexer, UInt32.MaxValue);
+				token = lexer.PeekToken();
+			}
+			lexer.Rewind(before);
+			lexer.ResetToken();
+
+			return new BlockExpression(lexer.Position, branches);
+		}
+
+		private ControlFlowExpression ParseControlFlowBranch(Lexer lexer)
+		{
+			AssertToken(lexer.PeekToken(), typeof(KeywordToken));
+			var token = (KeywordToken)lexer.GetToken();
+			ValueExpression cond = null;
+
+			bool isElse = false;
+			if (token.Keyword == Syntax.Keyword.Else) {
+				var before = lexer.Position;
+				isElse = lexer.PeekToken() != KeywordToken.GetToken(Syntax.Keyword.If);
+
+				if (isElse) {
+					lexer.Rewind(before);
+					lexer.ResetToken();
+				} else {
+					lexer.GetToken();
+				}
+
+			} else if (token.Keyword != Syntax.Keyword.If) {
+				throw new Exception(); // todo
+			}
+			if (!isElse) {
+				cond = ParseIfCondition(lexer);
+			}
+
+			var body = ParseBlock(lexer, e => ValidateExpressionInIfElse(e));
+
+			if (isElse) {
+				return new ElseExpression(lexer.Position, body);
+			} else {
+				return new IfExpression(lexer.Position, cond, body);
+			}
+		}
+
+		private void ValidateExpressionInIfElse(Expression expr)
+		{
+			if (expr is DirectiveExpression || expr is FunctionDefinitionExpression || expr is ClassDefinitionExpression) {
+				throw new Exception(); // todo
+			}
+		}
+
+		private ValueExpression ParseIfCondition(Lexer lexer)
+		{
+			lexer.PushState(Lexer.State.Expression);
+			var endToken = Token.OpenBrace; // todo: what about object literals?
+
+			bool inParentheses = lexer.PeekToken() == Token.OpenParenthesis;
+			if (inParentheses) {
+				lexer.GetToken();
+				endToken = Token.CloseParenthesis;
+			}
+
+			var cond = ParseExpressionChain(lexer, new[] { endToken }).ToExpression();
+
+			if (inParentheses) {
+				AssertToken(lexer.GetToken(), Token.CloseParenthesis);
+			}
+
+			lexer.PopState();
+			return cond;
 		}
 
 		private ReturnExpression ParseReturn(Lexer lexer)
