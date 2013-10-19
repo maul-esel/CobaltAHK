@@ -79,6 +79,16 @@ namespace CobaltAHK
 					if (reader.Peek() == '=') {
 						reader.Read();
 						return OperatorToken.GetToken(ch == '*' ? Operator.MultiplyAssign : Operator.TrueDivideAssign);
+					} else if (reader.Peek() == ch) {
+						reader.Read();
+						if (ch == '*') {
+							return OperatorToken.GetToken(Operator.Power);
+						} else if (reader.Peek() == '=') {
+							reader.Read();
+							return OperatorToken.GetToken(Operator.FloorDivideAssign);
+						} else {
+							return OperatorToken.GetToken(Operator.FloorDivide);
+						}
 					} else {
 						return OperatorToken.GetToken(ch == '*' ? Operator.Multiply : Operator.TrueDivide);
 					}
