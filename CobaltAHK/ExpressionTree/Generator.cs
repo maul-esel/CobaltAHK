@@ -135,8 +135,8 @@ namespace CobaltAHK.ExpressionTree
 			var endOfFunc = DLR.Expression.Label(typeof(object));
 			foreach (var e in func.Body) {
 				DLR.Expression expr;
-				if (IsReturn(e)) {
-					expr = MakeReturn((FunctionCallExpression)e, scope, funcBody, endOfFunc);
+				if (e is ReturnExpression) {
+					expr = MakeReturn((ReturnExpression)e, scope, funcBody, endOfFunc);
 				} else {
 					expr = Generate(e, funcScope);
 				}
@@ -156,22 +156,16 @@ namespace CobaltAHK.ExpressionTree
 			return function;
 		}
 
-		private bool IsReturn(Expression expr)
+		private DLR.Expression MakeReturn(ReturnExpression expr, Scope scope, IList<DLR.Expression> body, DLR.LabelTarget target)
 		{
-			return expr is FunctionCallExpression && ((FunctionCallExpression)expr).Name.ToLower() == "return";
-		}
-
-		private DLR.Expression MakeReturn(FunctionCallExpression expr, Scope scope, IList<DLR.Expression> body, DLR.LabelTarget target)
-		{
-			var prms = expr.Parameters.ToArray();
-			if (prms.Length == 0) {
-				return DLR.Expression.Return(target);
+			foreach (var e in expr.OtherExpressions) {
+				body.Add(Generate(e, scope));
 			}
-			for (var i = 0; i < prms.Length - 1; i++) {
-				body.Add(Generate(prms[i], scope));
+			if (expr.Value != null) {
+				var val = Generate(expr.Value, scope);
+				return DLR.Expression.Return(target, DLR.Expression.Convert(val, typeof(object)));
 			}
-			var val = Generate(prms[prms.Length - 1], scope);
-			return DLR.Expression.Return(target, DLR.Expression.Convert(val, typeof(object)));
+			return DLR.Expression.Return(target);
 		}
 
 		#region binary operations
