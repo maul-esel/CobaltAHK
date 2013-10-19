@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Reflection;
 
 namespace CobaltAHK
 {
@@ -132,16 +133,42 @@ namespace CobaltAHK
 
 	public class HotstringToken : Token { }
 
-	public class OperatorToken : Token
+	public abstract class EnumToken<T, TToken> : Token where TToken : EnumToken<T, TToken>
 	{
-		protected OperatorToken(Operator _op)
+		protected EnumToken(T val)
 		{
-			op = _op;
+			value = val;
 		}
 
-		private Operator op;
+		protected T value;
 
-		public Operator Operator { get { return op; } }
+		private static IDictionary<T, TToken> map = new Dictionary<T, TToken>();
+
+		public static TToken GetToken(T key)
+		{
+			if (!map.ContainsKey(key)) {
+				map[key] = CreateInstance(key);
+			}
+			return map[key];
+		}
+
+		private static TToken CreateInstance(T val)
+		{
+			var c = typeof(TToken).GetConstructor(
+				BindingFlags.NonPublic|BindingFlags.Instance,
+				null,
+				new[] { typeof(T) },
+				default(ParameterModifier[])
+			);
+			return (TToken)c.Invoke(new object[] { val });
+		}
+	}
+
+	public class OperatorToken : EnumToken<Operator, OperatorToken>
+	{
+		protected OperatorToken(Operator op) : base(op) { }
+
+		public Operator Operator { get { return value; } }
 
 #if DEBUG
 		public override string ToString()
@@ -149,16 +176,6 @@ namespace CobaltAHK
 			return string.Format("[OperatorToken: Operator='{0}' Type={1}]", Operator.Code, Operator.GetType());
 		}
 #endif
-
-		private static IDictionary<Operator, OperatorToken> map = new Dictionary<Operator, OperatorToken>();
-
-		public static OperatorToken GetToken(Operator op)
-		{
-			if (!map.ContainsKey(op)) {
-				map[op] = new OperatorToken(op);
-			}
-			return map[op];
-		}
 	}
 }
 
