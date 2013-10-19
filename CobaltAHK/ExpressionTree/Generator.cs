@@ -34,6 +34,8 @@ namespace CobaltAHK.ExpressionTree
 				return GenerateObjectLiteral((ObjectLiteralExpression)expr, scope);
 			} else if (expr is ArrayLiteralExpression) {
 				return GenerateArrayLiteral((ArrayLiteralExpression)expr, scope);
+			} else if (expr is BlockExpression) {
+				return GenerateIfElse((BlockExpression)expr, scope);
 			}
 			throw new NotImplementedException();
 		}
@@ -66,6 +68,47 @@ namespace CobaltAHK.ExpressionTree
 		{
 			return DLR.Expression.NewArrayInit(typeof(object),
 			                                   exprs.Select(e => DLR.Expression.Convert(Generate(e, scope), typeof(object))));
+		}
+
+		private DLR.Expression GenerateIfElse(BlockExpression block, Scope scope)
+		{
+			return GenerateIfElse(block.Branches, scope);
+		}
+
+		private DLR.Expression GenerateIfElse(IEnumerable<ControlFlowExpression> branches, Scope scope)
+		{
+			if (!(branches.ElementAt(0) is IfExpression)) {
+				throw new InvalidOperationException();
+			}
+			var ifExpr = (IfExpression)branches.ElementAt(0);
+			var ifCond = MakeBoolean(Generate(ifExpr.Condition, scope));
+			var ifBlock = DLR.Expression.Block(scope.GetVariables(), ifExpr.Body.Select(e => Generate(e, scope)));
+
+			if (branches.Count() == 1) {
+				return DLR.Expression.IfThen(ifCond, ifBlock);
+
+			} else if (branches.ElementAt(1) is ElseExpression) {
+				var elseExpr = (ElseExpression)branches.ElementAt(1);
+				return DLR.Expression.IfThenElse(ifCond, ifBlock, DLR.Expression.Block(scope.GetVariables(),
+				                                                                       elseExpr.Body.Select(e => Generate(e, scope))));
+			} else {
+				return DLR.Expression.IfThenElse(ifCond, ifBlock, GenerateIfElse(branches.Except(new[] { ifExpr }), scope));
+			}
+		}
+
+		private DLR.Expression MakeBoolean(DLR.Expression expr)
+		{
+			return DLR.Expression.Condition(
+				DLR.Expression.OrElse(
+					DLR.Expression.Equal(expr, DLR.Expression.Constant(null)),
+					DLR.Expression.OrElse(
+						DLR.Expression.Equal(expr, DLR.Expression.Constant("")),
+						DLR.Expression.Equal(expr, DLR.Expression.Convert(DLR.Expression.Constant(0), typeof(object)))
+					)
+				),
+				DLR.Expression.Constant(false),
+				DLR.Expression.Constant(true)
+			);
 		}
 
 		private DLR.Expression GenerateFunctionCall(FunctionCallExpression func, Scope scope)
