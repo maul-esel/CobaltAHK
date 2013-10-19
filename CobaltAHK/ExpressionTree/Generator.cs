@@ -236,16 +236,16 @@ namespace CobaltAHK.ExpressionTree
 				return CompoundAssigment(variable, left, op, right, scope);
 
 			} else if (op == Operator.Add) {
-				return DLR.Expression.Add(DLR.Expression.Convert(left, right.Type), right);
+				return DLR.Expression.Add(left, right);
 
 			} else if (op == Operator.Subtract) {
-				return DLR.Expression.Subtract(DLR.Expression.Convert(left, right.Type), right);
+				return DLR.Expression.Subtract(left, right);
 
 			} else if (op == Operator.Multiply) {
-				return DLR.Expression.Multiply(DLR.Expression.Convert(left, right.Type), right);
+				return DLR.Expression.Multiply(left, right);
 
 			} else if (op == Operator.TrueDivide) {
-				return DLR.Expression.Divide(DLR.Expression.Convert(left, right.Type), right);
+				return DLR.Expression.Divide(left, right);
 
 			} else if (op == Operator.FloorDivide) {
 				var floor = typeof(Math).GetMethod("Floor", new[] { typeof(double) });
