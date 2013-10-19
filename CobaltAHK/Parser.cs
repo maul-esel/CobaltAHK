@@ -213,6 +213,7 @@ namespace CobaltAHK
 			AssertToken(lexer.PeekToken(), Token.OpenParenthesis);
 			var parameters = ParseExpressionList(lexer);
 
+			var beforeToken = lexer.Position;
 			bool newline = SkipNewline(lexer);
 			var token = lexer.PeekToken();
 
@@ -233,6 +234,8 @@ namespace CobaltAHK
 
 				} else {
 					result = funcExpr;
+					lexer.Rewind(beforeToken);
+					lexer.ResetToken();
 				}
 			}
 
