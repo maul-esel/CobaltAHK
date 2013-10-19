@@ -556,6 +556,12 @@ namespace CobaltAHK
 					break;
 
 				} else {
+					if (currentExpr != null) {
+						if (token == Token.Newline) {
+							break;
+						}
+						throw new Exception(token.ToString());
+					}
 					currentExpr = ParseExpressionChain(lexer, new[] { Token.Comma, abort });
 					token = lexer.PeekToken();
 					continue;
