@@ -250,6 +250,9 @@ namespace CobaltAHK.ExpressionTree
 			} else if (op == Operator.FloorDivide) {
 				var floor = typeof(Math).GetMethod("Floor", new[] { typeof(double) });
 				return DLR.Expression.Call(floor, GenerateArithmeticExpression(left, Operator.TrueDivide, right, scope));
+
+			} else if (op == Operator.Power) {
+				return DLR.Expression.Power(DLR.Expression.Convert(left, typeof(double)), DLR.Expression.Convert(right, typeof(double)));
 			}
 
 			throw new InvalidOperationException(); // todo
