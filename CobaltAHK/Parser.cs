@@ -57,7 +57,7 @@ namespace CobaltAHK
 			} else if (token is FunctionToken) {
 				return ParseFunctionCallOrDefinition(lexer);
 
-			} else if (token == Token.ClassDefinition) {
+			} else if (token == KeywordToken.GetToken(Syntax.Keyword.Class)) {
 				return ParseClassDefinition(lexer);
 
 			} else if (token is HotkeyToken) {
@@ -131,7 +131,7 @@ namespace CobaltAHK
 
 		private ClassDefinitionExpression ParseClassDefinition(Lexer lexer)
 		{
-			AssertToken(lexer.GetToken(), Token.ClassDefinition);
+			AssertToken(lexer.GetToken(), KeywordToken.GetToken(Syntax.Keyword.Class));
 			lexer.PushState(Lexer.State.Expression);
 
 			AssertToken(lexer.PeekToken(), typeof(IdToken));

@@ -64,18 +64,17 @@ namespace CobaltAHK
 				ch = reader.Peek();
 			}
 
-			// todo: also handle "return" specially (followed by expressions!)
-			if (name.ToLower() == "class") {
-				return Token.ClassDefinition;
+			if (Syntax.IsKeyword(name)) {
+				return KeywordToken.GetToken(Syntax.GetKeyword(name));
 
 			} else if (reader.Peek() == '(') { // only function calls or definitions are followed by opening parentheses
 				return new FunctionToken(name);
-			}
-			// todo: handle hotkeys here as well!
 
-			if (Operator.IsOperator(name)) {
+			} else if (Operator.IsOperator(name)) {
 				return OperatorToken.GetToken(Operator.GetOperator(name));
 			}
+
+			// todo: handle hotkeys here as well!
 			return new IdToken(name);
 		}
 

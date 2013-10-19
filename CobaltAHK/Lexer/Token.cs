@@ -11,8 +11,6 @@ namespace CobaltAHK
 		public static readonly Token Comma            = new CharacterToken(',');
 		#endregion
 
-		public static readonly Token ClassDefinition  = new TextToken("class");
-
 		// State.Traditional
 		public static readonly Token ForceExpression  = new CharacterToken('%');
 
