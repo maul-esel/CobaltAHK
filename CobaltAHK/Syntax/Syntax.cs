@@ -5,64 +5,59 @@ namespace CobaltAHK
 {
 	public static partial class Syntax
 	{
+		private static bool IsEnumName<TEnum>(string name) where TEnum : struct
+		{
+			TEnum dummy;
+			return Enum.TryParse<TEnum>(name, true, out dummy);
+		}
+
+		private static TEnum GetEnumFromName<TEnum>(string name) where TEnum : struct
+		{
+			TEnum val;
+			if (Enum.TryParse<TEnum>(name, true, out val)) {
+				return val;
+			}
+			throw new ArgumentException();
+		}
+
 		public static bool IsDirective(string name)
 		{
-			Directive dir;
-			return Directive.TryParse(name, true, out dir);
+			return IsEnumName<Directive>(name);
 		}
 
 		public static Directive GetDirective(string name)
 		{
-			Directive dir;
-			if (Directive.TryParse(name, true, out dir)) {
-				return dir;
-			}
-			throw new ArgumentException();
+			return GetEnumFromName<Directive>(name);
 		}
 
 		public static bool IsBuiltinVariable(string name)
 		{
-			BuiltinVariable v;
-			return BuiltinVariable.TryParse(name, true, out v);
+			return IsEnumName<BuiltinVariable>(name);
 		}
 
 		public static BuiltinVariable GetBuiltinVariable(string name)
 		{
-			BuiltinVariable v;
-			if (BuiltinVariable.TryParse(name, true, out v)) {
-				return v;
-			}
-			throw new ArgumentException();
+			return GetEnumFromName<BuiltinVariable>(name);
 		}
 
 		public static bool IsParameterModifier(string name)
 		{
-			ParameterModifier m;
-			return ParameterModifier.TryParse(name, true, out m);
+			return IsEnumName<ParameterModifier>(name);
 		}
 
 		public static ParameterModifier GetParameterModifier(string name)
 		{
-			ParameterModifier m;
-			if (ParameterModifier.TryParse(name, true, out m)) {
-				return m;
-			}
-			throw new ArgumentException();
+			return GetEnumFromName<ParameterModifier>(name);
 		}
 
 		public static bool IsKeyword(string name)
 		{
-			Keyword k;
-			return Keyword.TryParse(name, true, out k);
+			return IsEnumName<Keyword>(name);
 		}
 
 		public static Keyword GetKeyword(string name)
 		{
-			Keyword k;
-			if (Keyword.TryParse(name, true, out k)) {
-				return k;
-			}
-			throw new ArgumentException();
+			return GetEnumFromName<Keyword>(name);
 		}
 
 		private static readonly BuiltinVariable[] variablesInInclude = new[] {
