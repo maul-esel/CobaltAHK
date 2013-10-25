@@ -93,7 +93,7 @@ namespace CobaltAHK.ExpressionTree
 				throw new InvalidOperationException();
 			}
 			var ifExpr = (IfExpression)branches.ElementAt(0);
-			var ifCond = MakeBoolean(Generate(ifExpr.Condition, scope));
+			var ifCond = Converter.ConvertToBoolean(Generate(ifExpr.Condition, scope));
 			var ifBlock = DLR.Expression.Block(scope.GetVariables(), ifExpr.Body.Select(e => Generate(e, scope)).Concat(new[] { DLR.Expression.Empty() }));
 
 			if (branches.Count() == 1) {
@@ -106,28 +106,6 @@ namespace CobaltAHK.ExpressionTree
 			} else {
 				return DLR.Expression.IfThenElse(ifCond, ifBlock, GenerateIfElse(branches.Except(new[] { ifExpr }), scope));
 			}
-		}
-
-		private DLR.Expression MakeBoolean(DLR.Expression expr) // todo
-		{
-			var tmp = DLR.Expression.Parameter(typeof(object));
-			return DLR.Expression.Block(new[] { tmp },
-				DLR.Expression.Assign(tmp, DLR.Expression.Convert(expr, typeof(object))),
-				DLR.Expression.Condition(
-					DLR.Expression.TypeIs(tmp, typeof(bool)),
-					DLR.Expression.Convert(tmp, typeof(bool)),
-					DLR.Expression.AndAlso(
-						DLR.Expression.NotEqual(tmp, DLR.Expression.Constant(null, typeof(object))),
-						DLR.Expression.AndAlso(
-							DLR.Expression.NotEqual(tmp, DLR.Expression.Constant("", typeof(object))),
-					                DLR.Expression.AndAlso(
-								DLR.Expression.NotEqual(tmp, DLR.Expression.Constant(false, typeof(object))),
-								DLR.Expression.NotEqual(tmp, DLR.Expression.Constant(0, typeof(object)))
-							)
-						)
-					)
-				)
-			);
 		}
 
 		private DLR.Expression GenerateFunctionCall(FunctionCallExpression func, Scope scope)
@@ -236,7 +214,7 @@ namespace CobaltAHK.ExpressionTree
 			var ifTrue = Generate(expr.Expressions.ElementAt(1), scope);
 			var ifFalse = Generate(expr.Expressions.ElementAt(2), scope);
 
-			return DLR.Expression.Condition(MakeBoolean(cond), ifTrue, ifFalse);
+			return DLR.Expression.Condition(Converter.ConvertToBoolean(cond), ifTrue, ifFalse);
 		}
 
 		#region binary operations
@@ -257,7 +235,7 @@ namespace CobaltAHK.ExpressionTree
 
 			if (op == Operator.Concatenate) {
 				var concat = typeof(string).GetMethod("Concat", new[] { typeof(string), typeof(string) });
-				return DLR.Expression.Call(concat, MakeString(left), MakeString(right));
+				return DLR.Expression.Call(concat, Converter.ConvertToString(left), Converter.ConvertToString(right));
 
 			} else if (op == Operator.ConcatenateAssign) { // todo: retype to string
 				return CompoundAssigment((DLR.ParameterExpression)left, left, op, right, scope); // `a .= b` <=> `a := a . b`
@@ -360,39 +338,6 @@ namespace CobaltAHK.ExpressionTree
 				scope.AddVariable(variable.Name, variable);
 			}
 			return variable;
-		}
-
-		private DLR.Expression MakeString(DLR.Expression expr)
-		{
-			DLR.Expression convert;
-
-			var cultureToString = expr.Type.GetMethod("ToString", new[] { typeof(IFormatProvider) });
-			if (CanConvert(expr.Type, typeof(string))) {
-				convert = DLR.Expression.Convert(expr, typeof(string));
-
-			} else if (cultureToString != null) {
-				convert = DLR.Expression.Call(expr, cultureToString, DLR.Expression.Constant(System.Globalization.CultureInfo.InvariantCulture.NumberFormat));
-
-			} else {
-				convert = DLR.Expression.Call(expr, expr.Type.GetMethod("ToString", Type.EmptyTypes));
-			}
-
-			return DLR.Expression.Condition(DLR.Expression.Equal(DLR.Expression.Convert(expr, typeof(object)), NULL), // handle null values
-			                                DLR.Expression.Constant(""),
-			                                convert);
-		}
-
-		private bool CanConvert(Type from, Type to)
-		{
-			// original code taken from http://stackoverflow.com/questions/292437/#answer-4640305
-			var input = DLR.Expression.Parameter(from);
-			try {
-				// If this succeeds then we can cast 'from' type to 'to' type using implicit coercion
-				DLR.Expression.Lambda(DLR.Expression.Convert(input, to), input).Compile();
-			} catch (InvalidOperationException) {
-				return false;
-			}
-			return true;
 		}
 	}
 }
