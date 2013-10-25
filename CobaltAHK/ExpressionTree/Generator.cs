@@ -9,6 +9,10 @@ namespace CobaltAHK.ExpressionTree
 {
 	public class Generator
 	{
+		internal static readonly DLR.Expression NULL = DLR.Expression.Constant(null);
+		internal static readonly DLR.Expression TRUE = DLR.Expression.Constant(true);
+		internal static readonly DLR.Expression FALSE = DLR.Expression.Constant(false);
+
 		public Generator(ScriptSettings config)
 		{
 			settings = config;
@@ -26,9 +30,9 @@ namespace CobaltAHK.ExpressionTree
 				return scope.ResolveVariable(((CustomVariableExpression)expr).Name);
 			} else if (expr is ValueKeywordExpression) {
 				switch (((ValueKeywordExpression)expr).Keyword) {
-					case Syntax.ValueKeyword.False: return DLR.Expression.Constant(false);
-					case Syntax.ValueKeyword.True:  return DLR.Expression.Constant(true);
-					case Syntax.ValueKeyword.Null:  return DLR.Expression.Constant(null);
+					case Syntax.ValueKeyword.False: return FALSE;
+					case Syntax.ValueKeyword.True:  return TRUE;
+					case Syntax.ValueKeyword.Null:  return NULL;
 				}
 			} else if (expr is BinaryExpression) {
 				return GenerateBinaryExpression((BinaryExpression)expr, scope);
@@ -200,7 +204,7 @@ namespace CobaltAHK.ExpressionTree
 				}
 				funcBody.Add(expr);
 			}
-			funcBody.Add(DLR.Expression.Label(endOfFunc, DLR.Expression.Constant(null))); // default return value is null
+			funcBody.Add(DLR.Expression.Label(endOfFunc, NULL)); // default return value is null
 
 			var function = DLR.Expression.Lambda(
 				DLR.Expression.GetFuncType(types.ToArray()),
@@ -223,7 +227,7 @@ namespace CobaltAHK.ExpressionTree
 				var val = Generate(expr.Value, scope);
 				return DLR.Expression.Return(target, DLR.Expression.Convert(val, typeof(object)));
 			}
-			return DLR.Expression.Return(target, DLR.Expression.Constant(null));
+			return DLR.Expression.Return(target, NULL);
 		}
 
 		private DLR.Expression GenerateTernaryExpression(TernaryExpression expr, Scope scope)
@@ -373,7 +377,7 @@ namespace CobaltAHK.ExpressionTree
 				convert = DLR.Expression.Call(expr, expr.Type.GetMethod("ToString", Type.EmptyTypes));
 			}
 
-			return DLR.Expression.Condition(DLR.Expression.Equal(DLR.Expression.Convert(expr, typeof(object)), DLR.Expression.Constant(null)), // handle null values
+			return DLR.Expression.Condition(DLR.Expression.Equal(DLR.Expression.Convert(expr, typeof(object)), NULL), // handle null values
 			                                DLR.Expression.Constant(""),
 			                                convert);
 		}
