@@ -29,9 +29,9 @@ namespace CobaltAHK
 
 	#region TextToken
 
-	public /*abstract*/ class TextToken : Token
+	public abstract class TextToken : Token
 	{
-		public TextToken(string str)
+		protected TextToken(string str)
 		{
 			text = str;
 		}
