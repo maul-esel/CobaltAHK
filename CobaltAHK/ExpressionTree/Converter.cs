@@ -97,7 +97,7 @@ namespace CobaltAHK.ExpressionTree
 
 		internal static Expression ConvertNumberToString(Expression value)
 		{
-			return Expression.Call(value, NumberToString, NumberFormat);
+			return Expression.Call(Cast<IConvertible>(value), NumberToString, NumberFormat);
 		}
 
 		#endregion
