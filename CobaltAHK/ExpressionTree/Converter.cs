@@ -38,10 +38,10 @@ namespace CobaltAHK.ExpressionTree
 		{
 			var tmp = Expression.Parameter(typeof(object));
 			return Expression.Block(new[] { tmp },
-				Expression.Assign(tmp, Expression.Convert(value, typeof(object))),
+				Expression.Assign(tmp, Cast<object>(value)),
 				Expression.Condition(
 					Expression.TypeIs(tmp, typeof(bool)),
-					Expression.Convert(tmp, typeof(bool)),
+					Cast<bool>(tmp),
 					AndAlso(
 						IsNotNull(tmp),
 						IsNotEmptyString(tmp),
@@ -81,7 +81,7 @@ namespace CobaltAHK.ExpressionTree
 		internal static Expression ConvertToString(Expression value)
 		{
 			return Expression.Condition(
-				Expression.Equal(value, Generator.NULL),
+				Expression.Equal(Cast<object>(value), Generator.NULL),
 				Expression.Constant(""),
 				Expression.Condition(IsNumber(value),
 			                     ConvertNumberToString(value),
@@ -111,7 +111,7 @@ namespace CobaltAHK.ExpressionTree
 						Expression.Throw(Expression.Constant(new InvalidCastException()))
 					),
 					Expression.Call(
-						Expression.Convert(value, typeof(IConvertible)),
+						Cast<IConvertible>(value),
 						ConvertibleToType,
 						Expression.Constant(type),
 						Expression.Constant(null, typeof(IFormatProvider))
@@ -129,6 +129,11 @@ namespace CobaltAHK.ExpressionTree
 				condition = (condition == null) ? (Expression)equality : Expression.OrElse(condition, equality);
 			}
 			return condition;
+		}
+
+		private static Expression Cast<T>(Expression expr)
+		{
+			return Expression.Convert(expr, typeof(T));
 		}
 
 		private static Expression AndAlso(params Expression[] exprs)
