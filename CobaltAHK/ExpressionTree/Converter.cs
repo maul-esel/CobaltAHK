@@ -1,5 +1,6 @@
 using System;
 using System.Globalization;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 
@@ -128,12 +129,7 @@ namespace CobaltAHK.ExpressionTree
 
 		private static Expression IsNumber(Expression value)
 		{
-			Expression condition = null;
-			foreach (var type in NumberTypes) {
-				var equality = Expression.TypeEqual(value, type);
-				condition = (condition == null) ? (Expression)equality : Expression.OrElse(condition, equality);
-			}
-			return condition;
+			return OrElse(NumberTypes.Select(type => Expression.TypeEqual(value, type)).ToArray());
 		}
 
 		private static Expression Cast<T>(Expression expr)
@@ -148,11 +144,12 @@ namespace CobaltAHK.ExpressionTree
 
 		private static Expression AndAlso(params Expression[] exprs)
 		{
-			Expression condition = Generator.TRUE; // in case of empty exprs array
-			foreach (var expr in exprs) {
-				condition = Expression.AndAlso(condition, expr);
-			}
-			return condition;
+			return exprs.Aggregate(Generator.TRUE, (condition, expr) => Expression.AndAlso(condition, expr));
+		}
+
+		private static Expression OrElse(params Expression[] exprs)
+		{
+			return exprs.Aggregate(Generator.FALSE, (condition, expr) => Expression.OrElse(condition, expr));
 		}
 
 		private static bool CanCast(Type from, Type to)
