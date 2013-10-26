@@ -11,7 +11,7 @@ namespace CobaltAHK.ExpressionTree
 
 		private static readonly Expression NumberFormat = Expression.Constant(CultureInfo.InvariantCulture.NumberFormat);
 
-		private static readonly MethodInfo ToString = typeof(object).GetMethod("ToString", Type.EmptyTypes);
+		private static readonly MethodInfo ObjectToString = typeof(object).GetMethod("ToString", Type.EmptyTypes);
 
 		private static readonly MethodInfo NumberToString = typeof(IConvertible).GetMethod("ToString", new[] { typeof(IFormatProvider) });
 
@@ -92,7 +92,7 @@ namespace CobaltAHK.ExpressionTree
 
 		private static Expression CreateToString(Expression value)
 		{
-			return Expression.Call(value, ToString);
+			return Expression.Call(value, ObjectToString);
 		}
 
 		internal static Expression ConvertNumberToString(Expression value)
