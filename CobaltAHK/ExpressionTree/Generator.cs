@@ -71,7 +71,7 @@ namespace CobaltAHK.ExpressionTree
 
 			return DLR.Expression.ListInit(
 				create,
-				arr.List.Select(e => DLR.Expression.Convert(Generate(e, scope), typeof(object)))
+				arr.List.Select(e => Converter.ConvertToObject(Generate(e, scope)))
 			);
 		}
 
@@ -79,7 +79,7 @@ namespace CobaltAHK.ExpressionTree
 		private DLR.Expression ExpressionArray(IEnumerable<Expression> exprs, Scope scope)
 		{
 			return DLR.Expression.NewArrayInit(typeof(object),
-			                                   exprs.Select(e => DLR.Expression.Convert(Generate(e, scope), typeof(object))));
+			                                   exprs.Select(e => Converter.ConvertToObject(Generate(e, scope))));
 		}
 
 		private DLR.Expression GenerateIfElse(BlockExpression block, Scope scope)
@@ -203,7 +203,7 @@ namespace CobaltAHK.ExpressionTree
 			}
 			if (expr.Value != null) {
 				var val = Generate(expr.Value, scope);
-				return DLR.Expression.Return(target, DLR.Expression.Convert(val, typeof(object)));
+				return DLR.Expression.Return(target, Converter.ConvertToObject(val));
 			}
 			return DLR.Expression.Return(target, NULL);
 		}

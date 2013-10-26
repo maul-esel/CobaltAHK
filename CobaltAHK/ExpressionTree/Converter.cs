@@ -32,6 +32,11 @@ namespace CobaltAHK.ExpressionTree
 			);
 		}
 
+		internal static Expression ConvertToObject(Expression value)
+		{
+			return Cast<object>(value);
+		}
+
 		#region to boolean
 
 		internal static Expression ConvertToBoolean(Expression value)
