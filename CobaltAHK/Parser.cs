@@ -17,6 +17,7 @@ namespace CobaltAHK
 			var token = lexer.PeekToken();
 			while (token != Token.EOF) {
 				expressions.Add(ParseExpression(lexer));
+				SkipNewlinesAndComments(lexer);
 				token = lexer.PeekToken();
 			}
 
@@ -27,17 +28,7 @@ namespace CobaltAHK
 		{
 			var token = lexer.PeekToken();
 
-			// skip empty lines
-			while (token == Token.Newline) {
-				lexer.GetToken();
-				token = lexer.PeekToken();
-			}
-
-			if (token is CommentToken) {
-				lexer.GetToken();
-				return new CommentExpression(lexer.Position, ((CommentToken)token).Text, token is MultiLineCommentToken);
-
-			} else if (token is DirectiveToken) {
+			if (token is DirectiveToken) {
 				var directive = (DirectiveToken)token;
 				if (directive.Directive == Syntax.Directive.If) {
 					return new IfDirectiveExpression(lexer.Position, ParseExpressionChain(lexer).ToExpression());
@@ -882,6 +873,15 @@ namespace CobaltAHK
 				token = lexer.PeekToken();
 			}
 			return skipped;
+		}
+
+		private void SkipNewlinesAndComments(Lexer lexer)
+		{
+			var token = lexer.PeekToken();
+			while (token == Token.Newline || token is CommentToken) {
+				lexer.GetToken();
+				token = lexer.PeekToken();
+			}
 		}
 
 		#endregion

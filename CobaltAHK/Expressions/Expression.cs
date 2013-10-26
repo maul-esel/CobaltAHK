@@ -17,11 +17,6 @@ namespace CobaltAHK.Expressions
 		public SourcePosition Position { get { return position; } }
 	}
 
-	public class CommentExpression : Expression
-	{
-		public CommentExpression(SourcePosition pos, string comment, bool multiline) : base(pos) { }
-	}
-
 	public class DirectiveExpression : Expression
 	{
 		public DirectiveExpression(SourcePosition pos, Syntax.Directive dir, IEnumerable<ValueExpression> prms)
