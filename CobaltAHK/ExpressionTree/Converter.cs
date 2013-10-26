@@ -26,7 +26,7 @@ namespace CobaltAHK.ExpressionTree
 			}
 
 			return Expression.Condition(
-				Expression.TypeIs(value, typeof(IConvertible)),
+				Is<IConvertible>(value),
 				ConvertConvertible(value, type),
 				Expression.Default(type) // todo: throw exception here?
 			);
@@ -40,7 +40,7 @@ namespace CobaltAHK.ExpressionTree
 			return Expression.Block(new[] { tmp },
 				Expression.Assign(tmp, Cast<object>(value)),
 				Expression.Condition(
-					Expression.TypeIs(tmp, typeof(bool)),
+					Is<bool>(tmp),
 					Cast<bool>(tmp),
 					AndAlso(
 						IsNotNull(tmp),
@@ -107,7 +107,7 @@ namespace CobaltAHK.ExpressionTree
 			return Expression.Convert(
 				Expression.Block(
 					Expression.IfThen(
-						Expression.Not(Expression.TypeIs(value, typeof(IConvertible))),
+						Expression.Not(Is<IConvertible>(value)),
 						Expression.Throw(Expression.Constant(new InvalidCastException()))
 					),
 					Expression.Call(
@@ -134,6 +134,11 @@ namespace CobaltAHK.ExpressionTree
 		private static Expression Cast<T>(Expression expr)
 		{
 			return Expression.Convert(expr, typeof(T));
+		}
+
+		private static Expression Is<T>(Expression expr)
+		{
+			return Expression.TypeIs(expr, typeof(T));
 		}
 
 		private static Expression AndAlso(params Expression[] exprs)
