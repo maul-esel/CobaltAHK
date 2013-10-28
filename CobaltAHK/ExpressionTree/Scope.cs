@@ -26,17 +26,15 @@ namespace CobaltAHK.ExpressionTree
 			foreach (var method in methods) {
 				// todo: filter by attribute?
 				var paramList = method.GetParameters();
-				if (HasFunction(method.Name) || paramList.Any(p => p.ParameterType.IsByRef)) {
-					continue; // skips byRef and overloads // todo: support both!
+				if (HasFunction(method.Name)) {
+					continue; // skips overloads // todo: support!
 				}
 
 				var prms  = paramList.Select(p => Expression.Parameter(p.ParameterType, p.Name)).ToArray();
 				var types = paramList.Select(p => p.ParameterType).ToList();
 				types.Add(method.ReturnType);
 
-				var lambda = Expression.Lambda(Expression.GetFuncType(types.ToArray()),
-				                               Expression.Call(method, prms),
-				                               prms);
+				var lambda = Expression.Lambda(Expression.Call(method, prms), prms);
 				AddFunctionName(method.Name);
 				AddFunction(method.Name, lambda);
 			}
