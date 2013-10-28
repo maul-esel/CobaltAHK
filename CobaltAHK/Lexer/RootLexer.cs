@@ -13,6 +13,12 @@ namespace CobaltAHK
 			{ '}', Token.CloseBrace }
 		};
 
+		protected override IDictionary<char, Token> punctuationTokens {
+			get {
+				return punctuation;
+			}
+		}
+
 		public override Token GetToken()
 		{
 			SkipWhitespaceAndNewlines();
