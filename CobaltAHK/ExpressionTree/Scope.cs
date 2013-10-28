@@ -206,27 +206,22 @@ namespace CobaltAHK.ExpressionTree
 
 	public class LoopScope : Scope
 	{
-		public LoopScope(Scope parent) : base(parent) { }
-
-		public override Expression ResolveBuiltinVariable(Syntax.BuiltinVariable variable)
+		public LoopScope(Scope parent)
+		: base(parent)
 		{
-			if (variable == Syntax.BuiltinVariable.A_Index) {
-				// todo
-			}
-			return base.ResolveBuiltinVariable(variable);
+			OverrideBuiltinVariable(Syntax.BuiltinVariable.A_Index,
+			                        Expression.Parameter(typeof(int), "A_Index"));
 		}
 	}
 
 	public class LoopFilesScope : LoopScope
 	{
-		public LoopFilesScope(Scope parent) : base(parent) { }
-
-		public override Expression ResolveBuiltinVariable(Syntax.BuiltinVariable variable)
+		public LoopFilesScope(Scope parent)
+		: base(parent)
 		{
-			if (variable == Syntax.BuiltinVariable.A_LoopFileName) { // todo: etc.
-				// todo
-			}
-			return base.ResolveBuiltinVariable(variable);
+			OverrideBuiltinVariable(Syntax.BuiltinVariable.A_LoopFileName,
+			                        Expression.Parameter(typeof(string), "A_LoopFileName"));
+			// todo: etc.
 		}
 	}
 
