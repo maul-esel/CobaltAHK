@@ -239,6 +239,9 @@ namespace CobaltAHK.ExpressionTree
 			if (Operator.IsArithmetic(op)) {
 				return GenerateArithmeticExpression(left, op, right, scope);
 
+			} else if (Operator.IsComparison(op)) {
+				return GenerateComparisonExpression(left, op, right);
+
 			} else if (op == Operator.Concatenate) { // keep here for compound assignments
 				return GenerateStringConcat(Converter.ConvertToString(left), Converter.ConvertToString(right));
 
@@ -259,6 +262,32 @@ namespace CobaltAHK.ExpressionTree
 		{
 			return GenerateBinaryExpression(variable, Operator.Assign, GenerateBinaryExpression(left, Operator.CompoundGetUnderlyingOperator(op), right, scope), scope);
 		}
+
+		#region comparison
+
+		private DLR.Expression GenerateComparisonExpression(DLR.Expression left, Operator op, DLR.Expression right)
+		{
+			// todo: changes types (numeric, string, ...)
+
+			if (op == Operator.Less) {
+				return DLR.Expression.LessThan(left, right);
+			} else if (op == Operator.LessOrEqual) {
+				return DLR.Expression.LessThanOrEqual(left, right);
+			} else if (op == Operator.Greater) {
+				return DLR.Expression.GreaterThan(left, right);
+			} else if (op == Operator.GreaterOrEqual) {
+				return DLR.Expression.GreaterThanOrEqual(left, right);
+			} else if (op == Operator.Equal) {
+				return DLR.Expression.Equal(left, right); // todo: special for strings
+			} else if (op == Operator.CaseEqual) {
+				return DLR.Expression.Equal(left, right);
+			} else if (op == Operator.RegexMatch) {
+				// todo
+			}
+			throw new NotImplementedException();
+		}
+
+		#endregion
 
 		#region optimized string concat
 

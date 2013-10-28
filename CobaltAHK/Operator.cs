@@ -123,6 +123,14 @@ namespace CobaltAHK
 			    || (IsCompoundAssignment(op) && IsArithmetic(CompoundGetUnderlyingOperator(op)));
 		}
 
+		public static bool IsComparison(Operator op)
+		{
+			return op == Operator.Less || op == Operator.LessOrEqual
+				|| op == Operator.Greater || op == Operator.GreaterOrEqual
+				|| op == Operator.Equal || op == Operator.CaseEqual
+				|| op == Operator.RegexMatch;
+		}
+
 		private class OperatorComparer : IComparer<Operator>
 		{
 			public int Compare(Operator first, Operator second)

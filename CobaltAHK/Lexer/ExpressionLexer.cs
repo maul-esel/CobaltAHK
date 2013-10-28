@@ -119,6 +119,25 @@ namespace CobaltAHK
 					} else {
 						return OperatorToken.GetToken(Operator.Equal);
 					}
+				case '>':
+				case '<':
+					reader.Read();
+					if (reader.Peek() == '=') {
+						reader.Read();
+						return OperatorToken.GetToken(ch == '>' ? Operator.GreaterOrEqual : Operator.LessOrEqual);
+					} else if (reader.Peek() == ch) {
+						reader.Read();
+						if (reader.Peek() == '=') {
+							reader.Read();
+							return OperatorToken.GetToken(ch == '>' ? Operator.BitShiftRightAssign : Operator.BitShiftLeftAssign);
+						}
+						return OperatorToken.GetToken(ch == '>' ? Operator.BitShiftRight : Operator.BitShiftLeft);
+					} else if (ch == '<' && reader.Peek() == '>') {
+						reader.Read();
+						return OperatorToken.GetToken(Operator.NotEqualAlt);
+					} else {
+						return OperatorToken.GetToken(ch == '>' ? Operator.Greater : Operator.Less);
+					}
 					// todo: operators & | ^ && || ...
 				default:
 					if (IsDigit(ch)) {
