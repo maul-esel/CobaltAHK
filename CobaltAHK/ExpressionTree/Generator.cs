@@ -231,15 +231,15 @@ namespace CobaltAHK.ExpressionTree
 			var left  = Generate(expr.Expressions.ElementAt(0), scope);
 			var right = Generate(expr.Expressions.ElementAt(1), scope);
 
-			return GenerateBinaryExpression(left, expr.Operator, right, scope);
+			return GenerateBinaryExpression(left, (BinaryOperator)expr.Operator, right, scope);
 		}
 
-		private DLR.Expression GenerateBinaryExpression(DLR.Expression left, Operator op, DLR.Expression right, Scope scope)
+		private DLR.Expression GenerateBinaryExpression(DLR.Expression left, BinaryOperator op, DLR.Expression right, Scope scope)
 		{
-			if (Operator.IsArithmetic(op)) {
+			if (op.Is(BinaryOperationType.Arithmetic)) {
 				return GenerateArithmeticExpression(left, op, right, scope);
 
-			} else if (Operator.IsComparison(op)) {
+			} else if (op.Is(BinaryOperationType.Comparison)) {
 				return GenerateComparisonExpression(left, op, right);
 
 			} else if (op == Operator.Concatenate) { // keep here for compound assignments
@@ -258,9 +258,9 @@ namespace CobaltAHK.ExpressionTree
 			throw new NotImplementedException();
 		}
 
-		private DLR.Expression CompoundAssigment(DLR.ParameterExpression variable, DLR.Expression left, Operator op, DLR.Expression right, Scope scope)
+		private DLR.Expression CompoundAssigment(DLR.ParameterExpression variable, DLR.Expression left, BinaryOperator op, DLR.Expression right, Scope scope)
 		{
-			return GenerateBinaryExpression(variable, Operator.Assign, GenerateBinaryExpression(left, Operator.CompoundGetUnderlyingOperator(op), right, scope), scope);
+			return GenerateBinaryExpression(variable, (BinaryOperator)Operator.Assign, GenerateBinaryExpression(left, Operator.CompoundGetUnderlyingOperator(op), right, scope), scope);
 		}
 
 		#region comparison
@@ -321,7 +321,7 @@ namespace CobaltAHK.ExpressionTree
 
 		#region arithmetic
 
-		private DLR.Expression GenerateArithmeticExpression(DLR.Expression left, Operator op, DLR.Expression right, Scope scope)
+		private DLR.Expression GenerateArithmeticExpression(DLR.Expression left, BinaryOperator op, DLR.Expression right, Scope scope)
 		{
 			Type leftType = left.Type, rightType = right.Type;
 			DLR.ParameterExpression variable = null;
@@ -354,7 +354,7 @@ namespace CobaltAHK.ExpressionTree
 
 			} else if (op == Operator.FloorDivide) {
 				var floor = typeof(Math).GetMethod("Floor", new[] { typeof(double) });
-				return DLR.Expression.Call(floor, GenerateArithmeticExpression(left, Operator.TrueDivide, right, scope));
+				return DLR.Expression.Call(floor, GenerateArithmeticExpression(left, (BinaryOperator)Operator.TrueDivide, right, scope));
 
 			} else if (op == Operator.Power) {
 				return DLR.Expression.Power(DLR.Expression.Convert(left, typeof(double)), DLR.Expression.Convert(right, typeof(double)));

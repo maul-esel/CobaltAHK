@@ -42,54 +42,54 @@ namespace CobaltAHK
 		
 		// todo: New
 		public static readonly Operator Deref                   = new   UnaryOperator("%",  13); // todo
-		public static readonly Operator ObjectAccess            = new  BinaryOperator(".",  13);
+		public static readonly Operator ObjectAccess            = new  BinaryOperator(".",  13, BinaryOperationType.Other);
 		public static readonly Operator Increment               = new   UnaryOperator("++", 12);
 		public static readonly Operator Decrement               = new   UnaryOperator("--", 12);
-		public static readonly Operator Power                   = new  BinaryOperator("**", 11);
+		public static readonly Operator Power                   = new  BinaryOperator("**", 11, BinaryOperationType.Arithmetic);
 		public static readonly Operator UnaryMinus              = new   UnaryOperator("-",  10);
 		public static readonly Operator LogicalNot              = new   UnaryOperator("!",  10);
 		public static readonly Operator BitwiseNot              = new   UnaryOperator("~",  10);
 		public static readonly Operator Address                 = new   UnaryOperator("&",  10);
 		public static readonly Operator Dereference             = new   UnaryOperator("*",  10);
-		public static readonly Operator Multiply                = new  BinaryOperator("*",  10);
-		public static readonly Operator TrueDivide              = new  BinaryOperator("/",  10);
-		public static readonly Operator FloorDivide             = new  BinaryOperator("//", 10);
-		public static readonly Operator Add                     = new  BinaryOperator("+",   9);
-		public static readonly Operator Subtract                = new  BinaryOperator("-",   9);
-		public static readonly Operator BitShiftLeft            = new  BinaryOperator("<<",  9);
-		public static readonly Operator BitShiftRight           = new  BinaryOperator(">>",  9);
-		public static readonly Operator BitwiseAnd              = new  BinaryOperator("&",   8);
-		public static readonly Operator BitwiseXor              = new  BinaryOperator("^",   8);
-		public static readonly Operator BitwiseOr               = new  BinaryOperator("|",   8);
-		public static readonly Operator Concatenate             = new  BinaryOperator(".",   7);
-		public static readonly Operator RegexMatch              = new  BinaryOperator("~=",  7);
-		public static readonly Operator Greater                 = new  BinaryOperator(">",   6);
-		public static readonly Operator Less                    = new  BinaryOperator("<",   6);
-		public static readonly Operator GreaterOrEqual          = new  BinaryOperator(">=",  6);
-		public static readonly Operator LessOrEqual             = new  BinaryOperator("<=",  6);
-		public static readonly Operator Equal                   = new  BinaryOperator("=",   5);
-		public static readonly Operator CaseEqual               = new  BinaryOperator("==",  5);
-		public static readonly Operator NotEqual                = new  BinaryOperator("!=",  5);
-		public static readonly Operator NotEqualAlt             = new  BinaryOperator("<>",  5);
+		public static readonly Operator Multiply                = new  BinaryOperator("*",  10, BinaryOperationType.Arithmetic);
+		public static readonly Operator TrueDivide              = new  BinaryOperator("/",  10, BinaryOperationType.Arithmetic);
+		public static readonly Operator FloorDivide             = new  BinaryOperator("//", 10, BinaryOperationType.Arithmetic);
+		public static readonly Operator Add                     = new  BinaryOperator("+",   9, BinaryOperationType.Arithmetic);
+		public static readonly Operator Subtract                = new  BinaryOperator("-",   9, BinaryOperationType.Arithmetic);
+		public static readonly Operator BitShiftLeft            = new  BinaryOperator("<<",  9, BinaryOperationType.BitShift);
+		public static readonly Operator BitShiftRight           = new  BinaryOperator(">>",  9, BinaryOperationType.BitShift);
+		public static readonly Operator BitwiseAnd              = new  BinaryOperator("&",   8, BinaryOperationType.Bitwise);
+		public static readonly Operator BitwiseXor              = new  BinaryOperator("^",   8, BinaryOperationType.Bitwise);
+		public static readonly Operator BitwiseOr               = new  BinaryOperator("|",   8, BinaryOperationType.Bitwise);
+		public static readonly Operator Concatenate             = new  BinaryOperator(".",   7, BinaryOperationType.Other);
+		public static readonly Operator RegexMatch              = new  BinaryOperator("~=",  7, BinaryOperationType.Comparison);
+		public static readonly Operator Greater                 = new  BinaryOperator(">",   6, BinaryOperationType.Comparison);
+		public static readonly Operator Less                    = new  BinaryOperator("<",   6, BinaryOperationType.Comparison);
+		public static readonly Operator GreaterOrEqual          = new  BinaryOperator(">=",  6, BinaryOperationType.Comparison);
+		public static readonly Operator LessOrEqual             = new  BinaryOperator("<=",  6, BinaryOperationType.Comparison);
+		public static readonly Operator Equal                   = new  BinaryOperator("=",   5, BinaryOperationType.Comparison);
+		public static readonly Operator CaseEqual               = new  BinaryOperator("==",  5, BinaryOperationType.Comparison);
+		public static readonly Operator NotEqual                = new  BinaryOperator("!=",  5, BinaryOperationType.Comparison);
+		public static readonly Operator NotEqualAlt             = new  BinaryOperator("<>",  5, BinaryOperationType.Comparison);
 		public static readonly Operator WordLogicalNot          = new   UnaryOperator("NOT", 4);
-		public static readonly Operator LogicalAnd              = new  BinaryOperator("&&",  3);
-		public static readonly Operator WordLogicalAnd          = new  BinaryOperator("AND", 3);
-		public static readonly Operator LogicalOr               = new  BinaryOperator("||",  3);
-		public static readonly Operator WordLogicalOr           = new  BinaryOperator("OR",  3);
+		public static readonly Operator LogicalAnd              = new  BinaryOperator("&&",  3, BinaryOperationType.Logical);
+		public static readonly Operator WordLogicalAnd          = new  BinaryOperator("AND", 3, BinaryOperationType.Logical);
+		public static readonly Operator LogicalOr               = new  BinaryOperator("||",  3, BinaryOperationType.Logical);
+		public static readonly Operator WordLogicalOr           = new  BinaryOperator("OR",  3, BinaryOperationType.Logical);
 		public static readonly Operator Ternary                 = new TernaryOperator("?", ":",  2); // todo
-		public static readonly Operator Assign                  = new  BinaryOperator(":=",  1);
-		public static readonly Operator AddAssign               = new  BinaryOperator("+=",  1);
-		public static readonly Operator SubtractAssign          = new  BinaryOperator("-=",  1);
-		public static readonly Operator MultiplyAssign          = new  BinaryOperator("*=",  1);
-		public static readonly Operator TrueDivideAssign        = new  BinaryOperator("/=",  1);
-		public static readonly Operator FloorDivideAssign       = new  BinaryOperator("//=", 1);
-		public static readonly Operator ConcatenateAssign       = new  BinaryOperator(".=",  1);
-		public static readonly Operator BitwiseOrAssign         = new  BinaryOperator("|=",  1);
-		public static readonly Operator BitwiseAndAssign        = new  BinaryOperator("&=",  1);
-		public static readonly Operator BitwiseXorAssign        = new  BinaryOperator("^=",  1);
-		public static readonly Operator BitShiftLeftAssign      = new  BinaryOperator("<<=", 1);
-		public static readonly Operator BitShiftRightAssign     = new  BinaryOperator(">>=", 1);
-		public static readonly Operator AltObjAccess            = new  BinaryOperator("[",   0); // todo: is precedence correct? e.g. `f . a[b]` => `(f . a)[b]` ?
+		public static readonly Operator Assign                  = new  BinaryOperator(":=",  1, BinaryOperationType.Assign);
+		public static readonly Operator AddAssign               = new  BinaryOperator("+=",  1, BinaryOperationType.Assign|BinaryOperationType.Arithmetic);
+		public static readonly Operator SubtractAssign          = new  BinaryOperator("-=",  1, BinaryOperationType.Assign|BinaryOperationType.Arithmetic);
+		public static readonly Operator MultiplyAssign          = new  BinaryOperator("*=",  1, BinaryOperationType.Assign|BinaryOperationType.Arithmetic);
+		public static readonly Operator TrueDivideAssign        = new  BinaryOperator("/=",  1, BinaryOperationType.Assign|BinaryOperationType.Arithmetic);
+		public static readonly Operator FloorDivideAssign       = new  BinaryOperator("//=", 1, BinaryOperationType.Assign|BinaryOperationType.Arithmetic);
+		public static readonly Operator ConcatenateAssign       = new  BinaryOperator(".=",  1, BinaryOperationType.Assign|BinaryOperationType.Other);
+		public static readonly Operator BitwiseOrAssign         = new  BinaryOperator("|=",  1, BinaryOperationType.Assign|BinaryOperationType.Bitwise);
+		public static readonly Operator BitwiseAndAssign        = new  BinaryOperator("&=",  1, BinaryOperationType.Assign|BinaryOperationType.Bitwise);
+		public static readonly Operator BitwiseXorAssign        = new  BinaryOperator("^=",  1, BinaryOperationType.Assign|BinaryOperationType.Bitwise);
+		public static readonly Operator BitShiftLeftAssign      = new  BinaryOperator("<<=", 1, BinaryOperationType.Assign|BinaryOperationType.BitShift);
+		public static readonly Operator BitShiftRightAssign     = new  BinaryOperator(">>=", 1, BinaryOperationType.Assign|BinaryOperationType.BitShift);
+		public static readonly Operator AltObjAccess            = new  BinaryOperator("[",   0, BinaryOperationType.Other); // todo: is precedence correct? e.g. `f . a[b]` => `(f . a)[b]` ?
 
 		private static readonly IDictionary<Operator, Operator> compoundAssigns = new Dictionary<Operator, Operator>() {
 			{ Operator.ConcatenateAssign,   Operator.Concatenate   },
@@ -105,30 +105,14 @@ namespace CobaltAHK
 			{ Operator.BitShiftRightAssign, Operator.BitShiftRight }
 		};
 
-		public static bool IsCompoundAssignment(Operator op)
+		internal static bool IsCompoundAssignment(BinaryOperator op)
 		{
-			return compoundAssigns.ContainsKey(op);
+			return op.Type.HasFlag(BinaryOperationType.Assign) && op.Type != BinaryOperationType.Assign;
 		}
 
-		public static Operator CompoundGetUnderlyingOperator(Operator op)
+		internal static BinaryOperator CompoundGetUnderlyingOperator(BinaryOperator op)
 		{
-			return compoundAssigns[op];
-		}
-
-		public static bool IsArithmetic(Operator op)
-		{
-			return op == Operator.Add        || op == Operator.FloorDivide
-			    || op == Operator.Multiply   || op == Operator.Subtract
-			    || op == Operator.TrueDivide || op == Operator.Power
-			    || (IsCompoundAssignment(op) && IsArithmetic(CompoundGetUnderlyingOperator(op)));
-		}
-
-		public static bool IsComparison(Operator op)
-		{
-			return op == Operator.Less || op == Operator.LessOrEqual
-				|| op == Operator.Greater || op == Operator.GreaterOrEqual
-				|| op == Operator.Equal || op == Operator.CaseEqual
-				|| op == Operator.RegexMatch;
+			return (BinaryOperator)compoundAssigns[op];
 		}
 
 		private class OperatorComparer : IComparer<Operator>
@@ -148,8 +132,34 @@ namespace CobaltAHK
 
 	internal class BinaryOperator : Operator
 	{
-		internal BinaryOperator(string op, uint prec)
-		: base(op, prec) { }
+		internal BinaryOperator(string op, uint prec, BinaryOperationType tp)
+		: base(op, prec)
+		{
+			type = tp;
+		}
+
+		public bool Is(BinaryOperationType type)
+		{
+			return Type.HasFlag(type);
+		}
+
+		private readonly BinaryOperationType type;
+
+		public BinaryOperationType Type { get { return type; } }
+	}
+
+	[Flags]
+	public enum BinaryOperationType
+	{
+		None        =   0,
+		Numeric     =   1,
+		Comparison  =   4,
+		Bitwise     =   8,
+		BitShift    =  16,
+		Logical     =  32,
+		Other       =  64,
+		Assign      = 128,
+		Arithmetic  = Numeric|2
 	}
 
 	internal class TernaryOperator : Operator
