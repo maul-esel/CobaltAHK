@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
@@ -48,6 +49,20 @@ namespace CobaltAHK
 		#endregion
 
 		#region helper methods
+
+		protected virtual IDictionary<char, Token> punctuationTokens {
+			get { return new Dictionary<char, Token>(0); }
+		}
+
+		protected Token ReadPunctuationToken()
+		{
+			char ch = reader.Peek();
+			if (punctuationTokens.ContainsKey(ch)) {
+				reader.Read();
+				return punctuationTokens[ch];
+			}
+			return null;
+		}
 
 		protected void ExpectString(string expected)
 		{

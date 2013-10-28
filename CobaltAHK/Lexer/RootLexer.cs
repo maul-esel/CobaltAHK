@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace CobaltAHK
 {
@@ -7,9 +8,20 @@ namespace CobaltAHK
 		public RootLexer(SourceReader source)
 		: base(source) { }
 
+		private static readonly IDictionary<char, Token> punctuation = new Dictionary<char, Token>() {
+			{ '{', Token.OpenBrace },
+			{ '}', Token.CloseBrace }
+		};
+
 		public override Token GetToken()
 		{
 			SkipWhitespaceAndNewlines();
+
+			var token = ReadPunctuationToken();
+			if (token != null) {
+				return token;
+			}
+
 			char ch = reader.Peek();
 
 			// Possible syntax:
@@ -42,12 +54,6 @@ namespace CobaltAHK
 						default:
 							throw new UnexpectedCodeException(reader.Position, ": or =", reader.Peek().ToString());
 					}
-				case '{':
-					reader.Read();
-					return Token.OpenBrace;
-				case '}':
-					reader.Read();
-					return Token.CloseBrace;
 				case '#': return ReadDirectiveOrHotkey();
 				// todo: hotkey chars, such as ^!...
 				default: return ReadTextToken();

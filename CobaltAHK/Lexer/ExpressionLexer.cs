@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Text;
 using System.Linq;
 
@@ -9,31 +10,35 @@ namespace CobaltAHK
 		public ExpressionLexer(SourceReader source)
 		: base(source) { }
 
+		private static readonly IDictionary<char, Token> punctuation = new Dictionary<char, Token>() {
+			{ '(', Token.OpenParenthesis },
+			{ ')', Token.CloseParenthesis },
+			{ '{', Token.OpenBrace },
+			{ '}', Token.CloseBrace }
+			//, { ',', Token.Comma }
+		};
+
+		protected override IDictionary<char, Token> punctuationTokens {
+			get {
+				return punctuation;
+			}
+		}
+
 		public override Token GetToken()
 		{
 			bool whitespace = IsWhitespace(reader.Peek());
 			SkipWhitespace();
 
+			var token = ReadPunctuationToken();
+			if (token != null) {
+				return token;
+			}
+
 			char ch = reader.Peek();
 			switch (ch) {
-				/*case ',':
-					reader.Read();
-					return Token.Comma;*/
 				case '"':
 					return ReadQuotedString();
 
-				case '(':
-					reader.Read();
-					return Token.OpenParenthesis;
-				case ')':
-					reader.Read();
-					return Token.CloseParenthesis;
-				case '{':
-					reader.Read();
-					return Token.OpenBrace;
-				case '}':
-					reader.Read();
-					return Token.CloseBrace;
 				case '[':
 					reader.Read();
 					if (whitespace) { // todo: or comma, or operator, or CloseBracket, or OpenParenthesis (NOT closeParens)
