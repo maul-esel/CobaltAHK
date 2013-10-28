@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
+using System.Reflection;
 using DLR = System.Linq.Expressions;
 using CobaltAHK.Expressions;
 
@@ -221,6 +222,10 @@ namespace CobaltAHK.ExpressionTree
 
 		private DLR.Expression GenerateBinaryExpression(BinaryExpression expr, Scope scope)
 		{
+			if (expr.Operator == Operator.Concatenate) {
+				return GenerateStringConcat(expr, scope);
+			}
+
 			var left  = Generate(expr.Expressions.ElementAt(0), scope);
 			var right = Generate(expr.Expressions.ElementAt(1), scope);
 
@@ -231,14 +236,12 @@ namespace CobaltAHK.ExpressionTree
 		{
 			if (Operator.IsArithmetic(op)) {
 				return GenerateArithmeticExpression(left, op, right, scope);
-			}
 
-			if (op == Operator.Concatenate) {
-				var concat = typeof(string).GetMethod("Concat", new[] { typeof(string), typeof(string) });
-				return DLR.Expression.Call(concat, Converter.ConvertToString(left), Converter.ConvertToString(right));
+			} else if (op == Operator.Concatenate) { // keep here for compound assignments
+				return GenerateStringConcat(Converter.ConvertToString(left), Converter.ConvertToString(right));
 
-			} else if (op == Operator.ConcatenateAssign) { // todo: retype to string
-				return CompoundAssigment((DLR.ParameterExpression)left, left, op, right, scope); // `a .= b` <=> `a := a . b`
+			} else if (Operator.IsCompoundAssignment(op)) {
+				return CompoundAssigment((DLR.ParameterExpression)left, left, op, right, scope);
 
 			} else if (op == Operator.Assign) {
 				if (left is DLR.ParameterExpression) {
@@ -254,6 +257,36 @@ namespace CobaltAHK.ExpressionTree
 		{
 			return GenerateBinaryExpression(variable, Operator.Assign, GenerateBinaryExpression(left, Operator.CompoundGetUnderlyingOperator(op), right, scope), scope);
 		}
+
+		#region optimized string concat
+
+		private static readonly MethodInfo concat = typeof(String).GetMethod("Concat", new[] { typeof(IEnumerable<string>) });
+
+		private DLR.Expression GenerateStringConcat(BinaryExpression expr, Scope scope)
+		{
+			return GenerateStringConcat(ExtractConcats(expr, scope));
+		}
+
+		private DLR.Expression GenerateStringConcat(params DLR.Expression[] exprs)
+		{
+			var init = DLR.Expression.ListInit(DLR.Expression.New(typeof(List<string>)), exprs);
+			return DLR.Expression.Call(concat, init);
+		}
+
+		private DLR.Expression[] ExtractConcats(Expression expr, Scope scope)
+		{
+			var list = new List<DLR.Expression>();
+			var binary = expr as BinaryExpression;
+			if (binary != null && binary.Operator == Operator.Concatenate) {
+				list.AddRange(ExtractConcats(binary.Expressions.ElementAt(0), scope));
+				list.AddRange(ExtractConcats(binary.Expressions.ElementAt(1), scope));
+			} else {
+				list.Add(Converter.ConvertToString(Generate(expr, scope)));
+			}
+			return list.ToArray();
+		}
+
+		#endregion
 
 		#region arithmetic
 
