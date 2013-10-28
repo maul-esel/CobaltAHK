@@ -29,6 +29,8 @@ namespace CobaltAHK.ExpressionTree
 				return GenerateFunctionDefinition((FunctionDefinitionExpression)expr, scope);
 			} else if (expr is CustomVariableExpression) {
 				return scope.ResolveVariable(((CustomVariableExpression)expr).Name);
+			} else if (expr is BuiltinVariableExpression) {
+				return scope.ResolveBuiltinVariable(((BuiltinVariableExpression)expr).Variable);
 			} else if (expr is ValueKeywordExpression) {
 				switch (((ValueKeywordExpression)expr).Keyword) {
 					case Syntax.ValueKeyword.False: return FALSE;

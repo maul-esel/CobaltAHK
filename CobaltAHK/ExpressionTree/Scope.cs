@@ -11,6 +11,7 @@ namespace CobaltAHK.ExpressionTree
 		public Scope() : this(null)
 		{
 			LoadBuiltinFunctions();
+			LoadBuiltinVariables();
 		}
 
 		public Scope(Scope parentScope)
@@ -146,16 +147,45 @@ namespace CobaltAHK.ExpressionTree
 			return variables[name.ToLower()];
 		}
 
-		public virtual Expression ResolveBuiltinVariable(Syntax.BuiltinVariable variable)
+		#region builtin
+
+		private readonly IDictionary<Syntax.BuiltinVariable, PropertyInfo> builtinVars = new Dictionary<Syntax.BuiltinVariable, PropertyInfo>();
+
+		private readonly IDictionary<Syntax.BuiltinVariable, ParameterExpression> overridenBuiltinVars = new Dictionary<Syntax.BuiltinVariable, ParameterExpression>();
+
+		private void LoadBuiltinVariables()
 		{
-			// todo: Expression.Dynamic
-			throw new NotImplementedException();
+			var flags = BindingFlags.Static | BindingFlags.Public | BindingFlags.DeclaredOnly;
+			var properties = typeof(IronAHK.Rusty.Core).GetProperties(flags);
+
+			foreach (var prop in properties) {
+				Console.WriteLine(prop.Name);
+				if (Syntax.IsBuiltinVariable(prop.Name)) {
+					builtinVars[Syntax.GetBuiltinVariable(prop.Name)] = prop;
+				}
+			}
 		}
 
-		public virtual void OverrideBuiltinVariable(Syntax.BuiltinVariable variable, ParameterExpression value) // used for A_Index etc.
+		public virtual Expression ResolveBuiltinVariable(Syntax.BuiltinVariable variable)
 		{
-			// todo
+			if (overridenBuiltinVars.ContainsKey(variable)) {
+				return overridenBuiltinVars[variable];
+
+			} else if (!builtinVars.ContainsKey(variable)) {
+				if (IsRoot) {
+					throw new InvalidOperationException();
+				}
+				return parent.ResolveBuiltinVariable(variable);
+			}
+			return Expression.Property(null, builtinVars[variable]);
 		}
+
+		public virtual void OverrideBuiltinVariable(Syntax.BuiltinVariable variable, ParameterExpression value)
+		{
+			overridenBuiltinVars[variable] = value;
+		}
+
+		#endregion
 
 		#endregion
 	}
