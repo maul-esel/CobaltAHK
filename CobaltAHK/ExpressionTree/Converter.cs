@@ -90,8 +90,11 @@ namespace CobaltAHK.ExpressionTree
 				Expression.Equal(Cast<object>(value), Generator.NULL),
 				Expression.Constant(""),
 				Expression.Condition(IsNumber(value),
-			                     ConvertNumberToString(value),
-			                     CreateToString(value)
+					ConvertNumberToString(value),
+					Expression.Condition(Is<bool>(value),
+						ConvertNumberToString(ConvertConvertible(value, typeof(int))),
+						CreateToString(value)
+				        )
 			        )
 			);
 		}
