@@ -1,11 +1,12 @@
 using System;
+using System.Dynamic;
 using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 
 namespace CobaltAHK
 {
-	public class CobaltAHKObject : System.Dynamic.DynamicObject, IDictionary<object, object>
+	public class CobaltAHKObject : DynamicObject, IDictionary<object, object>
 	{
 		internal CobaltAHKObject(IEnumerable<object> keys, IEnumerable<object> values)
 		{
@@ -19,7 +20,7 @@ namespace CobaltAHK
 
 		private readonly IDictionary<object, object> dict = new Dictionary<object, object>();
 
-		public override bool TryGetIndex(System.Dynamic.GetIndexBinder binder, object[] args, out object result)
+		public override bool TryGetIndex(GetIndexBinder binder, object[] args, out object result)
 		{
 			if (args.Length != 1) {
 				throw new InvalidOperationException();
@@ -27,7 +28,7 @@ namespace CobaltAHK
 			return dict.TryGetValue(args[0], out result);
 		}
 
-		public override bool TryGetMember(System.Dynamic.GetMemberBinder binder, out object result)
+		public override bool TryGetMember(GetMemberBinder binder, out object result)
 		{
 			return dict.TryGetValue(binder.Name, out result);
 		}
