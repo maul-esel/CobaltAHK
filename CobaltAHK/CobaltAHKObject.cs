@@ -33,6 +33,21 @@ namespace CobaltAHK
 			return dict.TryGetValue(binder.Name, out result);
 		}
 
+		public override bool TrySetIndex(SetIndexBinder binder, object[] args, object value)
+		{
+			if (args.Length != 1) {
+				throw new InvalidOperationException();
+			}
+			dict[args[0]] = value;
+			return true;
+		}
+
+		public override bool TrySetMember(SetMemberBinder binder, object value)
+		{
+			dict[binder.Name] = value;
+			return true;
+		}
+
 		#region IDictionary<object, object>
 
 		object IDictionary<object, object>.this[object key] {
