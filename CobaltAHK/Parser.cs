@@ -77,7 +77,13 @@ namespace CobaltAHK
 			return ParseWithState(lexer, Lexer.State.Expression, out expr, token => {
 				if (token is OperatorToken) {
 					var chain = new ExpressionChain();
-					chain.Append(GetVariable(id.Text, lexer.Position));
+
+					if (token == OperatorToken.GetToken(Operator.ObjectAccess)) {
+						var acc = ParseObjectAccess(lexer, GetVariable(id.Text, lexer.Position));
+						chain.Append(acc);
+					} else {
+						chain.Append(GetVariable(id.Text, lexer.Position));
+					}
 
 					ParseExpressionChain(lexer, chain);
 					return chain.ToExpression();
@@ -309,7 +315,13 @@ namespace CobaltAHK
 				bool concat = newline && token is OperatorToken; // todo
 				if (!newline || concat) {
 					var chain = new ExpressionChain();
-					chain.Append(funcExpr);
+
+					if (token == OperatorToken.GetToken(Operator.ObjectAccess)) {
+						chain.Append(ParseObjectAccess(lexer, funcExpr));
+					} else {
+						chain.Append(funcExpr);
+					}
+
 					ParseExpressionChain(lexer, chain); // parse further expressions here, like `myfunc("myParam").Add(5)`
 					result = chain.ToExpression();
 
