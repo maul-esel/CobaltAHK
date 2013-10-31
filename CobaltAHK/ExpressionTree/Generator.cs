@@ -55,14 +55,18 @@ namespace CobaltAHK.ExpressionTree
 			throw new NotImplementedException();
 		}
 
+		private static readonly ConstructorInfo ObjConstructor = typeof(CobaltAHKObject)
+			.GetConstructor(BindingFlags.NonPublic|BindingFlags.Instance,
+			                null,
+			                new[] { typeof(IEnumerable<object>), typeof(IEnumerable<object>) },
+					null);
+
 		private DLR.Expression GenerateObjectLiteral(ObjectLiteralExpression obj, Scope scope)
 		{
-			var t = typeof(IEnumerable<object>);
-			var constructor = typeof(CobaltAHKObject).GetConstructor(new[] { t, t });
-
 			var keys = ExpressionArray(obj.Dictionary.Keys, scope);
 			var values = ExpressionArray(obj.Dictionary.Values, scope);
-			return DLR.Expression.New(constructor, keys, values);
+
+			return DLR.Expression.New(ObjConstructor, keys, values);
 		}
 
 		private DLR.Expression GenerateArrayLiteral(ArrayLiteralExpression arr, Scope scope)
