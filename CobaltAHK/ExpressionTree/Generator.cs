@@ -41,6 +41,8 @@ namespace CobaltAHK.ExpressionTree
 				return GenerateBinaryExpression((BinaryExpression)expr, scope);
 			} else if (expr is TernaryExpression) {
 				return GenerateTernaryExpression((TernaryExpression)expr, scope);
+			} else if (expr is MemberAccessExpression) {
+				return GenerateMemberAccess((MemberAccessExpression)expr, scope);
 			} else if (expr is StringLiteralExpression) {
 				return DLR.Expression.Constant(((StringLiteralExpression)expr).String);
 			} else if (expr is NumberLiteralExpression) {
@@ -213,6 +215,15 @@ namespace CobaltAHK.ExpressionTree
 				return DLR.Expression.Return(target, Converter.ConvertToObject(val));
 			}
 			return DLR.Expression.Return(target, NULL);
+		}
+
+		private DLR.Expression GenerateMemberAccess(MemberAccessExpression expr, Scope scope)
+		{
+			return DLR.Expression.Dynamic(new MemberAccessBinder(),
+			                              typeof(object),
+			                              Generate(expr.Object, scope),
+			                              Generate(expr.Key, scope)
+			);
 		}
 
 		private DLR.Expression GenerateTernaryExpression(TernaryExpression expr, Scope scope)

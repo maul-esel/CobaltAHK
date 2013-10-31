@@ -71,6 +71,7 @@
     <Compile Include="Syntax\Keyword.cs" />
     <Compile Include="Syntax\ValueKeyword.cs" />
     <Compile Include="ExpressionTree\Converter.cs" />
+    <Compile Include="ExpressionTree\MemberAccessBinder.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
