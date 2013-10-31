@@ -159,7 +159,6 @@ namespace CobaltAHK.ExpressionTree
 			var properties = typeof(IronAHK.Rusty.Core).GetProperties(flags);
 
 			foreach (var prop in properties) {
-				Console.WriteLine(prop.Name);
 				if (Syntax.IsBuiltinVariable(prop.Name)) {
 					builtinVars[Syntax.GetBuiltinVariable(prop.Name)] = prop;
 				}
