@@ -13,7 +13,7 @@ namespace CobaltAHK.ExpressionTree
 
 		public override DynamicMetaObject FallbackGetIndex(DynamicMetaObject target, DynamicMetaObject[] args, DynamicMetaObject errorSuggestion)
 		{
-			if (args.Length > 1) {
+			if (args.Length != 1) {
 				throw new InvalidOperationException();
 			}
 
