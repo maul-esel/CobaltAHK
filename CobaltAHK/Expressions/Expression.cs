@@ -105,6 +105,38 @@ namespace CobaltAHK.Expressions
 		public Syntax.ValueKeyword Keyword { get { return keyword; } }
 	}
 
+	#region members
+
+	public abstract class MemberExpression : ValueExpression
+	{
+		public MemberExpression(SourcePosition pos, ValueExpression o, ValueExpression k)
+		: base(pos)
+		{
+			obj = o;
+			key = k;
+		}
+
+		private readonly ValueExpression obj;
+
+		public ValueExpression Object { get { return obj; } }
+
+		private readonly ValueExpression key;
+
+		public ValueExpression Key { get { return key; } }
+	}
+
+	public class MemberAccessExpression : MemberExpression
+	{
+		public MemberAccessExpression(SourcePosition pos, ValueExpression o, ValueExpression k) : base(pos, o, k) { }
+	}
+
+	public class MemberInvokeExpression : MemberExpression
+	{
+		public MemberInvokeExpression(SourcePosition pos, ValueExpression o, ValueExpression k) : base(pos, o, k) { }
+	}
+
+	#endregion
+
 	#region variables
 
 	public abstract class VariableExpression : ValueExpression

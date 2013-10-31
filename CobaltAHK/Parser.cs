@@ -495,8 +495,15 @@ namespace CobaltAHK
 				} else if (token == Token.Colon && ternary) {
 					ternary = false;
 				} else {
-					chain.Append(TokenToValueExpression(lexer));
+					var expr = TokenToValueExpression(lexer);
 					token = lexer.PeekToken();
+
+					while (token == OperatorToken.GetToken(Operator.ObjectAccess)) {
+						expr = ParseObjectAccess(lexer, expr);
+						token = lexer.PeekToken();
+					}
+
+					chain.Append(expr);
 					continue;
 				}
 
@@ -617,6 +624,24 @@ namespace CobaltAHK
 			}
 
 			throw new Exception(token.ToString()); // todo
+		}
+
+		private MemberExpression ParseObjectAccess(Lexer lexer, ValueExpression obj)
+		{
+			AssertToken(lexer.GetToken(), OperatorToken.GetToken(Operator.ObjectAccess));
+			AssertToken(lexer.PeekToken(), typeof(TextToken));
+			var pos = lexer.Position;
+
+			var token = lexer.GetToken();
+			var member = new StringLiteralExpression(pos, (token as TextToken).Text);
+
+			if (token is IdToken) {
+				return new MemberAccessExpression(pos, obj, member);
+			} else if (token is FunctionToken) {
+				return new MemberInvokeExpression(pos, obj, member);
+			}
+
+			throw new Exception(); // todo
 		}
 
 		private void ParseAltObjAccess(Lexer lexer, ExpressionChain chain)
