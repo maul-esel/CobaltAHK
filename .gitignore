@@ -4,3 +4,4 @@ Debug
 *.dll
 *.mdb
 *.userprefs
+test-results

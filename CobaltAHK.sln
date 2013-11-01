@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CobaltAHK-app", "CobaltAHK-
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rusty", "IronAHK\Rusty\Rusty.csproj", "{818030A8-5FFE-4CA1-8248-0940C72EA47A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "Tests\Tests.csproj", "{B70875C8-3941-40A2-A4DE-812FB4410DAD}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{818030A8-5FFE-4CA1-8248-0940C72EA47A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{818030A8-5FFE-4CA1-8248-0940C72EA47A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{818030A8-5FFE-4CA1-8248-0940C72EA47A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B70875C8-3941-40A2-A4DE-812FB4410DAD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B70875C8-3941-40A2-A4DE-812FB4410DAD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B70875C8-3941-40A2-A4DE-812FB4410DAD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B70875C8-3941-40A2-A4DE-812FB4410DAD}.Release|Any CPU.Build.0 = Release|Any CPU
 		{F5AF7424-17A3-48F3-9256-1A3AB4A123C4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{F5AF7424-17A3-48F3-9256-1A3AB4A123C4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F5AF7424-17A3-48F3-9256-1A3AB4A123C4}.Release|Any CPU.ActiveCfg = Release|Any CPU
