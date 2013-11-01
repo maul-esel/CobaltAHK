@@ -30,9 +30,6 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
-    <Reference Include="Microsoft.Scripting">
-      <HintPath>..\..\Codeplex-DLR-1.0\Src\Runtime\Microsoft.Scripting\%24%28SolutionDir%29..\Bin\40\Microsoft.Scripting.dll</HintPath>
-    </Reference>
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
