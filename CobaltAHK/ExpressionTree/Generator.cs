@@ -74,7 +74,7 @@ namespace CobaltAHK.ExpressionTree
 		private DLR.Expression GenerateArrayLiteral(ArrayLiteralExpression arr, Scope scope)
 		{
 			var create = DLR.Expression.New(typeof(List<object>));
-			if (arr.List.Count() == 0) {
+			if (arr.List.Length == 0) {
 				return create;
 			}
 
@@ -96,24 +96,24 @@ namespace CobaltAHK.ExpressionTree
 			return GenerateIfElse(block.Branches, scope);
 		}
 
-		private DLR.Expression GenerateIfElse(IEnumerable<ControlFlowExpression> branches, Scope scope)
+		private DLR.Expression GenerateIfElse(ControlFlowExpression[] branches, Scope scope)
 		{
-			if (!(branches.ElementAt(0) is IfExpression)) {
+			if (!(branches[0] is IfExpression)) {
 				throw new InvalidOperationException();
 			}
-			var ifExpr = (IfExpression)branches.ElementAt(0);
-			var ifCond = Converter.ConvertToBoolean(Generate(ifExpr.Condition, scope));
+			var ifExpr  = (IfExpression)branches[0];
+			var ifCond  = Converter.ConvertToBoolean(Generate(ifExpr.Condition, scope));
 			var ifBlock = DLR.Expression.Block(scope.GetVariables(), ifExpr.Body.Select(e => Generate(e, scope)).Concat(new[] { DLR.Expression.Empty() }));
 
-			if (branches.Count() == 1) {
+			if (branches.Length == 1) {
 				return DLR.Expression.IfThen(ifCond, ifBlock);
 
-			} else if (branches.ElementAt(1) is ElseExpression) {
-				var elseExpr = (ElseExpression)branches.ElementAt(1);
+			} else if (branches[1] is ElseExpression) {
+				var elseExpr = (ElseExpression)branches[1];
 				return DLR.Expression.IfThenElse(ifCond, ifBlock, DLR.Expression.Block(scope.GetVariables(),
 				                                                                       elseExpr.Body.Select(e => Generate(e, scope))));
 			} else {
-				return DLR.Expression.IfThenElse(ifCond, ifBlock, GenerateIfElse(branches.Except(new[] { ifExpr }), scope));
+				return DLR.Expression.IfThenElse(ifCond, ifBlock, GenerateIfElse(branches.Except(new[] { ifExpr }).ToArray(), scope));
 			}
 		}
 
@@ -137,12 +137,12 @@ namespace CobaltAHK.ExpressionTree
 
 		private DLR.Expression GenerateDynamicFunctionCall(FunctionCallExpression func, Scope scope)
 		{
-			var args = new List<DLR.Expression>(func.Parameters.Count() + 1);
+			var args = new List<DLR.Expression>(func.Parameters.Length + 1);
 			args.Add(DLR.Expression.Constant(func.Name));
 			args.AddRange(GenerateParams(func, scope));
 			// todo: store param count in scope and validate?
 
-			var binder = new FunctionCallBinder(new CallInfo(func.Parameters.Count()), scope); // todo: cache instances?
+			var binder = new FunctionCallBinder(new CallInfo(func.Parameters.Length), scope); // todo: cache instances?
 
 			return DLR.Expression.Dynamic(binder, typeof(object), args);
 		}
@@ -228,9 +228,9 @@ namespace CobaltAHK.ExpressionTree
 
 		private DLR.Expression GenerateTernaryExpression(TernaryExpression expr, Scope scope)
 		{
-			var cond = Generate(expr.Expressions.ElementAt(0), scope);
-			var ifTrue = Generate(expr.Expressions.ElementAt(1), scope);
-			var ifFalse = Generate(expr.Expressions.ElementAt(2), scope);
+			var cond    = Generate(expr.Expressions[0], scope);
+			var ifTrue  = Generate(expr.Expressions[1], scope);
+			var ifFalse = Generate(expr.Expressions[2], scope);
 
 			return DLR.Expression.Condition(Converter.ConvertToBoolean(cond), ifTrue, ifFalse);
 		}
@@ -243,8 +243,8 @@ namespace CobaltAHK.ExpressionTree
 				return GenerateStringConcat(expr, scope);
 			}
 
-			var left  = Generate(expr.Expressions.ElementAt(0), scope);
-			var right = Generate(expr.Expressions.ElementAt(1), scope);
+			var left  = Generate(expr.Expressions[0], scope);
+			var right = Generate(expr.Expressions[1], scope);
 
 			return GenerateBinaryExpression(left, (BinaryOperator)expr.Operator, right, scope);
 		}
@@ -324,8 +324,8 @@ namespace CobaltAHK.ExpressionTree
 			var list = new List<DLR.Expression>();
 			var binary = expr as BinaryExpression;
 			if (binary != null && binary.Operator == Operator.Concatenate) {
-				list.AddRange(ExtractConcats(binary.Expressions.ElementAt(0), scope));
-				list.AddRange(ExtractConcats(binary.Expressions.ElementAt(1), scope));
+				list.AddRange(ExtractConcats(binary.Expressions[0], scope));
+				list.AddRange(ExtractConcats(binary.Expressions[1], scope));
 			} else {
 				list.Add(Converter.ConvertToString(Generate(expr, scope)));
 			}

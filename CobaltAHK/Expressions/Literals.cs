@@ -65,14 +65,14 @@ namespace CobaltAHK.Expressions
 
 	public class ArrayLiteralExpression : ValueLiteralExpression
 	{
-		public ArrayLiteralExpression(SourcePosition pos, IEnumerable<ValueExpression> arr)
+		public ArrayLiteralExpression(SourcePosition pos, ValueExpression[] arr)
 		: base(pos)
 		{
 			list = arr;
 		}
 
-		private readonly IEnumerable<ValueExpression> list;
+		private readonly ValueExpression[] list;
 
-		public IEnumerable<ValueExpression> List { get { return list; } }
+		public ValueExpression[] List { get { return list; } }
 	}
 }

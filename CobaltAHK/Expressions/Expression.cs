@@ -1,7 +1,4 @@
 using System.Collections.Generic;
-#if DEBUG
-using System.Linq;
-#endif
 
 namespace CobaltAHK.Expressions
 {
@@ -19,7 +16,7 @@ namespace CobaltAHK.Expressions
 
 	public class DirectiveExpression : Expression
 	{
-		public DirectiveExpression(SourcePosition pos, Syntax.Directive dir, IEnumerable<ValueExpression> prms)
+		public DirectiveExpression(SourcePosition pos, Syntax.Directive dir, ValueExpression[] prms)
 		: base(pos)
 		{
 			directive = dir;
@@ -30,7 +27,7 @@ namespace CobaltAHK.Expressions
 
 		public Syntax.Directive Directive { get { return directive; } }
 
-		private readonly IEnumerable<ValueExpression> parameters;
+		private readonly ValueExpression[] parameters;
 
 #if DEBUG
 		public override string ToString()
@@ -39,7 +36,7 @@ namespace CobaltAHK.Expressions
 			foreach (var p in parameters) {
 				str += (p == null ? "<null>" : p.TypeName()) + " ";
 			}
-			return string.Format("[DirectiveExpression Directive='{0}', {1} parameters: {2}]", directive, parameters.Count(), str);
+			return string.Format("[DirectiveExpression Directive='{0}', {1} parameters: {2}]", directive, parameters.Length, str);
 		}
 #endif
 	}
@@ -76,7 +73,7 @@ namespace CobaltAHK.Expressions
 
 	public class FunctionCallExpression : ValueExpression
 	{
-		public FunctionCallExpression(SourcePosition pos, string funcName, IEnumerable<ValueExpression> prms)
+		public FunctionCallExpression(SourcePosition pos, string funcName, ValueExpression[] prms)
 		: base(pos)
 		{
 			name = funcName;
@@ -87,9 +84,9 @@ namespace CobaltAHK.Expressions
 
 		public string Name { get { return name; } }
 
-		private readonly IEnumerable<ValueExpression> parameters;
+		private readonly ValueExpression[] parameters;
 
-		public IEnumerable<ValueExpression> Parameters { get { return parameters; } }
+		public ValueExpression[] Parameters { get { return parameters; } }
 	}
 
 	public class ValueKeywordExpression : ValueExpression
@@ -176,7 +173,7 @@ namespace CobaltAHK.Expressions
 
 	public abstract class OperatorExpression : ValueExpression
 	{
-		protected OperatorExpression(SourcePosition pos, Operator op, IEnumerable<ValueExpression> exprs)
+		protected OperatorExpression(SourcePosition pos, Operator op, ValueExpression[] exprs)
 		: base(pos)
 		{
 			this.op = op;
@@ -187,9 +184,9 @@ namespace CobaltAHK.Expressions
 
 		public Operator Operator { get { return op; } }
 
-		private readonly IEnumerable<ValueExpression> expressions;
+		private readonly ValueExpression[] expressions;
 
-		public IEnumerable<ValueExpression> Expressions { get { return expressions; } }
+		public ValueExpression[] Expressions { get { return expressions; } }
 	}
 
 	// todo: differentiate between post/pre-increment and -decrement

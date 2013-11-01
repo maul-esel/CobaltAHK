@@ -136,7 +136,7 @@ namespace CobaltAHK
 			lexer.Rewind(before);
 			lexer.ResetToken();
 
-			return new BlockExpression(lexer.Position, branches);
+			return new BlockExpression(lexer.Position, branches.ToArray());
 		}
 
 		private ControlFlowExpression ParseControlFlowBranch(Lexer lexer)
@@ -749,14 +749,14 @@ namespace CobaltAHK
 					ExtractParamDefModifier(bin, out name, out modifier);
 
 				} else if (bin.Operator == Operator.Assign) {
-					var first = bin.Expressions.ElementAt(0);
+					var first = bin.Expressions[0];
 					if (first is CustomVariableExpression) {
 						name = ExtractParamDefName(first);
 					} else {
-						ExtractParamDefModifier(bin.Expressions.ElementAt(0), out name, out modifier);
+						ExtractParamDefModifier(bin.Expressions[0], out name, out modifier);
 					}
 
-					defaultValue = bin.Expressions.ElementAt(1); // todo: what's allowed as default? other vars? or only Literals?
+					defaultValue = bin.Expressions[1]; // todo: what's allowed as default? other vars? or only Literals?
 
 				} else {
 					throw new Exception("invalid operation"); // todo
@@ -787,13 +787,13 @@ namespace CobaltAHK
 				throw new Exception("not concat"); // todo
 			}
 
-			var first = bin.Expressions.ElementAt(0) as CustomVariableExpression;
+			var first = bin.Expressions[0] as CustomVariableExpression;
 			if (first == null || !Syntax.IsParameterModifier(first.Name)) {
 				throw new Exception("invalid modifier");
 			}
 
 			modifier = Syntax.GetParameterModifier(first.Name);
-			name = ExtractParamDefName(bin.Expressions.ElementAt(1));
+			name = ExtractParamDefName(bin.Expressions[1]);
 		}
 
 		#endregion

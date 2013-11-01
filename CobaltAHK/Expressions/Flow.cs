@@ -4,15 +4,15 @@ namespace CobaltAHK.Expressions
 {
 	public class BlockExpression : Expression
 	{
-		public BlockExpression(SourcePosition pos, IEnumerable<ControlFlowExpression> exprs)
+		public BlockExpression(SourcePosition pos, ControlFlowExpression[] exprs)
 		: base(pos)
 		{
 			branches = exprs;
 		}
 
-		private readonly IEnumerable<ControlFlowExpression> branches;
+		private readonly ControlFlowExpression[] branches;
 
-		public IEnumerable<ControlFlowExpression> Branches { get { return branches; } }
+		public ControlFlowExpression[] Branches { get { return branches; } }
 	}
 
 	public abstract class ControlFlowExpression : Expression
