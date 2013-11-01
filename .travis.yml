@@ -1,0 +1,10 @@
+language: C
+
+install:
+  - sudo apt-get install mono-devel mono-gmcs nunit-console
+
+before_script:
+  - xbuild Travis-Build.proj
+
+script:
+  - nunit-console ./Tests/bin/Debug/Tests.dll
