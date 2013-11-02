@@ -17,6 +17,12 @@ namespace CobaltAHK
 			set.Add(this);
 		}
 
+		protected Operator(string op, uint prec, Whitespace white)
+		: this(op, prec)
+		{
+			whitespace = white;
+		}
+
 		public virtual bool Matches(string op)
 		{
 			return Code == op.ToUpper();
@@ -24,12 +30,16 @@ namespace CobaltAHK
 
 		#region fields
 
+		private readonly Whitespace whitespace = Whitespace.none;
+
 		protected readonly string code;
 
 		private readonly uint precedence;
 
 		#endregion
 		#region properties
+
+		public Whitespace Whitespace { get { return whitespace; } }
 
 		public string Code { get { return code; } }
 
@@ -52,26 +62,40 @@ namespace CobaltAHK
 		#region instances
 		// todo: New
 		public static readonly Operator Deref                   = new   UnaryOperator("%",  13); // todo
-		public static readonly Operator ObjectAccess            = new  BinaryOperator(".",  13, BinaryOperationType.Other);
-		public static readonly Operator Increment               = new   UnaryOperator("++", 12);
-		public static readonly Operator Decrement               = new   UnaryOperator("--", 12);
+		public static readonly Operator ObjectAccess            = new  BinaryOperator(".", 13,
+		                                                                              BinaryOperationType.Other,
+		                                                                              Whitespace.neither);
+		public static readonly Operator Increment               = new   UnaryOperator("++", 12,
+		                                                                              Whitespace.before_xor_after);
+		public static readonly Operator Decrement               = new   UnaryOperator("--", 12,
+		                                                                              Whitespace.before_xor_after);
 		public static readonly Operator Power                   = new  BinaryOperator("**", 11, BinaryOperationType.Arithmetic);
 		public static readonly Operator UnaryMinus              = new   UnaryOperator("-",  10);
 		public static readonly Operator LogicalNot              = new   UnaryOperator("!",  10);
 		public static readonly Operator BitwiseNot              = new   UnaryOperator("~",  10);
 		public static readonly Operator Address                 = new   UnaryOperator("&",  10);
 		public static readonly Operator Dereference             = new   UnaryOperator("*",  10);
-		public static readonly Operator Multiply                = new  BinaryOperator("*",  10, BinaryOperationType.Arithmetic);
+		public static readonly Operator Multiply                = new  BinaryOperator("*",  10,
+		                                                                              BinaryOperationType.Arithmetic,
+		                                                                              Whitespace.both_or_neither);
 		public static readonly Operator TrueDivide              = new  BinaryOperator("/",  10, BinaryOperationType.Arithmetic);
 		public static readonly Operator FloorDivide             = new  BinaryOperator("//", 10, BinaryOperationType.Arithmetic);
-		public static readonly Operator Add                     = new  BinaryOperator("+",   9, BinaryOperationType.Arithmetic);
-		public static readonly Operator Subtract                = new  BinaryOperator("-",   9, BinaryOperationType.Arithmetic);
+		public static readonly Operator Add                     = new  BinaryOperator("+",   9,
+		                                                                              BinaryOperationType.Arithmetic,
+		                                                                              Whitespace.both_or_neither);
+		public static readonly Operator Subtract                = new  BinaryOperator("-",   9,
+		                                                                              BinaryOperationType.Arithmetic,
+		                                                                              Whitespace.both_or_neither);
 		public static readonly Operator BitShiftLeft            = new  BinaryOperator("<<",  9, BinaryOperationType.BitShift);
 		public static readonly Operator BitShiftRight           = new  BinaryOperator(">>",  9, BinaryOperationType.BitShift);
-		public static readonly Operator BitwiseAnd              = new  BinaryOperator("&",   8, BinaryOperationType.Bitwise);
+		public static readonly Operator BitwiseAnd              = new  BinaryOperator("&",   8,
+		                                                                              BinaryOperationType.Bitwise,
+		                                                                              Whitespace.both_or_neither);
 		public static readonly Operator BitwiseXor              = new  BinaryOperator("^",   8, BinaryOperationType.Bitwise);
 		public static readonly Operator BitwiseOr               = new  BinaryOperator("|",   8, BinaryOperationType.Bitwise);
-		public static readonly Operator Concatenate             = new  BinaryOperator(".",   7, BinaryOperationType.Other);
+		public static readonly Operator Concatenate             = new  BinaryOperator(".",   7,
+		                                                                              BinaryOperationType.Other,
+		                                                                              Whitespace.both);
 		public static readonly Operator RegexMatch              = new  BinaryOperator("~=",  7, BinaryOperationType.Comparison);
 		public static readonly Operator Greater                 = new  BinaryOperator(">",   6, BinaryOperationType.Comparison);
 		public static readonly Operator Less                    = new  BinaryOperator("<",   6, BinaryOperationType.Comparison);
@@ -81,7 +105,7 @@ namespace CobaltAHK
 		public static readonly Operator CaseEqual               = new  BinaryOperator("==",  5, BinaryOperationType.Comparison);
 		public static readonly Operator NotEqual                = new  BinaryOperator("!=",  5, BinaryOperationType.Comparison);
 		public static readonly Operator NotEqualAlt             = new  BinaryOperator("<>",  5, BinaryOperationType.Comparison);
-		public static readonly Operator WordLogicalNot          = new   UnaryOperator("NOT", 4);
+		public static readonly Operator WordLogicalNot          = new   UnaryOperator("NOT", 4, Whitespace.both);
 		public static readonly Operator LogicalAnd              = new  BinaryOperator("&&",  3, BinaryOperationType.Logical);
 		public static readonly Operator WordLogicalAnd          = new  BinaryOperator("AND", 3, BinaryOperationType.Logical);
 		public static readonly Operator LogicalOr               = new  BinaryOperator("||",  3, BinaryOperationType.Logical);
@@ -99,7 +123,9 @@ namespace CobaltAHK
 		public static readonly Operator BitwiseXorAssign        = new  BinaryOperator("^=",  1, BinaryOperationType.Assign|BinaryOperationType.Bitwise);
 		public static readonly Operator BitShiftLeftAssign      = new  BinaryOperator("<<=", 1, BinaryOperationType.Assign|BinaryOperationType.BitShift);
 		public static readonly Operator BitShiftRightAssign     = new  BinaryOperator(">>=", 1, BinaryOperationType.Assign|BinaryOperationType.BitShift);
-		public static readonly Operator AltObjAccess            = new  BinaryOperator("[",   0, BinaryOperationType.Other); // todo: is precedence correct? e.g. `f . a[b]` => `(f . a)[b]` ?
+		public static readonly Operator AltObjAccess            = new  BinaryOperator("[",   0,
+		                                                                              BinaryOperationType.Other,
+		                                                                              Whitespace.not_before); // todo: is precedence correct? e.g. `f . a[b]` => `(f . a)[b]` ?
 		#endregion
 
 		#region compound assignments
@@ -131,18 +157,40 @@ namespace CobaltAHK
 		#endregion
 	}
 
+	[Flags]
+	public enum Whitespace
+	{
+		none = 0,
+		before = 1,
+		not_before = 2,
+		after = 4,
+		not_after = 8,
+		both = before|after,
+		neither = not_before|not_after,
+		both_or_neither = 16,
+		before_xor_after = 32
+	}
+
 	internal class UnaryOperator : Operator
 	{
 		internal UnaryOperator(string op, uint prec)
-		: base(op, prec) { }
+		: this(op, prec, Whitespace.before|Whitespace.not_after) { }
+
+		internal UnaryOperator(string op, uint prec, Whitespace white)
+		: base(op, prec, white) { }
 	}
 
 	internal class BinaryOperator : Operator
 	{
-		internal BinaryOperator(string op, uint prec, BinaryOperationType tp)
-		: base(op, prec)
+		internal BinaryOperator(string op, uint prec, BinaryOperationType tp, Whitespace white)
+		: base(op, prec, white)
 		{
 			type = tp;
+		}
+
+		internal BinaryOperator(string op, uint prec, BinaryOperationType tp)
+		: this(op, prec, tp, Whitespace.none)
+		{
 		}
 
 		public bool Is(BinaryOperationType type)
