@@ -22,8 +22,9 @@ namespace CobaltAHK
 
 		public override bool TryGetIndex(GetIndexBinder binder, object[] args, out object result)
 		{
+			result = null;
 			if (args.Length != 1) {
-				throw new InvalidOperationException();
+				return false;
 			}
 			return dict.TryGetValue(args[0], out result);
 		}
@@ -36,7 +37,7 @@ namespace CobaltAHK
 		public override bool TrySetIndex(SetIndexBinder binder, object[] args, object value)
 		{
 			if (args.Length != 1) {
-				throw new InvalidOperationException();
+				return false;
 			}
 			dict[args[0]] = value;
 			return true;
