@@ -21,16 +21,13 @@ namespace CobaltAHK.ExpressionTree
 				return Defer(target, args);
 			}
 
-			if (target.LimitType.Is<DynamicObject>()) { // todo: IDynamicMetaObjProv. in general
-				var dyn = target.Value as DynamicObject;
-				object result;
-				if (dyn.TryGetIndex(this, args.Select(a => a.Value).ToArray(), out result)) {
-					return new DynamicMetaObject(Expression.Constant(result, typeof(object)),
-								     BindingRestrictions.GetInstanceRestriction(target.Expression, dyn));
-				}
-			}
-			// todo: other types, like static .NET
-			return errorSuggestion;
+			// todo: special properties like base
+			// todo: .NET types
+
+			return errorSuggestion ?? new DynamicMetaObject(
+				Expression.Block(Expression.Throw(Expression.Constant("")), Generator.NULL),
+			        BindingRestrictions.GetTypeRestriction(target.Expression, target.LimitType)
+			);
 		}
 	}
 }

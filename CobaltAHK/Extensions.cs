@@ -7,11 +7,6 @@ namespace CobaltAHK
 			return ch == Lexer.charEOF;
 		}
 
-		public static bool Is<T>(this System.Type type)
-		{
-			return type == typeof(T) || type.IsSubclassOf(typeof(T));
-		}
-
 #if DEBUG
 		private static readonly System.Collections.Generic.IDictionary<string, string> map = new System.Collections.Generic.Dictionary<string, string>() {
 			{ "\n", "\\n" },
