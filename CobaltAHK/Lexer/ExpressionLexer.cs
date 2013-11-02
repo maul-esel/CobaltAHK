@@ -14,7 +14,8 @@ namespace CobaltAHK
 			{ '(', Token.OpenParenthesis },
 			{ ')', Token.CloseParenthesis },
 			{ '{', Token.OpenBrace },
-			{ '}', Token.CloseBrace }
+			{ '}', Token.CloseBrace },
+			{ ']', Token.CloseBracket }
 			//, { ',', Token.Comma }
 		};
 
@@ -46,9 +47,6 @@ namespace CobaltAHK
 					} else {
 						return OperatorToken.GetToken(Operator.AltObjAccess);
 					}
-				case ']':
-					reader.Read();
-					return Token.CloseBracket;
 				
 				case '.':
 					reader.Read();
