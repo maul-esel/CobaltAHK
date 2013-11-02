@@ -33,7 +33,7 @@ namespace CobaltAHK
 			return IsAlpha(ch) || IsDigit(ch);
 		}
 
-		private char[] whitespace = new[] { ' ', '\t' };
+		private char[] whitespace = { ' ', '\t' };
 
 		protected bool IsWhitespace(char ch)
 		{

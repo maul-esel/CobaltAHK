@@ -8,7 +8,7 @@ namespace CobaltAHK.ExpressionTree
 {
 	internal static class Converter
 	{
-		private static readonly Type[] NumberTypes = new[] { typeof(double), typeof(int), typeof(uint) };
+		private static readonly Type[] NumberTypes = { typeof(double), typeof(int), typeof(uint) };
 
 		private static readonly Expression NumberFormat = Expression.Constant(CultureInfo.InvariantCulture.NumberFormat);
 

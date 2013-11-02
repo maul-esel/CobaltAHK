@@ -102,7 +102,7 @@ namespace CobaltAHK
 			throw new NotImplementedException(); // todo
 		}
 
-		private static readonly char[] directiveTerminators = new[] { ' ', '\t', '\r', '\n', ',', Lexer.charEOF };
+		private static readonly char[] directiveTerminators = { ' ', '\t', '\r', '\n', ',', Lexer.charEOF };
 
 		private Token ReadDirectiveOrHotkey()
 		{

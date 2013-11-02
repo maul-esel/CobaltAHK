@@ -173,8 +173,8 @@ namespace CobaltAHK
 
 		#region literals
 
-		private static readonly char[] definiteStringTerminators = new char[0];
-		private static readonly char[] escapableStringTerminators = new[] { '"' };
+		private static readonly char[] definiteStringTerminators =  { };
+		private static readonly char[] escapableStringTerminators = { '"' };
 
 		private QuotedStringToken ReadQuotedString()
 		{
@@ -191,7 +191,7 @@ namespace CobaltAHK
 			return new QuotedStringToken(str);
 		}
 
-		private static readonly char[] numberTerminators = new[] { ' ', '\t', '\n', ',', ')', ']', Lexer.charEOF };
+		private static readonly char[] numberTerminators = { ' ', '\t', '\n', ',', ')', ']', Lexer.charEOF };
 
 		private NumberToken ReadNumber()
 		{

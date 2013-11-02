@@ -110,7 +110,7 @@ namespace CobaltAHK
 			throw new NotImplementedException();
 		}
 
-		private static readonly char[] singleCommentTerminators = new[] { '\n', charEOF };
+		private static readonly char[] singleCommentTerminators = { '\n', charEOF };
 	}
 }
 

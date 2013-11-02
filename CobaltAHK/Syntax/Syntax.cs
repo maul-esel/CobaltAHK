@@ -70,7 +70,7 @@ namespace CobaltAHK
 			return GetEnumFromName<ValueKeyword>(name);
 		}
 
-		private static readonly BuiltinVariable[] variablesInInclude = new[] {
+		private static readonly BuiltinVariable[] variablesInInclude = {
 			BuiltinVariable.A_ScriptDir,
 			BuiltinVariable.A_AppData,
 			BuiltinVariable.A_AppDataCommon,

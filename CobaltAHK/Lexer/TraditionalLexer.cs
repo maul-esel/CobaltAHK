@@ -22,7 +22,7 @@ namespace CobaltAHK
 			return ReadString();
 		}
 
-		private static readonly char[] variableTerminators = new[] { '%' };
+		private static readonly char[] variableTerminators = { '%' };
 
 		private VariableToken ReadVariable()
 		{
@@ -35,8 +35,8 @@ namespace CobaltAHK
 			return new VariableToken(variable);
 		}
 		
-		private static readonly char[] definiteStringTerminators = new[] { '\n', Lexer.charEOF };
-		private static readonly char[] escapableStringTerminators = new[] { '%', ',', ';' };
+		private static readonly char[] definiteStringTerminators  = { '\n', Lexer.charEOF };
+		private static readonly char[] escapableStringTerminators = { '%', ',', ';' };
 
 		private TraditionalStringToken ReadString()
 		{

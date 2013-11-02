@@ -423,7 +423,7 @@ namespace CobaltAHK.ExpressionTree
 			return _left != left || _right != right;
 		}
 
-		private static readonly Type[] arithmeticTypes = new[] { typeof(double), typeof(int), typeof(uint) };
+		private static readonly Type[] arithmeticTypes = { typeof(double), typeof(int), typeof(uint) };
 
 		private Type HigherArithmeticType(Type one, Type two)
 		{
