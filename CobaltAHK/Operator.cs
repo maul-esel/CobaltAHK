@@ -28,7 +28,7 @@ namespace CobaltAHK
 		private readonly uint precedence;
 		public uint Precedence { get { return precedence; } }
 
-		protected static SortedSet<Operator> set = new SortedSet<Operator>(new OperatorComparer());
+		protected static ISet<Operator> set = new HashSet<Operator>();
 
 		public static Operator GetOperator(string code)
 		{
@@ -115,13 +115,6 @@ namespace CobaltAHK
 			return (BinaryOperator)compoundAssigns[op];
 		}
 
-		private class OperatorComparer : IComparer<Operator>
-		{
-			public int Compare(Operator first, Operator second)
-			{
-				return (int)(first.Precedence - second.Precedence);
-			}
-		}
 	}
 
 	internal class UnaryOperator : Operator
