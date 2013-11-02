@@ -36,122 +36,98 @@ namespace CobaltAHK
 			}
 
 			char ch = reader.Peek();
+
 			switch (ch) {
 				case '"':
 					return ReadQuotedString();
 
 				case '[':
-					reader.Read();
 					if (whitespace) { // todo: or comma, or operator, or CloseBracket, or OpenParenthesis (NOT closeParens)
+						reader.Read();
 						return Token.OpenBracket;
-					} else {
-						return OperatorToken.GetToken(Operator.AltObjAccess);
 					}
-				
-				case '.':
-					reader.Read();
-					if (reader.Peek() == '=') {
-						reader.Read();
-						return OperatorToken.GetToken(Operator.ConcatenateAssign);
-					} else if (whitespace && IsWhitespace(reader.Peek())) {
-						return OperatorToken.GetToken(Operator.Concatenate);
-					} else if (!whitespace && !IsWhitespace(reader.Peek())) {
-						return OperatorToken.GetToken(Operator.ObjectAccess);
-					} else {
-						throw new Exception(); // todo
-					}
-				case '+':
-				case '-':
-					char first = reader.Read(), next = reader.Peek();
-					if (next == '=') {
-						reader.Read();
-						return OperatorToken.GetToken(first == '+' ? Operator.AddAssign : Operator.SubtractAssign);
-					} else if ((whitespace && IsWhitespace(next)) || (!whitespace && !IsWhitespace(next))) {
-						return OperatorToken.GetToken(first == '+' ? Operator.Add : Operator.Subtract);
-					} else if (next == first) {
-						reader.Read();
-						return OperatorToken.GetToken(first == '+' ? Operator.Increment : Operator.Decrement);
-					} else if (first == '-') {
-						return OperatorToken.GetToken(Operator.UnaryMinus);
-					} else {
-						throw new Exception(); // todo
-					}
-				case '*':
-				case '/':
-					reader.Read();
-					if (reader.Peek() == '=') {
-						reader.Read();
-						return OperatorToken.GetToken(ch == '*' ? Operator.MultiplyAssign : Operator.TrueDivideAssign);
-					} else if (reader.Peek() == ch) {
-						reader.Read();
-						if (ch == '*') {
-							return OperatorToken.GetToken(Operator.Power);
-						} else if (reader.Peek() == '=') {
-							reader.Read();
-							return OperatorToken.GetToken(Operator.FloorDivideAssign);
-						} else {
-							return OperatorToken.GetToken(Operator.FloorDivide);
-						}
-					} else {
-						return OperatorToken.GetToken(ch == '*' ? Operator.Multiply : Operator.TrueDivide);
-					}
-				case '?':
-					reader.Read();
-					if (!whitespace || !IsWhitespace(reader.Peek())) {
-						throw new Exception(); // todo
-					}
-					return OperatorToken.GetToken(Operator.Ternary);
+					break;
 				case ':':
 					reader.Read();
 					if (reader.Peek() == '=') {
 						reader.Read();
-						return OperatorToken.GetToken(Operator.Assign);
-					} else {
-						return Token.Colon;
+						return OperatorToken.GetToken(Operator.Assign); // special handling because colon is not an operator
 					}
-				case '=':
+					return Token.Colon;
+				case '?':
 					reader.Read();
-					if (reader.Peek() == '=') {
-						reader.Read();
-						return OperatorToken.GetToken(Operator.CaseEqual);
-					} else {
-						return OperatorToken.GetToken(Operator.Equal);
+					if (whitespace && IsWhitespace(reader.Peek())) {
+						return OperatorToken.GetToken(Operator.Ternary);
 					}
-				case '>':
-				case '<':
-					reader.Read();
-					if (reader.Peek() == '=') {
-						reader.Read();
-						return OperatorToken.GetToken(ch == '>' ? Operator.GreaterOrEqual : Operator.LessOrEqual);
-					} else if (reader.Peek() == ch) {
-						reader.Read();
-						if (reader.Peek() == '=') {
-							reader.Read();
-							return OperatorToken.GetToken(ch == '>' ? Operator.BitShiftRightAssign : Operator.BitShiftLeftAssign);
-						}
-						return OperatorToken.GetToken(ch == '>' ? Operator.BitShiftRight : Operator.BitShiftLeft);
-					} else if (ch == '<' && reader.Peek() == '>') {
-						reader.Read();
-						return OperatorToken.GetToken(Operator.NotEqualAlt);
-					} else {
-						return OperatorToken.GetToken(ch == '>' ? Operator.Greater : Operator.Less);
-					}
-				case '!':
-					reader.Read();
-					if (reader.Peek() == '=') {
-						reader.Read();
-						return OperatorToken.GetToken(Operator.NotEqual);
-					} else {
-						return OperatorToken.GetToken(Operator.LogicalNot);
-					}
-					// todo: operators & | ^ && || ...
-				default:
-					if (IsDigit(ch)) {
-						return ReadNumber();
-					}
-					return ReadIdOrOperator();
+					throw new Exception(); // todo
 			}
+
+			if (IsDigit(ch)) {
+				return ReadNumber();
+
+			} else if (IsIdChar(ch)) {
+				return ReadIdOrOperator();
+			}
+
+			return ReadOperator(whitespace);
 		}
+
+		#region operator parsing
+
+		private Token ReadOperator(bool wsBefore)
+		{
+			string str = "";
+			char ch = reader.Peek();
+			var ops = Operator.Operators;
+
+			while (!IsWhitespace(ch) && ops.Count() > 0) {
+				ops = Operator.Operators.Where(op => op.Code.StartsWith(str + ch)
+					&& MatchesWhitespace(op, wsBefore, null)
+				);
+
+				str += reader.Read();
+				ch = reader.Peek();
+			}
+
+			bool wsAfter = IsWhitespace(reader.Peek());
+
+			ops = Operator.Operators.Where(op => op.Code == str && MatchesWhitespace(op, wsBefore, wsAfter));
+			if (ops.Count() != 1) {
+				throw new Exception(); // todo
+			}
+			return OperatorToken.GetToken(ops.ElementAt(0));
+		}
+
+		private bool Implies(Whitespace combi, Whitespace flag, bool conclusion)
+		{
+			return Implies(combi.HasFlag(flag), conclusion);
+		}
+
+		private bool Implies(bool a, bool b)
+		{
+			return !a || b;
+		}
+
+		private bool MatchesWhitespace(Operator op, bool before, bool? after)
+		{
+			var white = op.Whitespace;
+
+			bool result = Implies(white, Whitespace.before,  before)
+				&& Implies(white, Whitespace.not_before, !before);
+
+			if (after != null) {
+				result = result && Implies(white, Whitespace.after,    after.Value)
+					&& Implies(white, Whitespace.not_after,        !after.Value)
+					&& Implies(white, Whitespace.before_xor_after, before ^ after.Value)
+					&& Implies(white, Whitespace.both_or_neither,
+						           Implies(before, after.Value) && Implies(after.Value, before)
+						  );
+			}
+
+			return result;
+		}
+
+		#endregion
 
 		private Token ReadIdOrOperator()
 		{
