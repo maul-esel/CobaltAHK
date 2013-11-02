@@ -53,6 +53,8 @@ namespace CobaltAHK.ExpressionTree
 				return GenerateArrayLiteral((ArrayLiteralExpression)expr, scope);
 			} else if (expr is BlockExpression) {
 				return GenerateIfElse((BlockExpression)expr, scope);
+			} else if (expr is ThrowExpression) {
+				return GenerateThrow((ThrowExpression)expr, scope);
 			}
 			throw new NotImplementedException();
 		}
@@ -215,6 +217,13 @@ namespace CobaltAHK.ExpressionTree
 				return DLR.Expression.Return(target, Converter.ConvertToObject(val));
 			}
 			return DLR.Expression.Return(target, NULL);
+		}
+
+		private static ConstructorInfo exceptionConstructor = typeof(ScriptException).GetConstructor(new[] { typeof(object) });
+
+		private DLR.Expression GenerateThrow(ThrowExpression expr, Scope scope)
+		{
+			return DLR.Expression.Throw(DLR.Expression.New(exceptionConstructor, Generate(expr.Value, scope)));
 		}
 
 		private DLR.Expression GenerateMemberAccess(MemberAccessExpression expr, Scope scope)

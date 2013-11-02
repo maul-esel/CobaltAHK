@@ -71,6 +71,7 @@
     <Compile Include="ExpressionTree\MemberAccessBinder.cs" />
     <Compile Include="ExpressionTree\MemberAssignBinder.cs" />
     <Compile Include="Expressions\Keywords.cs" />
+    <Compile Include="ScriptException.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
