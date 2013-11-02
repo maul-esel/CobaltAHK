@@ -191,7 +191,7 @@ namespace CobaltAHK
 				endToken = Token.CloseParenthesis;
 			}
 
-			var cond = ParseExpressionChain(lexer, new[] { endToken }).ToExpression();
+			var cond = ParseExpressionChain(lexer, endToken).ToExpression();
 
 			if (inParentheses) {
 				AssertToken(lexer.GetToken(), Token.CloseParenthesis);
@@ -426,7 +426,7 @@ namespace CobaltAHK
 					lexer.GetToken();
 					consumed = true;
 
-					currentParam.Append(ParseExpressionChain(lexer, new[] { Token.Comma }).ToExpression());
+					currentParam.Append(ParseExpressionChain(lexer, Token.Comma).ToExpression());
 
 				} else if (token is TraditionalStringToken) {
 					// todo: ensure currentParam is not forced expression
@@ -460,7 +460,7 @@ namespace CobaltAHK
 
 		#region expression mode
 
-		private ExpressionChain ParseExpressionChain(Lexer lexer, IEnumerable<Token> terminators = null)
+		private ExpressionChain ParseExpressionChain(Lexer lexer, params Token[] terminators)
 		{
 			var chain = new ExpressionChain();
 			ParseExpressionChain(lexer, chain, terminators);
@@ -488,7 +488,7 @@ namespace CobaltAHK
 
 				if (token == Token.OpenParenthesis) {
 					lexer.GetToken(); // consume parenthesis
-					chain.Append(ParseExpressionChain(lexer, new[] { Token.CloseParenthesis }).ToExpression());
+					chain.Append(ParseExpressionChain(lexer, Token.CloseParenthesis).ToExpression());
 				
 				} else if (token is OperatorToken) {
 					var op = ((OperatorToken)token).Operator;
@@ -576,7 +576,7 @@ namespace CobaltAHK
 						}
 						throw new Exception(token.ToString());
 					}
-					currentExpr = ParseExpressionChain(lexer, new[] { Token.Comma, abort });
+					currentExpr = ParseExpressionChain(lexer, Token.Comma, abort);
 					token = lexer.PeekToken();
 					continue;
 				}
@@ -678,7 +678,7 @@ namespace CobaltAHK
 					if (currentParam != null) {
 						throw new Exception(); // todo
 					}
-					currentParam = ParseExpressionChain(lexer, new[] { Token.Comma, Token.CloseBracket }).ToExpression();
+					currentParam = ParseExpressionChain(lexer, Token.Comma, Token.CloseBracket).ToExpression();
 				}
 				token = lexer.PeekToken();
 			}
@@ -697,9 +697,9 @@ namespace CobaltAHK
 
 			var token = lexer.PeekToken();
 			while (token != Token.CloseBrace) {
-				var key = ParseExpressionChain(lexer, new[] { Token.Colon }).ToExpression();
+				var key = ParseExpressionChain(lexer, Token.Colon).ToExpression();
 				AssertToken(lexer.GetToken(), Token.Colon);
-				var value = ParseExpressionChain(lexer, new[] { Token.Comma, Token.CloseBrace }).ToExpression();
+				var value = ParseExpressionChain(lexer, Token.Comma, Token.CloseBrace).ToExpression();
 
 				dict[key] = value;
 				if (lexer.PeekToken() == Token.Comma) {
