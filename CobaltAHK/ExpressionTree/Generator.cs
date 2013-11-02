@@ -226,6 +226,16 @@ namespace CobaltAHK.ExpressionTree
 			);
 		}
 
+		private DLR.Expression GenerateMemberAssign(MemberAccessExpression expr, DLR.Expression value, Scope scope)
+		{
+			return DLR.Expression.Dynamic(new MemberAssignBinder(),
+			                              typeof(object),
+			                              Generate(expr.Object, scope),
+			                              Generate(expr.Key, scope),
+			                              value
+			);
+		}
+
 		private DLR.Expression GenerateTernaryExpression(TernaryExpression expr, Scope scope)
 		{
 			var cond    = Generate(expr.Expressions[0], scope);
@@ -239,14 +249,25 @@ namespace CobaltAHK.ExpressionTree
 
 		private DLR.Expression GenerateBinaryExpression(BinaryExpression expr, Scope scope)
 		{
-			if (expr.Operator == Operator.Concatenate) {
+			var op = (BinaryOperator)expr.Operator;
+
+			if (op == Operator.Concatenate) {
 				return GenerateStringConcat(expr, scope);
+
 			}
 
-			var left  = Generate(expr.Expressions[0], scope);
+			var member = expr.Expressions[0] as MemberAccessExpression;
 			var right = Generate(expr.Expressions[1], scope);
+			if (member != null) {
+				if (expr.Operator == Operator.Assign) {
+					return GenerateMemberAssign(member, right, scope);
 
-			return GenerateBinaryExpression(left, (BinaryOperator)expr.Operator, right, scope);
+				} else if (Operator.IsCompoundAssignment(op)) {
+					return MemberCompoundAssignment(member, op, right, scope);
+				}
+			}
+
+			return GenerateBinaryExpression(Generate(expr.Expressions[0], scope), op, right, scope);
 		}
 
 		private DLR.Expression GenerateBinaryExpression(DLR.Expression left, BinaryOperator op, DLR.Expression right, Scope scope)
@@ -276,6 +297,19 @@ namespace CobaltAHK.ExpressionTree
 		private DLR.Expression CompoundAssigment(DLR.ParameterExpression variable, DLR.Expression left, BinaryOperator op, DLR.Expression right, Scope scope)
 		{
 			return GenerateBinaryExpression(variable, (BinaryOperator)Operator.Assign, GenerateBinaryExpression(left, Operator.CompoundGetUnderlyingOperator(op), right, scope), scope);
+		}
+
+		private DLR.Expression MemberCompoundAssignment(MemberAccessExpression member, BinaryOperator op, DLR.Expression right, Scope scope)
+		{
+			return GenerateMemberAssign(member,
+			                            GenerateBinaryExpression(
+							Generate(member, scope),
+							Operator.CompoundGetUnderlyingOperator(op),
+							right,
+							scope
+						    ),
+			                            scope
+			);
 		}
 
 		#region comparison
