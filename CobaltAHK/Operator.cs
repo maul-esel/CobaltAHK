@@ -10,23 +10,32 @@ namespace CobaltAHK
 		private class DummyOperator : Operator { } // todo: see how ExpressionChain behaves with no precedence value
 		public static readonly Operator Dummy = new DummyOperator();
 
-		protected Operator(string code, uint prec)
+		protected Operator(string op, uint prec)
 		{
-			op = code;
+			code = op;
 			precedence = prec;
 			set.Add(this);
 		}
 
 		public virtual bool Matches(string op)
 		{
-			return this.op == op.ToUpper();
+			return Code == op.ToUpper();
 		}
 
-		protected readonly string op;
-		public string Code { get { return op; } }
+		#region fields
+
+		protected readonly string code;
 
 		private readonly uint precedence;
+
+		#endregion
+		#region properties
+
+		public string Code { get { return code; } }
+
 		public uint Precedence { get { return precedence; } }
+
+		#endregion
 
 		protected static ISet<Operator> set = new HashSet<Operator>();
 
@@ -39,7 +48,8 @@ namespace CobaltAHK
 		{
 			return set.Where(op => op.Matches(code)).Count() > 0;
 		}
-		
+
+		#region instances
 		// todo: New
 		public static readonly Operator Deref                   = new   UnaryOperator("%",  13); // todo
 		public static readonly Operator ObjectAccess            = new  BinaryOperator(".",  13, BinaryOperationType.Other);
@@ -90,6 +100,9 @@ namespace CobaltAHK
 		public static readonly Operator BitShiftLeftAssign      = new  BinaryOperator("<<=", 1, BinaryOperationType.Assign|BinaryOperationType.BitShift);
 		public static readonly Operator BitShiftRightAssign     = new  BinaryOperator(">>=", 1, BinaryOperationType.Assign|BinaryOperationType.BitShift);
 		public static readonly Operator AltObjAccess            = new  BinaryOperator("[",   0, BinaryOperationType.Other); // todo: is precedence correct? e.g. `f . a[b]` => `(f . a)[b]` ?
+		#endregion
+
+		#region compound assignments
 
 		private static readonly IDictionary<Operator, Operator> compoundAssigns = new Dictionary<Operator, Operator>() {
 			{ Operator.ConcatenateAssign,   Operator.Concatenate   },
@@ -115,6 +128,7 @@ namespace CobaltAHK
 			return (BinaryOperator)compoundAssigns[op];
 		}
 
+		#endregion
 	}
 
 	internal class UnaryOperator : Operator
