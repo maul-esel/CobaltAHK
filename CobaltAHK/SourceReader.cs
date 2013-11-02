@@ -20,7 +20,7 @@ namespace CobaltAHK
 			char ch = Peek();
 
 			// keep the current position
-			if (!ch.IsEOF()) {
+			if (ch != Lexer.charEOF) {
 				index++;
 				col++;
 			}

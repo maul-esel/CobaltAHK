@@ -86,7 +86,7 @@ namespace CobaltAHK
 		{
 			string text = "";
 			char ch = reader.Peek();
-			while (!ch.IsEOF() || ends.Any(e => e[0].IsEOF())) { // todo: nicer eof handling
+			while (ch != Lexer.charEOF || ends.Any(e => e[0] == Lexer.charEOF)) {
 				text += ch;
 
 				var valid_ends = ends.Where(str => text.Substring(text.Length - str.Length) == str);
@@ -130,7 +130,7 @@ namespace CobaltAHK
 		protected void SkipWhitespace()
 		{
 			char ch = reader.Peek();
-			while (!ch.IsEOF() && IsWhitespace(ch)) {
+			while (ch != Lexer.charEOF && IsWhitespace(ch)) {
 				reader.Read();
 				ch = reader.Peek();
 			}
@@ -139,7 +139,7 @@ namespace CobaltAHK
 		protected void SkipWhitespaceAndNewlines()
 		{
 			char ch = reader.Peek();
-			while (!ch.IsEOF() && (IsWhitespace(ch) || ch == '\n' || ch == '\r')) {
+			while (ch != Lexer.charEOF && (IsWhitespace(ch) || ch == '\n' || ch == '\r')) {
 				reader.Read();
 				ch = reader.Peek();
 			}
