@@ -138,6 +138,14 @@ namespace CobaltAHK
 					} else {
 						return OperatorToken.GetToken(ch == '>' ? Operator.Greater : Operator.Less);
 					}
+				case '!':
+					reader.Read();
+					if (reader.Peek() == '=') {
+						reader.Read();
+						return OperatorToken.GetToken(Operator.NotEqual);
+					} else {
+						return OperatorToken.GetToken(Operator.LogicalNot);
+					}
 					// todo: operators & | ^ && || ...
 				default:
 					if (IsDigit(ch)) {

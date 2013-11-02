@@ -339,6 +339,8 @@ namespace CobaltAHK.ExpressionTree
 				return DLR.Expression.Equal(left, right); // todo: special for strings
 			} else if (op == Operator.CaseEqual) {
 				return DLR.Expression.Equal(left, right);
+			} else if (op == Operator.NotEqual) {
+				return DLR.Expression.NotEqual(left, right);
 			} else if (op == Operator.RegexMatch) {
 				// todo
 			}
