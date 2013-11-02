@@ -46,24 +46,6 @@ namespace CobaltAHK.Expressions
 		public IfDirectiveExpression(SourcePosition pos, ValueExpression cond) : base(pos) { }
 	}
 
-	public class ReturnExpression : Expression
-	{
-		public ReturnExpression(SourcePosition pos, ValueExpression val, IEnumerable<ValueExpression> exprs)
-		: base(pos)
-		{
-			value = val;
-			other = exprs;
-		}
-
-		private ValueExpression value;
-
-		public ValueExpression Value { get { return value; } }
-
-		private IEnumerable<ValueExpression> other;
-
-		public IEnumerable<ValueExpression> OtherExpressions { get { return other; } }
-	}
-
 	#region value expressions
 
 	public abstract class ValueExpression : Expression

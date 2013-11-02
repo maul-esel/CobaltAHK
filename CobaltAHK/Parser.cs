@@ -55,6 +55,8 @@ namespace CobaltAHK
 						return ParseClassDefinition(lexer);
 					case Syntax.Keyword.Return:
 						return ParseReturn(lexer);
+					case Syntax.Keyword.Throw:
+						return ParseThrow(lexer);
 					case Syntax.Keyword.If:
 						return ParseIf(lexer);
 					case Syntax.Keyword.Else:
@@ -223,6 +225,27 @@ namespace CobaltAHK
 
 			lexer.PopState();
 			return new ReturnExpression(lexer.Position, value, others);
+		}
+
+		private ThrowExpression ParseThrow(Lexer lexer)
+		{
+			AssertToken(lexer.GetToken(), KeywordToken.GetToken(Syntax.Keyword.Throw));
+			lexer.PushState(Lexer.State.Expression);
+
+			Token[] endToken = {};
+			if (lexer.PeekToken() == Token.OpenParenthesis) {
+				lexer.GetToken();
+				endToken = new[] { Token.CloseParenthesis };
+			}
+
+			var val = ParseExpressionChain(lexer, endToken);
+
+			if (endToken.Length > 0) {
+				AssertToken(lexer.GetToken(), endToken[0]);
+			}
+
+			lexer.PopState();
+			return new ThrowExpression(lexer.Position, val.ToExpression());
 		}
 
 		private DirectiveExpression ParseDirective(Lexer lexer)
