@@ -22,16 +22,6 @@ namespace CobaltAHK
 			return str;
 		}
 
-		public static string Times(this int i, string str)
-		{
-			string result = "";
-			for (var index = 0; index < i; index++)
-			{
-				result += str;
-			}
-			return result;
-		}
-
 		public static string TypeName(this object o)
 		{
 			return o.GetType().Name;

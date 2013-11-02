@@ -41,10 +41,6 @@ namespace CobaltAHK
 		{
 			var tmp = PeekToken();
 			ResetToken();
-#if DEBUG
-			Console.WriteLine(level.Times("\t") + tmp);
-			//System.Threading.Thread.Sleep(500);
-#endif
 			return tmp;
 		}
 
@@ -52,29 +48,15 @@ namespace CobaltAHK
 
 		#region state stack handling
 
-#if DEBUG
-		private int level = 0;
-#endif
-
 		private Stack<State> stack = new Stack<State>(new[] { State.Root });
 
 		public void PushState(State state)
 		{
-#if DEBUG
-			Console.WriteLine(level.Times("\t") + state + " {");
-			level++;
-			//System.Threading.Thread.Sleep(500);
-#endif
 			stack.Push(state);
 		}
 
 		public State PopState()
 		{
-#if DEBUG
-			level--;
-			Console.WriteLine(level.Times("\t") + "}");
-			//System.Threading.Thread.Sleep(500);
-#endif
 			return stack.Pop();
 		}
 

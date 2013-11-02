@@ -12,15 +12,17 @@ namespace CobaltAHK
 			Execute(new StringReader(code));
 		}
 
+		[System.Diagnostics.Conditional("DEBUG")]
+		internal void Debug(string str, params object[] placeholders)
+		{
+			Console.WriteLine(str, placeholders);
+		}
+
 		public void Execute(TextReader code)
 		{
 			var expressions = parser.Parse(code);
-#if DEBUG
-			Console.WriteLine(String.Format("{0} expressions", expressions.Length));
-			foreach (var e in expressions) {
-				Console.WriteLine("\t" + e.ToString());
-			}
-#endif
+			Debug("Parsed {0} expressions.", expressions.Length);
+
 			var scope = new ExpressionTree.Scope();
 			var settings = new ScriptSettings();
 
@@ -31,9 +33,12 @@ namespace CobaltAHK
 			foreach (var e in expressions) {
 				et.Add(generator.Generate(e, scope));
 			}
+			Debug("Generated {0} expressions.", et.Count);
 
 			var lambda = Expression.Lambda<Action>(Expression.Block(scope.GetVariables(), et));
+			Debug("Generated lambda wrapper.");
 			var exec = lambda.Compile();
+			Debug("Compiled lambda wrapper. Begin execution...");
 			exec();
 		}
 
