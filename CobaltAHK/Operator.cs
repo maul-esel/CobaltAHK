@@ -49,6 +49,8 @@ namespace CobaltAHK
 
 		protected static ISet<Operator> set = new HashSet<Operator>();
 
+		internal static IEnumerable<Operator> Operators { get { return set; } }
+
 		public static Operator GetOperator(string code)
 		{
 			return set.First(op => op.Matches(code));
