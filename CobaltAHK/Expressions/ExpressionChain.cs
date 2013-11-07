@@ -77,14 +77,12 @@ namespace CobaltAHK.Expressions
 					expr = new TernaryExpression(exps[index].Position, currentOp, exps[index], exps[index + 1], exps[index + 2]);
 
 					ops.RemoveAt(index + 1); // remove dummy operator
-					exps.Remove(exps[index + 2]);
 				} else {
 					throw new Exception(); // todo
 				}
 
 				ops.RemoveAt(index);
-				exps.Remove(exps[index + 1]);
-				exps.Remove(exps[index]);
+				exps.Remove(expr.Expressions);
 
 				exps.Insert(index, expr);
 			}

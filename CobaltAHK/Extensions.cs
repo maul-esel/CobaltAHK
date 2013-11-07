@@ -1,8 +1,10 @@
-#if DEBUG
+using System.Collections.Generic;
+
 namespace CobaltAHK
 {
 	internal static class Extensions
 	{
+#if DEBUG
 		private static readonly System.Collections.Generic.IDictionary<string, string> map = new System.Collections.Generic.Dictionary<string, string>() {
 			{ "\n", "\\n" },
 			{ "\r", "\\r" },
@@ -21,6 +23,12 @@ namespace CobaltAHK
 		{
 			return o.GetType().Name;
 		}
+#endif
+		public static void Remove<T>(this IList<T> e, IEnumerable<T> list)
+		{
+			foreach (var item in list) {
+				e.Remove(item);
+			}
+		}
 	}
 }
-#endif
