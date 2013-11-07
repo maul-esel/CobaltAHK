@@ -17,6 +17,10 @@ namespace CobaltAHK.ExpressionTree
 
 		public override DynamicMetaObject FallbackInvoke(DynamicMetaObject target, DynamicMetaObject[] args, DynamicMetaObject errorSuggestion)
 		{
+			if (!target.HasValue || args.Any(a => !a.HasValue)) {
+				return Defer(target, args);
+			}
+
 			var func = (string)target.Value;
 			if (!scope.IsFunctionDefined(func)) { // todo: defer when !HasValue ?
 				return Defer(target, args);
