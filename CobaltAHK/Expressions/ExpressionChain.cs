@@ -9,33 +9,26 @@ namespace CobaltAHK.Expressions
 		public void Append(ValueExpression expr)
 		{
 			if (operators.Count < expressions.Count) {
-				Append(Operator.Concatenate);
+				Append((BinaryOperator)Operator.Concatenate);
 			}
 			expressions.Add(expr);
 		}
 
 		private IList<ValueExpression> expressions = new List<ValueExpression>();
 
-		public void Append(Operator op)
+		internal void Append(BinaryOperator op)
 		{
-			if (!(op is BinaryOperator) && !(op is TernaryOperator)) {
-				throw new InvalidOperationException("type");
-			}
 			if (operators.Count >= expressions.Count) {
 				throw new InvalidOperationException("count: " + operators.Count + " >= " + expressions.Count);
 			}
 			operators.Add(op);
-
-			if (op is TernaryOperator) {
-				operators.Add(Operator.Dummy); // add a dummy to keep the count statisfied
-			}
 		}
 
-		private IList<Operator> operators = new List<Operator>();
+		private IList<BinaryOperator> operators = new List<BinaryOperator>();
 
 		public int Length { get { return expressions.Count; } }
 
-		public bool IsValid ()
+		public bool IsValid()
 		{
 			return operators.Count == expressions.Count - 1;
 		}
@@ -50,11 +43,11 @@ namespace CobaltAHK.Expressions
 					);
 			}
 
-			var ops = new List<Operator>(operators);
+			var ops = new List<BinaryOperator>(operators);
 			var exps = new List<ValueExpression>(expressions);
 
 			var precedences = new List<uint>(ops.Select(op => op.Precedence).Distinct());
-			var match = new Func<Operator, bool>(op => op.Precedence == precedences.Max());
+			var match = new Func<BinaryOperator, bool>(op => op.Precedence == precedences.Max());
 
 			while (exps.Count > 1 && ops.Count > 0) {
 				while (ops.Where(match).Count() == 0) {
@@ -69,17 +62,7 @@ namespace CobaltAHK.Expressions
 					index = ops.LastIndexOf(currentOp);
 				}
 
-				OperatorExpression expr;
-
-				if (currentOp is BinaryOperator) {
-					expr = new BinaryExpression(exps[index].Position, currentOp, exps[index], exps[index + 1]);
-				} else if (currentOp is TernaryOperator) {
-					expr = new TernaryExpression(exps[index].Position, currentOp, exps[index], exps[index + 1], exps[index + 2]);
-
-					ops.RemoveAt(index + 1); // remove dummy operator
-				} else {
-					throw new Exception(); // todo
-				}
+				var expr = new BinaryExpression(exps[index].Position, currentOp, exps[index], exps[index + 1]);
 
 				ops.RemoveAt(index);
 				exps.Remove(expr.Expressions);
@@ -90,9 +73,9 @@ namespace CobaltAHK.Expressions
 			return exps[0];
 		}
 
-		private bool IsRightToLeft(Operator op)
+		private bool IsRightToLeft(BinaryOperator op)
 		{
-			return (op is BinaryOperator && ((BinaryOperator)op).Is(BinaryOperationType.Assign)) || op == Operator.Ternary;
+			return op.Is(BinaryOperationType.Assign);
 		}
 	}
 }

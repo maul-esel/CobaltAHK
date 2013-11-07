@@ -6,10 +6,6 @@ namespace CobaltAHK
 {
 	public abstract class Operator
 	{
-		private Operator() { }
-		private class DummyOperator : Operator { } // todo: see how ExpressionChain behaves with no precedence value
-		public static readonly Operator Dummy = new DummyOperator();
-
 		protected Operator(string op, uint prec)
 		{
 			code = op;

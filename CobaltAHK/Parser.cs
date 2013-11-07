@@ -699,7 +699,7 @@ namespace CobaltAHK
 		private void ParseAltObjAccess(Lexer lexer, ExpressionChain chain)
 		{
 			AssertToken(lexer.GetToken(), OperatorToken.GetToken(Operator.AltObjAccess));
-			chain.Append(Operator.AltObjAccess);
+			chain.Append((BinaryOperator)Operator.AltObjAccess);
 
 			var token = lexer.PeekToken();
 			ValueExpression currentParam = null;
@@ -711,7 +711,7 @@ namespace CobaltAHK
 						// todo: empty expression? fail?
 					}
 					chain.Append(currentParam);
-					chain.Append(Operator.AltObjAccess);
+					chain.Append((BinaryOperator)Operator.AltObjAccess);
 					currentParam = null;
 
 				} else {
