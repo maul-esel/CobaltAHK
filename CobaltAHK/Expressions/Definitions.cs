@@ -27,7 +27,20 @@ namespace CobaltAHK.Expressions
 
 	public class ClassDefinitionExpression : Expression
 	{
-		public ClassDefinitionExpression(SourcePosition pos, string name, IEnumerable<FunctionDefinitionExpression> methods) : base(pos) { } // todo: how to set fields? or a ruby-like approach (any expression?)
+		public ClassDefinitionExpression(SourcePosition pos, string cls, IEnumerable<FunctionDefinitionExpression> funcs)
+		: base(pos)
+		{
+			name = cls;
+			methods = funcs;
+		} // todo: how to set fields? or a ruby-like approach (any expression?)
+
+		private readonly string name;
+
+		public string Name { get { return name; } }
+
+		private readonly IEnumerable<FunctionDefinitionExpression> methods;
+
+		public IEnumerable<FunctionDefinitionExpression> Methods { get { return methods; } }
 	}
 
 	public class ParameterDefinitionExpression : Expression
