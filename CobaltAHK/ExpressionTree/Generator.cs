@@ -105,7 +105,7 @@ namespace CobaltAHK.ExpressionTree
 			}
 			var ifExpr  = (IfExpression)branches[0];
 			var ifCond  = Converter.ConvertToBoolean(Generate(ifExpr.Condition, scope));
-			var ifBlock = DLR.Expression.Block(scope.GetVariables(), ifExpr.Body.Select(e => Generate(e, scope)).Concat(new[] { DLR.Expression.Empty() }));
+			var ifBlock = DLR.Expression.Block(ifExpr.Body.Select(e => Generate(e, scope)).Concat(new[] { DLR.Expression.Empty() }));
 
 			if (branches.Length == 1) {
 				return DLR.Expression.IfThen(ifCond, ifBlock);
