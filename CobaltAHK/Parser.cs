@@ -494,7 +494,6 @@ namespace CobaltAHK
 		{
 			lexer.PushState(Lexer.State.Expression);
 			var token = lexer.PeekToken();
-			bool ternary = false;
 
 			while (token != Token.EOF) {
 				if (token == Token.Newline) {
@@ -521,20 +520,24 @@ namespace CobaltAHK
 					} else if (op is UnaryOperator) {
 						throw new NotImplementedException();
 
+					} else if (op is BinaryOperator) {
+						chain.Append((BinaryOperator)op);
+
 					} else {
-						if (op == Operator.Ternary) {
-							ternary = true;
-						}
-						chain.Append(op);
+						throw new Exception(); // todo
 					}
-				} else if (token == Token.Colon && ternary) {
-					ternary = false;
 				} else {
 					var expr = TokenToValueExpression(lexer);
 					token = lexer.PeekToken();
 
-					while (token == OperatorToken.GetToken(Operator.ObjectAccess)) {
-						expr = ParseObjectAccess(lexer, expr);
+					var objAcc = OperatorToken.GetToken(Operator.ObjectAccess);
+					var ternary = OperatorToken.GetToken(Operator.Ternary);
+					while (token == objAcc || token == ternary) {
+						if (token == objAcc) {
+							expr = ParseObjectAccess(lexer, expr);
+						} else if (token == ternary) {
+							expr = ParseTernary(lexer, expr, terminators);
+						}
 						token = lexer.PeekToken();
 					}
 
@@ -659,6 +662,20 @@ namespace CobaltAHK
 			}
 
 			throw new Exception(token.ToString()); // todo
+		}
+
+		private TernaryExpression ParseTernary(Lexer lexer, ValueExpression cond, IEnumerable<Token> terminators)
+		{
+			AssertToken(lexer.GetToken(), OperatorToken.GetToken(Operator.Ternary));
+			var ifTrue  = ParseExpressionChain(lexer, Token.Colon);
+
+			AssertToken(lexer.GetToken(), Token.Colon);
+			var ifFalse = ParseExpressionChain(lexer, terminators.ToArray());
+
+			return new TernaryExpression(lexer.Position,
+			                             cond,
+			                             ifTrue.ToExpression(),
+			                             ifFalse.ToExpression());
 		}
 
 		private MemberExpression ParseObjectAccess(Lexer lexer, ValueExpression obj)
