@@ -15,9 +15,7 @@ namespace CobaltAHK
 		public static readonly Token ForceExpression  = new CharacterToken('%');
 
 		#region State.Expression (and others)
-		[System.Obsolete]
 		public static readonly Token Colon            = new CharacterToken(':');
-
 		public static readonly Token OpenParenthesis  = new CharacterToken('(');
 		public static readonly Token CloseParenthesis = new CharacterToken(')');
 		public static readonly Token OpenBrace        = new CharacterToken('{'); // blocks or object literals
