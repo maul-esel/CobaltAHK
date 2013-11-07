@@ -27,6 +27,8 @@ namespace CobaltAHK.ExpressionTree
 				return GenerateFunctionCall((FunctionCallExpression)expr, scope);
 			} else if (expr is FunctionDefinitionExpression) {
 				return GenerateFunctionDefinition((FunctionDefinitionExpression)expr, scope);
+			} else if (expr is ClassDefinitionExpression) {
+				return GenerateClassDefinition((ClassDefinitionExpression)expr, scope);
 			} else if (expr is CustomVariableExpression) {
 				return scope.ResolveVariable(((CustomVariableExpression)expr).Name);
 			} else if (expr is BuiltinVariableExpression) {
@@ -217,6 +219,27 @@ namespace CobaltAHK.ExpressionTree
 				return DLR.Expression.Return(target, Converter.ConvertToObject(val));
 			}
 			return DLR.Expression.Return(target, NULL);
+		}
+
+		private DLR.Expression GenerateClassDefinition(ClassDefinitionExpression expr, Scope scope)
+		{
+			var obj = DLR.Expression.Parameter(typeof(CobaltAHKObject), expr.Name);
+			scope.AddVariable(expr.Name, obj);
+
+			var exprs = new List<DLR.Expression>() {
+				DLR.Expression.Assign(obj, DLR.Expression.New(typeof(CobaltAHKObject)))
+			};
+
+			foreach (var method in expr.Methods) {
+				exprs.Add(
+					GenerateMemberAssign(obj,
+				                     DLR.Expression.Constant(method.Name),
+				                     Generate(method, scope)
+				        )
+				);
+			}
+
+			return DLR.Expression.Block(typeof(void), exprs);
 		}
 
 		private static ConstructorInfo exceptionConstructor = typeof(ScriptException).GetConstructor(new[] { typeof(object) });

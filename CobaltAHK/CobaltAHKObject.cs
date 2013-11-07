@@ -9,6 +9,7 @@ namespace CobaltAHK
 	public class CobaltAHKObject : DynamicObject, IDictionary<object, object>
 	{
 		internal CobaltAHKObject(IEnumerable<object> keys, IEnumerable<object> values)
+		: this()
 		{
 			if (keys.Count() != values.Count()) {
 				throw new Exception(); // todo
@@ -17,6 +18,8 @@ namespace CobaltAHK
 				(this as IDictionary<object, object>).Add(keys.ElementAt(i), values.ElementAt(i));
 			}
 		}
+
+		public CobaltAHKObject() { }
 
 		private readonly IDictionary<object, object> dict = new Dictionary<object, object>();
 
