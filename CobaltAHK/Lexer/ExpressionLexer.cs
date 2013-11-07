@@ -119,9 +119,7 @@ namespace CobaltAHK
 				result = result && Implies(white, Whitespace.after,    after.Value)
 					&& Implies(white, Whitespace.not_after,        !after.Value)
 					&& Implies(white, Whitespace.before_xor_after, before ^ after.Value)
-					&& Implies(white, Whitespace.both_or_neither,
-						           Implies(before, after.Value) && Implies(after.Value, before)
-						  );
+					&& Implies(white, Whitespace.both_or_neither,  before == after.Value);
 			}
 
 			return result;
