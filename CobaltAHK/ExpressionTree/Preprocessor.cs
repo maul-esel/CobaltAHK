@@ -25,6 +25,11 @@ namespace CobaltAHK.ExpressionTree
 				var funcScope = new FunctionScope(scope);
 				scope.AddScope(expr, funcScope);
 				Process(func.Body, funcScope, settings);
+
+			} else if (expr is ClassDefinitionExpression) {
+				foreach (var method in ((ClassDefinitionExpression)expr).Methods) {
+					Process(method, scope, settings);
+				}
 			}
 		}
 	}
