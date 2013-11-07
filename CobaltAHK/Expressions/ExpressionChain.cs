@@ -64,6 +64,11 @@ namespace CobaltAHK.Expressions
 				var currentOp = ops.First(match);
 				var index = ops.IndexOf(currentOp);
 
+				if (IsRightToLeft(currentOp)) {
+					currentOp = ops.Last(match);
+					index = ops.LastIndexOf(currentOp);
+				}
+
 				OperatorExpression expr;
 
 				if (currentOp is BinaryOperator) {
@@ -86,6 +91,10 @@ namespace CobaltAHK.Expressions
 
 			return exps[0];
 		}
+
+		private bool IsRightToLeft(Operator op)
+		{
+			return (op is BinaryOperator && ((BinaryOperator)op).Is(BinaryOperationType.Assign)) || op == Operator.Ternary;
+		}
 	}
 }
-
