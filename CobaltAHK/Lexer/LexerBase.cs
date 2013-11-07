@@ -16,6 +16,24 @@ namespace CobaltAHK
 
 		public abstract Token GetToken();
 
+		private static IDictionary<string, string> escapes = new Dictionary<string, string>() {
+			{ "n", "\n" },
+			{ "r", "\r" },
+			{ "t", "\t" },
+			{ "v", "\v" },
+			{ "a", "\a" },
+			{ "f", "\f" }
+		};
+
+		protected static string Unescape(string str)
+		{
+			foreach (var escape in escapes) {
+				str = str.Replace("`" + escape.Key, escape.Value)
+					 .Replace("`" + escape.Key.ToUpper(), escape.Value);
+			}
+			return str;
+		}
+
 		#region type checks
 
 		protected bool IsDigit(char ch)

@@ -47,7 +47,7 @@ namespace CobaltAHK
 				}
 				escape = ch == '`';
 			});
-			return new TraditionalStringToken(str);
+			return new TraditionalStringToken(Unescape(str));
 		}
 	}
 }

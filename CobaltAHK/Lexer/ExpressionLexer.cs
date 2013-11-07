@@ -168,7 +168,7 @@ namespace CobaltAHK
 				}
 				escape = ch == '`';
 			});
-			return new QuotedStringToken(str);
+			return new QuotedStringToken(Unescape(str));
 		}
 
 		private static readonly char[] numberTerminators = { ' ', '\t', '\n', ',', ')', ']', Lexer.charEOF };
