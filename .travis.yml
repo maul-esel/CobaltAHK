@@ -8,3 +8,4 @@ before_script:
 
 script:
   - nunit-console ./Tests/bin/Debug/Tests.dll
+  - ./CobaltAHK-app/bin/Debug/CobaltAHK-app.exe test.ahk
