@@ -184,6 +184,9 @@ namespace CobaltAHK.Expressions
 
 	public class TernaryExpression : OperatorExpression
 	{
+		public TernaryExpression(SourcePosition pos, ValueExpression cond, ValueExpression ifTrue, ValueExpression ifFalse)
+		: this(pos, Operator.Ternary, cond, ifTrue, ifFalse) { }
+
 		public TernaryExpression(SourcePosition pos, Operator op, ValueExpression expr1, ValueExpression expr2, ValueExpression expr3) : base(pos, op, new[] { expr1, expr2, expr3 }) { }
 	}
 
