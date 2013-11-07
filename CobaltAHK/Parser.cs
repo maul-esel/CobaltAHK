@@ -508,11 +508,7 @@ namespace CobaltAHK
 					break;
 				}
 
-				if (token == Token.OpenParenthesis) {
-					lexer.GetToken(); // consume parenthesis
-					chain.Append(ParseExpressionChain(lexer, Token.CloseParenthesis).ToExpression());
-				
-				} else if (token is OperatorToken) {
+				if (token is OperatorToken) {
 					var op = ((OperatorToken)token).Operator;
 					if (op == Operator.AltObjAccess) { // special handling for f[A, B]
 						ParseAltObjAccess(lexer, chain);
@@ -527,7 +523,15 @@ namespace CobaltAHK
 						throw new Exception(); // todo
 					}
 				} else {
-					var expr = TokenToValueExpression(lexer);
+					ValueExpression expr;
+					if (token == Token.OpenParenthesis) {
+						lexer.GetToken(); // consume parenthesis
+						expr = ParseExpressionChain(lexer, Token.CloseParenthesis).ToExpression();
+						lexer.GetToken(); // consume closing parenthesis
+
+					} else {
+						expr = TokenToValueExpression(lexer);
+					}
 					token = lexer.PeekToken();
 
 					var objAcc = OperatorToken.GetToken(Operator.ObjectAccess);
