@@ -48,6 +48,14 @@ if (g) {
 	Assert(g, "Assertion in if-Block failed")
 }
 
+; just a comment - divider
+
+if (false) {
+	throw "False is true"
+} else {
+	Assert(g, "Assertion in else-Block failed")
+}
+
 ; todo: fix parsing so it works without parentheses
 result := (a ? b ? c : d : e ? f : g)
 Assert(result == "f", "Chained ternary failed")

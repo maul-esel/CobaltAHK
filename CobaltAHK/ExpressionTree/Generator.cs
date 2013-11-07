@@ -114,8 +114,8 @@ namespace CobaltAHK.ExpressionTree
 
 			} else if (branches[1] is ElseExpression) {
 				var elseExpr = (ElseExpression)branches[1];
-				return DLR.Expression.IfThenElse(ifCond, ifBlock, DLR.Expression.Block(scope.GetVariables(),
-				                                                                       elseExpr.Body.Select(e => Generate(e, scope))));
+				return DLR.Expression.IfThenElse(ifCond, ifBlock,
+				                                 DLR.Expression.Block(elseExpr.Body.Select(e => Generate(e, scope))));
 			} else {
 				return DLR.Expression.IfThenElse(ifCond, ifBlock, GenerateIfElse(branches.Except(new[] { ifExpr }).ToArray(), scope));
 			}
