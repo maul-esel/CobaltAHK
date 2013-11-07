@@ -58,7 +58,7 @@ Assert(a == b, "chained assignment failed")
 
 Assert(cond, msg) {
 	if (cond) {
-		FileAppend("Assert (" cond ") : '" msg "'\n", "*")
+		FileAppend("`tAssert (" cond ") : '" msg "'`n", "*")
 	} else {
 		throw(msg "")
 	}
