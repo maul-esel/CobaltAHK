@@ -670,7 +670,7 @@ namespace CobaltAHK
 			var ifTrue  = ParseExpressionChain(lexer, Token.Colon);
 
 			AssertToken(lexer.GetToken(), Token.Colon);
-			var ifFalse = ParseExpressionChain(lexer, terminators.ToArray());
+			var ifFalse = ParseExpressionChain(lexer, terminators != null ? terminators.ToArray() : null);
 
 			return new TernaryExpression(lexer.Position,
 			                             cond,
