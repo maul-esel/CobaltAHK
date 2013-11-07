@@ -27,7 +27,7 @@ namespace CobaltAHK.ExpressionTree
 			}
 
 			var lambda = scope.ResolveFunction(func);
-			var prms = args.Select(arg => arg.Expression);
+			var prms = args.Select(arg => Converter.ConvertToObject(arg.Expression));
 
 			return new DynamicMetaObject(
 				Expression.Invoke(lambda, prms),
