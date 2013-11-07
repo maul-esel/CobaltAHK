@@ -237,12 +237,19 @@ namespace CobaltAHK.ExpressionTree
 
 		private DLR.Expression GenerateMemberAssign(MemberAccessExpression expr, DLR.Expression value, Scope scope)
 		{
+			return GenerateMemberAssign(Generate(expr.Object, scope),
+			                            Generate(expr.Key, scope),
+			                            value
+			);
+		}
+
+		private DLR.Expression GenerateMemberAssign(DLR.Expression obj, DLR.Expression member, DLR.Expression value)
+		{
 			return DLR.Expression.Dynamic(new MemberAssignBinder(),
 			                              typeof(object),
-			                              Generate(expr.Object, scope),
-			                              Generate(expr.Key, scope),
-			                              value
-			);
+			                              obj,
+			                              member,
+			                              value);
 		}
 
 		private DLR.Expression GenerateTernaryExpression(TernaryExpression expr, Scope scope)
