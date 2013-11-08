@@ -29,12 +29,21 @@ namespace CobaltAHK
 			if (args.Length != 1) {
 				return false;
 			}
-			return dict.TryGetValue(args[0], out result);
+
+			if (!dict.TryGetValue(args[0], out result)) {
+				dict[args[0]] = result = null;
+			}
+
+			return true;
 		}
 
 		public override bool TryGetMember(GetMemberBinder binder, out object result)
 		{
-			return dict.TryGetValue(binder.Name, out result);
+			if (!dict.TryGetValue(binder.Name, out result)) {
+				dict[binder.Name] = result = null;
+			}
+
+			return true;
 		}
 
 		public override bool TrySetIndex(SetIndexBinder binder, object[] args, object value)

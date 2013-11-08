@@ -30,6 +30,8 @@ Assert((5 > 3) * 4 == 4, "Bool as int failed")
 obj := { "a" : 4, 4 : 5, 5 : "a" }
 Assert(obj.a "" == 4 "", "Object literal incorrect")
 
+Assert(obj.b == null, "Retrieval of undefined object member failed")
+
 obj.a += 5
 Assert(obj.a "" == 9 "", "+= on obj member failed")
 
