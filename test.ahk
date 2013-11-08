@@ -1,4 +1,24 @@
-Assert(a ? false : true, "Uninitialized var is not false")
+; truth values:
+; ==========================================================
+Assert(""    ? false : true, "Empty string is true")
+Assert(0     ? false : true, "0 is true")
+Assert(0.0   ? false : true, "0.0 is true")
+Assert(false ? false : true, "false is true")
+Assert(null  ? false : true, "null is true")
+Assert(a     ? false : true, "Uninitialized var is not false")
+
+Assert("a", "Non-empty string is false")
+Assert(1, "1 is false")
+Assert(true, "true is false")
+; ==========================================================
+
+Assert(0x2 "" == "2", "Hex-Int to string conversion failed")
+
+five() {
+	return(5)
+}
+Assert(five() "" == "5", "Return value failed")
+Assert(5 ** 2 == 25.0, "Power failed")
 
 c := 5
 c += 8.2
@@ -28,6 +48,7 @@ Assert((5 < 3) "" == "0", "Bools as strings")
 Assert((5 > 3) * 4 == 4, "Bool as int failed")
 
 obj := { "a" : 4, 4 : 5, 5 : "a" }
+Assert(obj != null, "Object literal failed")
 Assert(obj.a "" == 4 "", "Object literal incorrect")
 
 Assert(obj.b == null, "Retrieval of undefined object member failed")
@@ -37,6 +58,13 @@ Assert(obj.a "" == 9 "", "+= on obj member failed")
 
 obj.a := "a"
 Assert(obj.a == "a", "obj member assignment failed")
+
+; just testing for errors on empty literals
+obj := {}
+arr := []
+
+arr := [2, 4, 9]
+Assert(arr != null, "Array literal failed")
 
 a := 0
 b := "b"
