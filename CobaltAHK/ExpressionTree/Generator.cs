@@ -246,7 +246,14 @@ namespace CobaltAHK.ExpressionTree
 
 		private DLR.Expression GenerateThrow(ThrowExpression expr, Scope scope)
 		{
-			return DLR.Expression.Throw(DLR.Expression.New(exceptionConstructor, Generate(expr.Value, scope)));
+			var val = Generate(expr.Value, scope);
+			return DLR.Expression.Throw(
+				DLR.Expression.Condition(
+					DLR.Expression.TypeIs(val, typeof(Exception)),
+					DLR.Expression.Convert(DLR.Expression.Convert(val, typeof(object)), typeof(Exception)),
+					DLR.Expression.Convert(DLR.Expression.New(exceptionConstructor, val), typeof(Exception))
+				)
+			);
 		}
 
 		private DLR.Expression GenerateMemberAccess(MemberAccessExpression expr, Scope scope)
