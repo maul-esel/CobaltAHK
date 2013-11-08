@@ -14,9 +14,12 @@ namespace CobaltAHK
 			var lexer = new Lexer(code);
 			var expressions = new List<Expression>();
 
+			SkipNewlinesAndComments(lexer);
 			var token = lexer.PeekToken();
+
 			while (token != Token.EOF) {
 				expressions.Add(ParseExpression(lexer));
+
 				SkipNewlinesAndComments(lexer);
 				token = lexer.PeekToken();
 			}
