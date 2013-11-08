@@ -880,9 +880,13 @@ namespace CobaltAHK
 					continue;
 				}
 
-				var expr = ParseExpression(lexer); // consumes tokens
-				validate(expr);
-				body.Add(expr);
+				if (token is CommentToken) {
+					lexer.GetToken(); // consume token
+				} else {
+					var expr = ParseExpression(lexer); // consumes tokens
+					validate(expr);
+					body.Add(expr);
+				}
 
 				token = lexer.PeekToken();
 			}
