@@ -155,7 +155,7 @@ namespace CobaltAHK.Expressions
 
 	public abstract class OperatorExpression : ValueExpression
 	{
-		protected OperatorExpression(SourcePosition pos, Operator op, ValueExpression[] exprs)
+		protected OperatorExpression(SourcePosition pos, Operator op, params ValueExpression[] exprs)
 		: base(pos)
 		{
 			this.op = op;
@@ -174,12 +174,12 @@ namespace CobaltAHK.Expressions
 	// todo: differentiate between post/pre-increment and -decrement
 	public class UnaryExpression : OperatorExpression
 	{
-		public UnaryExpression(SourcePosition pos, Operator op, ValueExpression expr) : base(pos, op, new[] { expr }) { }
+		public UnaryExpression(SourcePosition pos, Operator op, ValueExpression expr) : base(pos, op, expr) { }
 	}
 
 	public class BinaryExpression : OperatorExpression
 	{
-		public BinaryExpression(SourcePosition pos, Operator op, ValueExpression expr1, ValueExpression expr2) : base(pos, op, new[] { expr1, expr2 }) { }
+		public BinaryExpression(SourcePosition pos, Operator op, ValueExpression expr1, ValueExpression expr2) : base(pos, op, expr1, expr2) { }
 	}
 
 	public class TernaryExpression : OperatorExpression
@@ -187,7 +187,7 @@ namespace CobaltAHK.Expressions
 		public TernaryExpression(SourcePosition pos, ValueExpression cond, ValueExpression ifTrue, ValueExpression ifFalse)
 		: this(pos, Operator.Ternary, cond, ifTrue, ifFalse) { }
 
-		public TernaryExpression(SourcePosition pos, Operator op, ValueExpression expr1, ValueExpression expr2, ValueExpression expr3) : base(pos, op, new[] { expr1, expr2, expr3 }) { }
+		public TernaryExpression(SourcePosition pos, Operator op, ValueExpression expr1, ValueExpression expr2, ValueExpression expr3) : base(pos, op, expr1, expr2, expr3) { }
 	}
 
 	#endregion
