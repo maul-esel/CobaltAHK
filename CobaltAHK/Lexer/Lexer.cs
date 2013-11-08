@@ -83,6 +83,7 @@ namespace CobaltAHK
 			char ch = reader.Peek();
 			if (state == State.Root) {
 				SkipWhitespace();
+				ch = reader.Peek();
 			}
 
 			// state-independent tokens
