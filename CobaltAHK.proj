@@ -1,8 +1,10 @@
 <?xml version="1.0"?>
 <!-- source: http://danlimerick.wordpress.com/2013/02/03/build-your-open-source-net-project-on-travis-ci/ -->
 <Project ToolsVersion="4.0" DefaultTargets="Travis" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-	<Target Name="Travis" DependsOnTargets="Build"/>
+	<Target Name="Travis">
+		<MSBuild Projects="CobaltAHK-app/CobaltAHK-app.csproj;Tests/Tests.csproj" Properties="Configuration=Debug" />
+	</Target>
 	<Target Name="Build">
-		<MSBuild Projects="CobaltAHK.sln" Properties="Configuration=Debug" />
+		<MSBuild Projects="CobaltAHK.sln" />
 	</Target>
 </Project>
