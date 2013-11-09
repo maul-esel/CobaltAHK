@@ -7,8 +7,13 @@ before_install:
 install:
   - sudo apt-get install mono-devel mono-gmcs nunit-console
 
+env:
+#  - FRAMEWORK_VERSION=v3.5
+  - FRAMEWORK_VERSION=v4.0
+  - FRAMEWORK_VERSION=v4.5
+
 before_script:
-  - xbuild /target:Travis CobaltAHK.proj
+  - xbuild /target:Travis /property:TargetFrameworkVersion=$FRAMEWORK_VERSION CobaltAHK.proj
 
 script:
   - nunit-console ./Tests/bin/Debug/Tests.dll
