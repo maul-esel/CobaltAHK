@@ -1,5 +1,9 @@
 language: C
 
+before_install:
+  - sudo add-apt-repository -y ppa:directhex/monoxide
+  - sudo apt-get update
+
 install:
   - sudo apt-get install mono-devel mono-gmcs nunit-console
 
