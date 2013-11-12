@@ -19,6 +19,14 @@ namespace CobaltAHK.ExpressionTree
 			parent = parentScope;
 		}
 
+		protected Scope(Scope parentScope, LabelTarget ret, LabelTarget con, LabelTarget brk)
+		: this(parentScope)
+		{
+			returnTarget = ret;
+			continueTarget = con;
+			breakTarget = brk;
+		}
+
 		private void LoadBuiltinFunctions()
 		{
 			var flags = BindingFlags.Static | BindingFlags.Public | BindingFlags.DeclaredOnly;
@@ -185,6 +193,22 @@ namespace CobaltAHK.ExpressionTree
 		}
 
 		#endregion
+
+		#endregion
+
+		#region targets
+
+		private readonly LabelTarget returnTarget = null;
+
+		private readonly LabelTarget continueTarget = null;
+
+		private readonly LabelTarget breakTarget = null;
+
+		public LabelTarget Return { get { return returnTarget; } }
+
+		public LabelTarget Continue { get { return continueTarget; } }
+
+		public LabelTarget Break { get { return breakTarget; } }
 
 		#endregion
 	}
