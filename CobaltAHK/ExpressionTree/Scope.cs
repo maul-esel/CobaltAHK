@@ -51,6 +51,8 @@ namespace CobaltAHK.ExpressionTree
 
 		protected readonly Scope parent;
 
+		public Scope Parent { get { return parent; } }
+
 		public bool IsRoot { get { return parent == null; } }
 
 		#region scopes
