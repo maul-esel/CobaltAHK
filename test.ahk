@@ -17,8 +17,16 @@ Assert(0x2 "" == "2", "Hex-Int to string conversion failed")
 five() {
 	return(5)
 }
+
 Assert(five() "" == "5", "Return value failed")
 Assert(5 ** 2 == 25.0, "Power failed")
+
+cond() {
+	if (true) {
+		return(true)
+	}
+}
+Assert(cond(), "function return in if failed")
 
 c := 5
 c += 8.2
