@@ -215,7 +215,15 @@ namespace CobaltAHK.ExpressionTree
 
 	public class FunctionScope : Scope
 	{
-		public FunctionScope(Scope parent) : base(parent) { }
+		public FunctionScope(Scope parent)
+		: base(parent, CreateReturnLabel(), null, null)
+		{
+		}
+
+		private static LabelTarget CreateReturnLabel()
+		{
+			return Expression.Label(typeof(object));
+		}
 
 		public override ParameterExpression ResolveVariable(string name) // override, because we can't just use parent scope vars
 		{
@@ -230,10 +238,15 @@ namespace CobaltAHK.ExpressionTree
 	public class LoopScope : Scope
 	{
 		public LoopScope(Scope parent)
-		: base(parent)
+		: base(parent, null, CreateJumpLabel(), CreateJumpLabel())
 		{
 			OverrideBuiltinVariable(Syntax.BuiltinVariable.A_Index,
 			                        Expression.Parameter(typeof(int), "A_Index"));
+		}
+
+		private static LabelTarget CreateJumpLabel()
+		{
+			return Expression.Label(); // void
 		}
 	}
 
