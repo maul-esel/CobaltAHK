@@ -57,6 +57,8 @@ namespace CobaltAHK.ExpressionTree
 				return GenerateIfElse((BlockExpression)expr, scope);
 			} else if (expr is ThrowExpression) {
 				return GenerateThrow((ThrowExpression)expr, scope);
+			} else if (expr is ReturnExpression) {
+				return GenerateReturnExpression((ReturnExpression)expr, scope);
 			}
 			throw new NotImplementedException();
 		}
@@ -162,7 +164,6 @@ namespace CobaltAHK.ExpressionTree
 
 			var prms = new List<DLR.ParameterExpression>();
 			var types = new List<Type>(prms.Count + 1);
-			var funcBody = new List<DLR.Expression>();
 
 			foreach (var p in func.Parameters) {
 				var param = DLR.Expression.Parameter(typeof(object), p.Name);
@@ -185,17 +186,9 @@ namespace CobaltAHK.ExpressionTree
 			}
 			types.Add(typeof(object)); // return value
 
-			var endOfFunc = DLR.Expression.Label(typeof(object));
-			foreach (var e in func.Body) {
-				DLR.Expression expr;
-				if (e is ReturnExpression) {
-					expr = MakeReturn((ReturnExpression)e, scope, funcBody, endOfFunc);
-				} else {
-					expr = Generate(e, funcScope);
-				}
-				funcBody.Add(expr);
-			}
-			funcBody.Add(DLR.Expression.Label(endOfFunc, NULL)); // default return value is null
+			var funcBody = func.Body.Select(e => Generate(e, funcScope)).Concat(
+				new[] { DLR.Expression.Label(funcScope.Return, NULL) } // default return value is null
+			);
 
 			var function = DLR.Expression.Lambda(
 				DLR.Expression.GetFuncType(types.ToArray()),
@@ -209,17 +202,42 @@ namespace CobaltAHK.ExpressionTree
 			return function;
 		}
 
-		private DLR.Expression MakeReturn(ReturnExpression expr, Scope scope, IList<DLR.Expression> body, DLR.LabelTarget target)
+		#region return
+
+		private DLR.Expression GenerateReturnExpression(ReturnExpression expr, Scope scope)
 		{
-			foreach (var e in expr.OtherExpressions) {
-				body.Add(Generate(e, scope));
+			if (expr.OtherExpressions.Count() > 0) {
+				var blockBody = expr.OtherExpressions.Select(e => Generate(e, scope)).Concat(
+					new[] { MakeReturn(expr, scope) }
+				);
+				return DLR.Expression.Block(blockBody); // todo: vars?
 			}
-			if (expr.Value != null) {
-				var val = Generate(expr.Value, scope);
-				return DLR.Expression.Return(target, Converter.ConvertToObject(val));
-			}
-			return DLR.Expression.Return(target, NULL);
+			return MakeReturn(expr, scope);
 		}
+
+		private DLR.Expression MakeReturn(ReturnExpression expr, Scope scope)
+		{
+			var target = GetScopeReturn(scope);
+			if (expr.Value == null) {
+				return DLR.Expression.Return(target, NULL);
+			}
+			return DLR.Expression.Return(target, Converter.ConvertToObject(Generate(expr.Value, scope)));
+		}
+
+		private DLR.LabelTarget GetScopeReturn(Scope scope)
+		{
+			while (scope.Return == null && !scope.IsRoot) {
+				scope = scope.Parent;
+			}
+
+			if (scope.Return == null) {
+				throw new InvalidOperationException();
+			}
+
+			return scope.Return;
+		}
+
+		#endregion
 
 		private DLR.Expression GenerateClassDefinition(ClassDefinitionExpression expr, Scope scope)
 		{
