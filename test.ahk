@@ -102,6 +102,11 @@ a := b .= c
 Assert(b == "bc", "chained concat-assign failed")
 Assert(a == b, "chained assignment failed")
 
+if (true) {
+	return()
+}
+Assert(false, "conditional return in auto-execute failed")
+
 Assert(cond, msg) {
 	if (cond) {
 		FileAppend("`tAssert (" cond ") : '" msg "'`n", "*")

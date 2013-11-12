@@ -8,10 +8,15 @@ namespace CobaltAHK.ExpressionTree
 {
 	public class Scope
 	{
-		public Scope() : this(null)
+		public Scope() : this(null, CreateEndOfProgramLabel(), null, null)
 		{
 			LoadBuiltinFunctions();
 			LoadBuiltinVariables();
+		}
+
+		private static LabelTarget CreateEndOfProgramLabel()
+		{
+			return Expression.Label();
 		}
 
 		public Scope(Scope parentScope)

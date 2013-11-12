@@ -36,7 +36,9 @@ namespace CobaltAHK
 			var et = Generate(expressions, scope, settings);
 			Debug("Generated {0} expressions.", et.Length);
 
-			var lambda = Expression.Lambda<Action>(Expression.Block(scope.GetVariables(), et));
+			var end = Expression.Label(scope.Return);
+
+			var lambda = Expression.Lambda<Action>(Expression.Block(scope.GetVariables(), et.Concat(new[] { end })));
 			Debug("Generated lambda wrapper.");
 
 			return lambda.Compile();
