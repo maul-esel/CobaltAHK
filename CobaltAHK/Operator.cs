@@ -49,20 +49,23 @@ namespace CobaltAHK
 
 		#region instances
 		// todo: New
-		public static readonly Operator Deref                   = new   UnaryOperator("%",  13); // todo
+		[Obsolete]
+		public static readonly Operator Deref                   = new   UnaryOperator("%",  13, Position.undefined); // todo
 		public static readonly Operator ObjectAccess            = new  BinaryOperator(".", 13,
 		                                                                              BinaryOperationType.Other,
 		                                                                              Whitespace.neither);
-		public static readonly Operator Increment               = new   UnaryOperator("++", 12/*,
-		                                                                              Whitespace.before_xor_after*/);
-		public static readonly Operator Decrement               = new   UnaryOperator("--", 12/*,
-		                                                                              Whitespace.before_xor_after*/);
+
+		public static readonly Operator PrefixIncrement         = new   UnaryOperator("++", 12, Position.prefix);
+		public static readonly Operator PostfixIncrement        = new   UnaryOperator("++", 12, Position.postfix);
+		public static readonly Operator PrefixDecrement         = new   UnaryOperator("--", 12, Position.prefix);
+		public static readonly Operator PostfixDecrement        = new   UnaryOperator("--", 12, Position.postfix);
+
 		public static readonly Operator Power                   = new  BinaryOperator("**", 11, BinaryOperationType.Arithmetic);
-		public static readonly Operator UnaryMinus              = new   UnaryOperator("-",  10);
-		public static readonly Operator LogicalNot              = new   UnaryOperator("!",  10);
-		public static readonly Operator BitwiseNot              = new   UnaryOperator("~",  10);
-		public static readonly Operator Address                 = new   UnaryOperator("&",  10);
-		public static readonly Operator Dereference             = new   UnaryOperator("*",  10);
+		public static readonly Operator UnaryMinus              = new   UnaryOperator("-",  10, Position.prefix);
+		public static readonly Operator LogicalNot              = new   UnaryOperator("!",  10, Position.prefix);
+		public static readonly Operator BitwiseNot              = new   UnaryOperator("~",  10, Position.prefix);
+		public static readonly Operator Address                 = new   UnaryOperator("&",  10, Position.prefix);
+		public static readonly Operator Dereference             = new   UnaryOperator("*",  10, Position.prefix);
 		public static readonly Operator Multiply                = new  BinaryOperator("*",  10,
 		                                                                              BinaryOperationType.Arithmetic,
 		                                                                              Whitespace.both_or_neither);
@@ -93,7 +96,7 @@ namespace CobaltAHK
 		public static readonly Operator CaseEqual               = new  BinaryOperator("==",  5, BinaryOperationType.Comparison);
 		public static readonly Operator NotEqual                = new  BinaryOperator("!=",  5, BinaryOperationType.Comparison);
 		public static readonly Operator NotEqualAlt             = new  BinaryOperator("<>",  5, BinaryOperationType.Comparison);
-		public static readonly Operator WordLogicalNot          = new   UnaryOperator("NOT", 4/*, Whitespace.both*/);
+		public static readonly Operator WordLogicalNot          = new   UnaryOperator("NOT", 4, Position.undefined);
 		public static readonly Operator LogicalAnd              = new  BinaryOperator("&&",  3, BinaryOperationType.Logical);
 		public static readonly Operator WordLogicalAnd          = new  BinaryOperator("AND", 3, BinaryOperationType.Logical);
 		public static readonly Operator LogicalOr               = new  BinaryOperator("||",  3, BinaryOperationType.Logical);
@@ -158,11 +161,23 @@ namespace CobaltAHK
 		both_or_neither = 16
 	}
 
+	public enum Position
+	{
+		undefined,
+		prefix,
+		postfix
+	}
+
 	internal class UnaryOperator : Operator
 	{
-		internal UnaryOperator(string op, uint prec)
-
+		internal UnaryOperator(string op, uint prec, Position pos)
 		: base(op, prec)
+		{
+		}
+
+		private Position position;
+
+		public Position Position { get { return position; } }
 	}
 
 	internal class BinaryOperator : Operator
