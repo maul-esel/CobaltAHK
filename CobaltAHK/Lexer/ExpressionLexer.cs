@@ -110,10 +110,24 @@ namespace CobaltAHK
 
 		private bool MatchesWhitespace(Operator op, bool before, bool? after)
 		{
-			if (op is BinaryOperator) {
+			if (op is UnaryOperator) {
+				return MatchesWhitespace((UnaryOperator)op, before, after);
+			} else if (op is BinaryOperator) {
 				return MatchesWhitespace((BinaryOperator)op, before, after);
 			}
 			throw new Exception(); // todo
+		}
+
+		private bool MatchesWhitespace(UnaryOperator op, bool before, bool? after)
+		{
+			bool result = Implies(op.Position == Position.postfix, !before);
+			// note: prefix doesn't imply before, e.g. `(!a)`
+
+			if (after != null) {
+				result = result && Implies(op.Position == Position.prefix, !after.Value);
+				// note: as above, postfix doesn't imply after, e.g. `(a++)`
+			}
+			return result;
 		}
 
 		private bool MatchesWhitespace(BinaryOperator op, bool before, bool? after)
