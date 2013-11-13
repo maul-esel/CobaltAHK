@@ -180,4 +180,3 @@ namespace CobaltAHK
 		public Syntax.ValueKeyword Keyword { get { return value; } }
 	}
 }
-

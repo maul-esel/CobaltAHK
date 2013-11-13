@@ -18,4 +18,3 @@ namespace CobaltAHK
 		public uint Index { get { return index; } }
 	}
 }
-

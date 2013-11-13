@@ -245,4 +245,3 @@ namespace CobaltAHK
 		#endregion
 	}
 }
-

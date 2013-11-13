@@ -56,4 +56,3 @@ namespace CobaltAHK
 		public UnexpectedCodeException(SourcePosition pos, string expected, string actual, string msg = null) : base(pos, msg) { }
 	}
 }
-

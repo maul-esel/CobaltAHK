@@ -15,4 +15,3 @@ namespace CobaltAHK
 		public object Value { get { return value; } }
 	}
 }
-

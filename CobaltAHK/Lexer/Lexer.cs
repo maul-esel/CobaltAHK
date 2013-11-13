@@ -114,4 +114,3 @@ namespace CobaltAHK
 		private static readonly char[] singleCommentTerminators = { '\n', charEOF };
 	}
 }
-

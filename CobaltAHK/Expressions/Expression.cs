@@ -194,4 +194,3 @@ namespace CobaltAHK.Expressions
 
 	#endregion
 }
-
