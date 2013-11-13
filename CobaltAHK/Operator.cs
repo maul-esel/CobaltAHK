@@ -173,6 +173,7 @@ namespace CobaltAHK
 		internal UnaryOperator(string op, uint prec, Position pos)
 		: base(op, prec)
 		{
+			position = pos;
 		}
 
 		private Position position;
