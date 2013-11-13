@@ -10,6 +10,7 @@ Assert(a     ? false : true, "Uninitialized var is not false")
 Assert("a", "Non-empty string is false")
 Assert(1, "1 is false")
 Assert(true, "true is false")
+Assert(!false, "!false is false")
 ; ==========================================================
 
 Assert(0x2 "" == "2", "Hex-Int to string conversion failed")

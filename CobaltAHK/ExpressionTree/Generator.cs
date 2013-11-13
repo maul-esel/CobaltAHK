@@ -39,6 +39,8 @@ namespace CobaltAHK.ExpressionTree
 					case Syntax.ValueKeyword.True:  return TRUE;
 					case Syntax.ValueKeyword.Null:  return NULL;
 				}
+			} else if (expr is UnaryExpression) {
+				return GenerateUnaryExpression((UnaryExpression)expr, scope);
 			} else if (expr is BinaryExpression) {
 				return GenerateBinaryExpression((BinaryExpression)expr, scope);
 			} else if (expr is TernaryExpression) {
@@ -308,6 +310,18 @@ namespace CobaltAHK.ExpressionTree
 
 			return DLR.Expression.Condition(Converter.ConvertToBoolean(cond), ifTrue, ifFalse);
 		}
+
+		#region unary operations
+
+		private DLR.Expression GenerateUnaryExpression(UnaryExpression expr, Scope scope)
+		{
+			if (expr.Operator == Operator.LogicalNot || expr.Operator == Operator.WordLogicalNot) {
+				return DLR.Expression.Not(Converter.ConvertToBoolean(Generate(expr.Expressions[0], scope)));
+			}
+			throw new NotImplementedException();
+		}
+
+		#endregion
 
 		#region binary operations
 
