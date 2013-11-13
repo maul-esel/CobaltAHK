@@ -497,9 +497,14 @@ namespace CobaltAHK
 		{
 			lexer.PushState(Lexer.State.Expression);
 			var token = lexer.PeekToken();
+			UnaryOperator prefixOp = null;
 
 			while (token != Token.EOF) {
 				if (token == Token.Newline) {
+					if (prefixOp != null) {
+						throw new Exception(); // todo
+					}
+
 					lexer.GetToken();
 					token = lexer.PeekToken();
 					if (!(token is OperatorToken)) { // don't concat
@@ -508,16 +513,26 @@ namespace CobaltAHK
 				}
 
 				if (terminators != null && terminators.Contains(token)) {
+					if (prefixOp != null) {
+						throw new Exception(); // todo
+					}
 					break;
 				}
 
 				if (token is OperatorToken) {
+					if (prefixOp != null) {
+						throw new Exception(); // todo
+					}
+
 					var op = ((OperatorToken)token).Operator;
 					if (op == Operator.AltObjAccess) { // special handling for f[A, B]
 						ParseAltObjAccess(lexer, chain);
 
 					} else if (op is UnaryOperator) {
-						throw new NotImplementedException();
+						if (((UnaryOperator)op).Position != Position.prefix) {
+							throw new Exception(); // todo
+						}
+						prefixOp = (UnaryOperator)op;
 
 					} else if (op is BinaryOperator) {
 						chain.Append((BinaryOperator)op);
@@ -535,6 +550,12 @@ namespace CobaltAHK
 					} else {
 						expr = TokenToValueExpression(lexer);
 					}
+
+					if (prefixOp != null) {
+						expr = new UnaryExpression(lexer.Position, prefixOp, expr);
+							prefixOp = null;
+					}
+
 					token = lexer.PeekToken();
 
 					var objAcc = OperatorToken.GetToken(Operator.ObjectAccess);
