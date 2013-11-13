@@ -13,12 +13,6 @@ namespace CobaltAHK
 			set.Add(this);
 		}
 
-		protected Operator(string op, uint prec, Whitespace white)
-		: this(op, prec)
-		{
-			whitespace = white;
-		}
-
 		public virtual bool Matches(string op)
 		{
 			return Code == op.ToUpper();
@@ -26,16 +20,12 @@ namespace CobaltAHK
 
 		#region fields
 
-		private readonly Whitespace whitespace = Whitespace.none;
-
 		protected readonly string code;
 
 		private readonly uint precedence;
 
 		#endregion
 		#region properties
-
-		public Whitespace Whitespace { get { return whitespace; } }
 
 		public string Code { get { return code; } }
 
@@ -63,10 +53,10 @@ namespace CobaltAHK
 		public static readonly Operator ObjectAccess            = new  BinaryOperator(".", 13,
 		                                                                              BinaryOperationType.Other,
 		                                                                              Whitespace.neither);
-		public static readonly Operator Increment               = new   UnaryOperator("++", 12,
-		                                                                              Whitespace.before_xor_after);
-		public static readonly Operator Decrement               = new   UnaryOperator("--", 12,
-		                                                                              Whitespace.before_xor_after);
+		public static readonly Operator Increment               = new   UnaryOperator("++", 12/*,
+		                                                                              Whitespace.before_xor_after*/);
+		public static readonly Operator Decrement               = new   UnaryOperator("--", 12/*,
+		                                                                              Whitespace.before_xor_after*/);
 		public static readonly Operator Power                   = new  BinaryOperator("**", 11, BinaryOperationType.Arithmetic);
 		public static readonly Operator UnaryMinus              = new   UnaryOperator("-",  10);
 		public static readonly Operator LogicalNot              = new   UnaryOperator("!",  10);
@@ -103,7 +93,7 @@ namespace CobaltAHK
 		public static readonly Operator CaseEqual               = new  BinaryOperator("==",  5, BinaryOperationType.Comparison);
 		public static readonly Operator NotEqual                = new  BinaryOperator("!=",  5, BinaryOperationType.Comparison);
 		public static readonly Operator NotEqualAlt             = new  BinaryOperator("<>",  5, BinaryOperationType.Comparison);
-		public static readonly Operator WordLogicalNot          = new   UnaryOperator("NOT", 4, Whitespace.both);
+		public static readonly Operator WordLogicalNot          = new   UnaryOperator("NOT", 4/*, Whitespace.both*/);
 		public static readonly Operator LogicalAnd              = new  BinaryOperator("&&",  3, BinaryOperationType.Logical);
 		public static readonly Operator WordLogicalAnd          = new  BinaryOperator("AND", 3, BinaryOperationType.Logical);
 		public static readonly Operator LogicalOr               = new  BinaryOperator("||",  3, BinaryOperationType.Logical);
@@ -165,31 +155,33 @@ namespace CobaltAHK
 		not_after = 8,
 		both = before|after,
 		neither = not_before|not_after,
-		both_or_neither = 16,
-		before_xor_after = 32
+		both_or_neither = 16
 	}
 
 	internal class UnaryOperator : Operator
 	{
 		internal UnaryOperator(string op, uint prec)
-		: this(op, prec, Whitespace.before|Whitespace.not_after) { }
 
-		internal UnaryOperator(string op, uint prec, Whitespace white)
-		: base(op, prec, white) { }
+		: base(op, prec)
 	}
 
 	internal class BinaryOperator : Operator
 	{
 		internal BinaryOperator(string op, uint prec, BinaryOperationType tp, Whitespace white)
-		: base(op, prec, white)
+		: base(op, prec)
 		{
 			type = tp;
+			whitespace = white;
 		}
 
 		internal BinaryOperator(string op, uint prec, BinaryOperationType tp)
 		: this(op, prec, tp, Whitespace.none)
 		{
 		}
+
+		private readonly Whitespace whitespace = Whitespace.none;
+
+		public Whitespace Whitespace { get { return whitespace; } }
 
 		public bool Is(BinaryOperationType type)
 		{

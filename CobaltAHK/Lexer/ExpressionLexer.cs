@@ -110,6 +110,14 @@ namespace CobaltAHK
 
 		private bool MatchesWhitespace(Operator op, bool before, bool? after)
 		{
+			if (op is BinaryOperator) {
+				return MatchesWhitespace((BinaryOperator)op, before, after);
+			}
+			throw new Exception(); // todo
+		}
+
+		private bool MatchesWhitespace(BinaryOperator op, bool before, bool? after)
+		{
 			var white = op.Whitespace;
 
 			bool result = Implies(white, Whitespace.before,  before)
@@ -118,7 +126,6 @@ namespace CobaltAHK
 			if (after != null) {
 				result = result && Implies(white, Whitespace.after,    after.Value)
 					&& Implies(white, Whitespace.not_after,        !after.Value)
-					&& Implies(white, Whitespace.before_xor_after, before ^ after.Value)
 					&& Implies(white, Whitespace.both_or_neither,  before == after.Value);
 			}
 
