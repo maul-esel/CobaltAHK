@@ -15,8 +15,8 @@ namespace CobaltAHK
 			{ ')', Token.CloseParenthesis },
 			{ '{', Token.OpenBrace },
 			{ '}', Token.CloseBrace },
-			{ ']', Token.CloseBracket }
-			//, { ',', Token.Comma }
+			{ ']', Token.CloseBracket },
+			{ ',', Token.Comma } // needed here in case of whitespace before comma, because then Lexer doesn't recognize it.
 		};
 
 		protected override IDictionary<char, Token> punctuationTokens {
