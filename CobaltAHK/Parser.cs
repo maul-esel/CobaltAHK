@@ -539,11 +539,14 @@ namespace CobaltAHK
 
 					var objAcc = OperatorToken.GetToken(Operator.ObjectAccess);
 					var ternary = OperatorToken.GetToken(Operator.Ternary);
-					while (token == objAcc || token == ternary) {
+					while (token == objAcc || token == ternary || IsUnaryPostfixOperator(token)) {
 						if (token == objAcc) {
 							expr = ParseObjectAccess(lexer, expr);
 						} else if (token == ternary) {
 							expr = ParseTernary(lexer, expr, terminators);
+						} else if (IsUnaryPostfixOperator(token)) {
+							lexer.GetToken();
+							expr = new UnaryExpression(lexer.Position, ((OperatorToken)token).Operator, expr);
 						}
 						token = lexer.PeekToken();
 					}
@@ -557,6 +560,13 @@ namespace CobaltAHK
 			}
 
 			lexer.PopState();
+		}
+
+		private static bool IsUnaryPostfixOperator(Token token)
+		{
+			return token is OperatorToken
+				&& ((OperatorToken)token).Operator is UnaryOperator
+				&& ((UnaryOperator)((OperatorToken)token).Operator).Position == Position.postfix;
 		}
 
 		private ValueExpression[] ParseExpressionList(Lexer lexer)
