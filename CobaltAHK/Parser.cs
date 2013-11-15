@@ -723,13 +723,14 @@ namespace CobaltAHK
 			AssertToken(lexer.PeekToken(), typeof(TextToken));
 			var pos = lexer.Position;
 
-			var token = lexer.GetToken();
-			var member = new StringLiteralExpression(pos, (token as TextToken).Text);
+			AssertToken(lexer.PeekToken(), typeof(TextToken));
+			var token = (TextToken)lexer.GetToken();
+			var member = new StringLiteralExpression(token.Position, token.Text);
 
 			if (token is IdToken) {
-				return new MemberAccessExpression(pos, obj, member);
+				return new MemberAccessExpression(obj.Position, obj, member);
 			} else if (token is FunctionToken) {
-				return new MemberInvokeExpression(pos, obj, member);
+				return new MemberInvokeExpression(obj.Position, obj, member);
 			}
 
 			throw new Exception(); // todo
