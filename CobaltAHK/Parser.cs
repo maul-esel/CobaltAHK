@@ -319,9 +319,7 @@ namespace CobaltAHK
 			var func = (FunctionToken)lexer.GetToken();
 
 			lexer.PushState(Lexer.State.Expression);
-
-			AssertToken(lexer.PeekToken(), Token.OpenParenthesis);
-			var parameters = ParseExpressionList(lexer);
+			var parameters = ReadFunctionParamTokens(lexer);
 
 			var beforeToken = lexer.Position;
 			bool newline = SkipNewline(lexer);
@@ -332,11 +330,11 @@ namespace CobaltAHK
 				var body = ParseBlock(lexer, e => ValidateExpressionInDefinition(e));
 				AssertToken(lexer.GetToken(), Token.Newline, Token.EOF);
 
-				var prms = ValidateFunctionDefParams(parameters);
+				var prms = ParseParamDefinitions(parameters);
 				result = new FunctionDefinitionExpression(func.Position, func.Text, prms, body);
 
 			} else { // function call
-				var funcExpr = new FunctionCallExpression(func.Position, func.Text, parameters);
+				var funcExpr = new FunctionCallExpression(func.Position, func.Text, ParseExpressionList(parameters));
 				bool concat = newline && token is OperatorToken; // todo
 				if (!newline || concat) {
 					var chain = new ExpressionChain();
@@ -359,6 +357,37 @@ namespace CobaltAHK
 
 			lexer.PopState();
 			return result;
+		}
+
+		private ITokenStream ReadFunctionParamTokens(Lexer lexer)
+		{
+			var list = new List<Token>();
+			var pos = lexer.Position;
+			int level = 0;
+
+			lexer.PushState(Lexer.State.Expression);
+			AssertToken(lexer.PeekToken(), Token.OpenParenthesis);
+			list.Add(lexer.GetToken());
+
+			var token = lexer.PeekToken();
+			while (token != Token.CloseParenthesis || level > 0) {
+				if (token == Token.OpenParenthesis) {
+					++level;
+				} else if (token == Token.CloseParenthesis) {
+					--level;
+				} else if (token == Token.EOF) {
+					throw new Exception(); // todo
+				}
+
+				list.Add(lexer.GetToken());
+				token = lexer.PeekToken();
+			}
+
+			AssertToken(lexer.PeekToken(), Token.CloseParenthesis);
+			list.Add(lexer.GetToken());
+
+			lexer.PopState();
+			return new ArrayTokenStream(pos, list.ToArray());
 		}
 
 		#region helpers
@@ -790,81 +819,54 @@ namespace CobaltAHK
 
 		#region function definitions
 
-		private ParameterDefinitionExpression[] ValidateFunctionDefParams(ValueExpression[] exprs)
+		private ParameterDefinitionExpression[] ParseParamDefinitions(ITokenStream stream)
 		{
 			var list = new List<ParameterDefinitionExpression>();
+			AssertToken(stream.GetToken(), Token.OpenParenthesis);
 
-			foreach (var expr in exprs) {
-				string name;
-				Syntax.ParameterModifier modifier = Syntax.ParameterModifier.None;
-				ValueExpression defaultValue = null;
+			while (stream.PeekToken() != Token.CloseParenthesis) {
+				IdToken nameToken = null, modifierToken = null;
+				ValueExpression value = null;
 
-				ExtractParamDef(expr, out name, ref modifier, ref defaultValue);
-				var param = new ParameterDefinitionExpression(expr.Position, name, modifier, defaultValue);
+				AssertToken(stream.PeekToken(), typeof(IdToken));
+				nameToken = (IdToken)stream.GetToken();
 
-				list.Add(param);
+				if (stream.PeekToken() is IdToken) { // first was actually a modifier
+					if (!IsValidParamModifier(nameToken)) {
+						throw new Exception(); // todo
+					}
+					modifierToken = nameToken;
+					nameToken = (IdToken)stream.GetToken();
+				}
+
+				if (stream.PeekToken() is OperatorToken) { // default value specified
+					stream.GetToken();
+					value = ParseExpressionChain(stream, Token.Comma, Token.CloseParenthesis).ToExpression(); // todo: what's actually allowed as default value?
+				}
+
+				AssertToken(stream.PeekToken(), Token.Comma, Token.CloseParenthesis);
+				if (stream.PeekToken() == Token.Comma) {
+					stream.GetToken();
+				}
+
+				Syntax.ParameterModifier modifier = modifierToken != null ? Syntax.GetParameterModifier(modifierToken.Text) : Syntax.ParameterModifier.None;
+				list.Add(
+					new ParameterDefinitionExpression((modifierToken ?? nameToken).Position,
+				                                  nameToken.Text,
+				                                  modifier,
+				                                  value
+				        )
+				);
+
 			}
 
+			AssertToken(stream.GetToken(), Token.CloseParenthesis);
 			return list.ToArray();
 		}
 
-		private void ExtractParamDef(ValueExpression expr, out string name, ref Syntax.ParameterModifier modifier, ref ValueExpression defaultValue)
+		private bool IsValidParamModifier(IdToken token)
 		{
-			if (expr is CustomVariableExpression) {
-				name = ExtractParamDefName(expr);
-
-			} else if (expr is BinaryExpression) {
-				var bin = (BinaryExpression)expr;
-
-				if (bin.Operator == Operator.Concatenate) { // todo: allow implicit only
-					ExtractParamDefModifier(bin, out name, out modifier);
-
-				} else if (bin.Operator == Operator.Assign) {
-					var first = bin.Expressions[0];
-					if (first is CustomVariableExpression) {
-						name = ExtractParamDefName(first);
-					} else {
-						ExtractParamDefModifier(bin.Expressions[0], out name, out modifier);
-					}
-
-					defaultValue = bin.Expressions[1]; // todo: what's allowed as default? other vars? or only Literals?
-
-				} else {
-					throw new Exception("invalid operation"); // todo
-				}
-
-			} else {
-				throw new Exception("invalid expression"); // todo
-			}
-		}
-
-		private string ExtractParamDefName(ValueExpression expr)
-		{
-			var v = expr as CustomVariableExpression;
-
-			if (v == null) {
-				throw new Exception(); // todo
-			} else if (Syntax.IsParameterModifier(v.Name)) {
-				throw new Exception(); // todo
-			}
-
-			return v.Name;
-		}
-
-		private void ExtractParamDefModifier(ValueExpression expr, out string name, out Syntax.ParameterModifier modifier)
-		{
-			var bin = expr as BinaryExpression;
-			if (bin == null || bin.Operator != Operator.Concatenate) { // todo: allow implicit concat only
-				throw new Exception("not concat"); // todo
-			}
-
-			var first = bin.Expressions[0] as CustomVariableExpression;
-			if (first == null || !Syntax.IsParameterModifier(first.Name)) {
-				throw new Exception("invalid modifier");
-			}
-
-			modifier = Syntax.GetParameterModifier(first.Name);
-			name = ExtractParamDefName(bin.Expressions[1]);
+			return Syntax.IsParameterModifier(token.Text);
 		}
 
 		#endregion
