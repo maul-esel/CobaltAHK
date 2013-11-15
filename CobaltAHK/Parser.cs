@@ -34,7 +34,9 @@ namespace CobaltAHK
 			if (token is DirectiveToken) {
 				var directive = (DirectiveToken)token;
 				if (directive.Directive == Syntax.Directive.If) {
-					return new IfDirectiveExpression(lexer.Position, ParseExpressionChain(lexer).ToExpression());
+					return ParseWithState(lexer, Lexer.State.Expression,
+					                 () => new IfDirectiveExpression(lexer.Position, ParseExpressionChain(lexer).ToExpression())
+					);
 				}
 				return ParseDirective(lexer);
 
@@ -300,17 +302,14 @@ namespace CobaltAHK
 		/// <remarks>
 		/// 	Expects a <see cref="FunctionToken"/> and <see cref="Token.OpenParenthesis"/> from the Lexer.
 		/// </remarks>
-		private FunctionCallExpression ParseFunctionCall(Lexer lexer)
+		private FunctionCallExpression ParseFunctionCall(ITokenStream stream)
 		{
-			AssertToken(lexer.PeekToken(), typeof(FunctionToken));
-			var func = (FunctionToken)lexer.GetToken();
+			AssertToken(stream.PeekToken(), typeof(FunctionToken));
+			var func = (FunctionToken)stream.GetToken();
 
-			lexer.PushState(Lexer.State.Expression);
+			AssertToken(stream.PeekToken(), Token.OpenParenthesis);
+			var parameters = ParseExpressionList(stream);
 
-			AssertToken(lexer.PeekToken(), Token.OpenParenthesis);
-			var parameters = ParseExpressionList(lexer);
-
-			lexer.PopState();
 			return new FunctionCallExpression(func.Position, func.Text, parameters);
 		}
 
@@ -452,7 +451,11 @@ namespace CobaltAHK
 					lexer.GetToken();
 					consumed = true;
 
-					currentParam.Append(ParseExpressionChain(lexer, Token.Comma).ToExpression());
+					currentParam.Append(
+						ParseWithState(lexer, Lexer.State.Expression,
+					               () => ParseExpressionChain(lexer, Token.Comma).ToExpression()
+					        )
+					);
 
 				} else if (token is TraditionalStringToken) {
 					// todo: ensure currentParam is not forced expression
@@ -487,17 +490,16 @@ namespace CobaltAHK
 
 		#region expression mode
 
-		private ExpressionChain ParseExpressionChain(Lexer lexer, params Token[] terminators)
+		private ExpressionChain ParseExpressionChain(ITokenStream stream, params Token[] terminators)
 		{
 			var chain = new ExpressionChain();
-			ParseExpressionChain(lexer, chain, terminators);
+			ParseExpressionChain(stream, chain, terminators);
 			return chain;
 		}
 
-		private void ParseExpressionChain(Lexer lexer, ExpressionChain chain, IEnumerable<Token> terminators = null)
+		private void ParseExpressionChain(ITokenStream stream, ExpressionChain chain, IEnumerable<Token> terminators = null)
 		{
-			lexer.PushState(Lexer.State.Expression);
-			var token = lexer.PeekToken();
+			var token = stream.PeekToken();
 			UnaryOperator prefixOp = null;
 
 			while (token != Token.EOF) {
@@ -506,8 +508,8 @@ namespace CobaltAHK
 						throw new Exception(); // todo
 					}
 
-					lexer.GetToken();
-					token = lexer.PeekToken();
+					stream.GetToken();
+					token = stream.PeekToken();
 					if (!(token is OperatorToken)) { // don't concat
 						break;
 					}
@@ -527,7 +529,7 @@ namespace CobaltAHK
 
 					var op = ((OperatorToken)token).Operator;
 					if (op == Operator.AltObjAccess) { // special handling for f[A, B]
-						ParseAltObjAccess(lexer, chain);
+						ParseAltObjAccess(stream, chain);
 
 					} else if (op is UnaryOperator) {
 						if (((UnaryOperator)op).Position != Position.prefix) {
@@ -544,44 +546,42 @@ namespace CobaltAHK
 				} else {
 					ValueExpression expr;
 					if (token == Token.OpenParenthesis) {
-						lexer.GetToken(); // consume parenthesis
-						expr = ParseExpressionChain(lexer, Token.CloseParenthesis).ToExpression();
-						lexer.GetToken(); // consume closing parenthesis
+						stream.GetToken(); // consume parenthesis
+						expr = ParseExpressionChain(stream, Token.CloseParenthesis).ToExpression();
+						stream.GetToken(); // consume closing parenthesis
 
 					} else {
-						expr = TokenToValueExpression(lexer);
+						expr = TokenToValueExpression(stream);
 					}
 
 					if (prefixOp != null) {
-						expr = new UnaryExpression(lexer.Position, prefixOp, expr);
+						expr = new UnaryExpression(stream.Position, prefixOp, expr);
 							prefixOp = null;
 					}
 
-					token = lexer.PeekToken();
+					token = stream.PeekToken();
 
 					var objAcc = OperatorToken.GetToken(Operator.ObjectAccess);
 					var ternary = OperatorToken.GetToken(Operator.Ternary);
 					while (token == objAcc || token == ternary || IsUnaryPostfixOperator(token)) {
 						if (token == objAcc) {
-							expr = ParseObjectAccess(lexer, expr);
+							expr = ParseObjectAccess(stream, expr);
 						} else if (token == ternary) {
-							expr = ParseTernary(lexer, expr, terminators);
+							expr = ParseTernary(stream, expr, terminators);
 						} else if (IsUnaryPostfixOperator(token)) {
-							lexer.GetToken();
+							stream.GetToken();
 							expr = new UnaryExpression(expr.Position, ((OperatorToken)token).Operator, expr);
 						}
-						token = lexer.PeekToken();
+						token = stream.PeekToken();
 					}
 
 					chain.Append(expr);
 					continue;
 				}
 
-				lexer.GetToken();
-				token = lexer.PeekToken();
+				stream.GetToken();
+				token = stream.PeekToken();
 			}
-
-			lexer.PopState();
 		}
 
 		private static bool IsUnaryPostfixOperator(Token token)
@@ -591,31 +591,26 @@ namespace CobaltAHK
 				&& ((UnaryOperator)((OperatorToken)token).Operator).Position == Position.postfix;
 		}
 
-		private ValueExpression[] ParseExpressionList(Lexer lexer)
+		private ValueExpression[] ParseExpressionList(ITokenStream stream)
 		{
-			return ParseExpressionList(lexer, Token.OpenParenthesis, Token.CloseParenthesis);
+			return ParseExpressionList(stream, Token.OpenParenthesis, Token.CloseParenthesis);
 		}
 
-		private ValueExpression[] ParseExpressionList(Lexer lexer, Token open, Token close)
+		private ValueExpression[] ParseExpressionList(ITokenStream stream, Token open, Token close)
 		{
-			lexer.PushState(Lexer.State.Expression);
+			AssertToken(stream.GetToken(), open);
+			var list = ParseExpressionSequence(stream, close);
 
-			AssertToken(lexer.GetToken(), open);
-			var list = ParseExpressionSequence(lexer, close);
-			AssertToken(lexer.GetToken(), close);
-
-			lexer.PopState();
+			AssertToken(stream.GetToken(), close);
 			return list;
 		}
 
-		private ValueExpression[] ParseExpressionSequence(Lexer lexer, Token abort = null)
+		private ValueExpression[] ParseExpressionSequence(ITokenStream stream, Token abort = null)
 		{
-			lexer.PushState(Lexer.State.Expression);
-
 			var list = new List<ValueExpression>();
 			ExpressionChain currentExpr = null;
 
-			var token = lexer.PeekToken();
+			var token = stream.PeekToken();
 			while (true) {
 				if (token == Token.EOF) {
 					// todo: if currentExpr == null -> allow empty? or fail? (param to define?) (to allow empty, must add Expression.Empty parameter)
@@ -641,16 +636,15 @@ namespace CobaltAHK
 						}
 						throw new Exception(token.ToString());
 					}
-					currentExpr = ParseExpressionChain(lexer, Token.Comma, abort);
-					token = lexer.PeekToken();
+					currentExpr = ParseExpressionChain(stream, Token.Comma, abort);
+					token = stream.PeekToken();
 					continue;
 				}
 
-				lexer.GetToken();
-				token = lexer.PeekToken();
+				stream.GetToken();
+				token = stream.PeekToken();
 			}
 
-			lexer.PopState();
 			return list.ToArray();
 		}
 
@@ -669,47 +663,47 @@ namespace CobaltAHK
 		/// <remarks>
 		/// 	This function consumes the converted token(s).
 		/// </remarks>
-		private ValueExpression TokenToValueExpression(Lexer lexer)
+		private ValueExpression TokenToValueExpression(ITokenStream stream)
 		{
-			var token = lexer.PeekToken();
+			var token = stream.PeekToken();
 			if (token is FunctionToken) {
-				return ParseFunctionCall(lexer);
+				return ParseFunctionCall(stream);
 
 			} else if (token is IdToken) {
-				var id = (IdToken)lexer.GetToken();
+				var id = (IdToken)stream.GetToken();
 				return GetVariable(id.Text, id.Position);
 			
 			} else if (token is ValueKeywordToken) {
-				var value = (ValueKeywordToken)lexer.GetToken();
-				return new ValueKeywordExpression(lexer.Position, value.Keyword);
+				var value = (ValueKeywordToken)stream.GetToken();
+				return new ValueKeywordExpression(stream.Position, value.Keyword);
 
 			} else if (token is QuotedStringToken) {
-				var str = (QuotedStringToken)lexer.GetToken();
+				var str = (QuotedStringToken)stream.GetToken();
 				return new StringLiteralExpression(str.Position, str.Text);
 
 			} else if (token is NumberToken) {
-				var number = (NumberToken)lexer.GetToken();
+				var number = (NumberToken)stream.GetToken();
 				return new NumberLiteralExpression(number.Position, number.Text, number.Type);
 			
 			} else if (token == Token.OpenBracket) {
-				var arr = ParseExpressionList(lexer, Token.OpenBracket, Token.CloseBracket);
-				return new ArrayLiteralExpression(lexer.Position, arr);
+				var arr = ParseExpressionList(stream, Token.OpenBracket, Token.CloseBracket);
+				return new ArrayLiteralExpression(stream.Position, arr);
 			
 			} else if (token == Token.OpenBrace) {
-				var obj = ParseObjectLiteral(lexer);
-				return new ObjectLiteralExpression(lexer.Position, obj);
+				var obj = ParseObjectLiteral(stream);
+				return new ObjectLiteralExpression(stream.Position, obj);
 			}
 
 			throw new Exception(token.ToString()); // todo
 		}
 
-		private TernaryExpression ParseTernary(Lexer lexer, ValueExpression cond, IEnumerable<Token> terminators)
+		private TernaryExpression ParseTernary(ITokenStream stream, ValueExpression cond, IEnumerable<Token> terminators)
 		{
-			AssertToken(lexer.GetToken(), OperatorToken.GetToken(Operator.Ternary));
-			var ifTrue  = ParseExpressionChain(lexer, Token.Colon);
+			AssertToken(stream.GetToken(), OperatorToken.GetToken(Operator.Ternary));
+			var ifTrue  = ParseExpressionChain(stream, Token.Colon);
 
-			AssertToken(lexer.GetToken(), Token.Colon);
-			var ifFalse = ParseExpressionChain(lexer, terminators != null ? terminators.ToArray() : null);
+			AssertToken(stream.GetToken(), Token.Colon);
+			var ifFalse = ParseExpressionChain(stream, terminators != null ? terminators.ToArray() : null);
 
 			return new TernaryExpression(cond.Position,
 			                             cond,
@@ -717,14 +711,13 @@ namespace CobaltAHK
 			                             ifFalse.ToExpression());
 		}
 
-		private MemberExpression ParseObjectAccess(Lexer lexer, ValueExpression obj)
+		private MemberExpression ParseObjectAccess(ITokenStream stream, ValueExpression obj)
 		{
-			AssertToken(lexer.GetToken(), OperatorToken.GetToken(Operator.ObjectAccess));
-			AssertToken(lexer.PeekToken(), typeof(TextToken));
-			var pos = lexer.Position;
+			AssertToken(stream.GetToken(), OperatorToken.GetToken(Operator.ObjectAccess));
+			AssertToken(stream.PeekToken(), typeof(TextToken));
 
-			AssertToken(lexer.PeekToken(), typeof(TextToken));
-			var token = (TextToken)lexer.GetToken();
+			AssertToken(stream.PeekToken(), typeof(TextToken));
+			var token = (TextToken)stream.GetToken();
 			var member = new StringLiteralExpression(token.Position, token.Text);
 
 			if (token is IdToken) {
@@ -736,17 +729,17 @@ namespace CobaltAHK
 			throw new Exception(); // todo
 		}
 
-		private void ParseAltObjAccess(Lexer lexer, ExpressionChain chain)
+		private void ParseAltObjAccess(ITokenStream stream, ExpressionChain chain)
 		{
-			AssertToken(lexer.GetToken(), OperatorToken.GetToken(Operator.AltObjAccess));
+			AssertToken(stream.GetToken(), OperatorToken.GetToken(Operator.AltObjAccess));
 			chain.Append((BinaryOperator)Operator.AltObjAccess);
 
-			var token = lexer.PeekToken();
+			var token = stream.PeekToken();
 			ValueExpression currentParam = null;
 			while (token != Token.CloseBracket) {
 				// todo
 				if (token == Token.Comma) {
-					lexer.GetToken();
+					stream.GetToken();
 					if (currentParam == null) {
 						// todo: empty expression? fail?
 					}
@@ -758,9 +751,9 @@ namespace CobaltAHK
 					if (currentParam != null) {
 						throw new Exception(); // todo
 					}
-					currentParam = ParseExpressionChain(lexer, Token.Comma, Token.CloseBracket).ToExpression();
+					currentParam = ParseExpressionChain(stream, Token.Comma, Token.CloseBracket).ToExpression();
 				}
-				token = lexer.PeekToken();
+				token = stream.PeekToken();
 			}
 			if (currentParam == null) {
 				// todo (see above for comma)
@@ -768,28 +761,26 @@ namespace CobaltAHK
 			chain.Append(currentParam);
 		}
 
-		private IDictionary<ValueExpression, ValueExpression> ParseObjectLiteral(Lexer lexer)
+		private IDictionary<ValueExpression, ValueExpression> ParseObjectLiteral(ITokenStream stream)
 		{
-			lexer.PushState(Lexer.State.Expression);
-			AssertToken(lexer.GetToken(), Token.OpenBrace);
+			AssertToken(stream.GetToken(), Token.OpenBrace);
 
 			var dict = new Dictionary<ValueExpression, ValueExpression>();
 
-			var token = lexer.PeekToken();
+			var token = stream.PeekToken();
 			while (token != Token.CloseBrace) {
-				var key = ParseExpressionChain(lexer, Token.Colon).ToExpression();
-				AssertToken(lexer.GetToken(), Token.Colon);
-				var value = ParseExpressionChain(lexer, Token.Comma, Token.CloseBrace).ToExpression();
+				var key = ParseExpressionChain(stream, Token.Colon).ToExpression();
+				AssertToken(stream.GetToken(), Token.Colon);
+				var value = ParseExpressionChain(stream, Token.Comma, Token.CloseBrace).ToExpression();
 
 				dict[key] = value;
-				if (lexer.PeekToken() == Token.Comma) {
-					lexer.GetToken();
+				if (stream.PeekToken() == Token.Comma) {
+					stream.GetToken();
 				}
-				token = lexer.PeekToken();
+				token = stream.PeekToken();
 			}
-			AssertToken(lexer.GetToken(), Token.CloseBrace);
+			AssertToken(stream.GetToken(), Token.CloseBrace);
 
-			lexer.PopState();
 			return dict;
 		}
 
@@ -958,6 +949,14 @@ namespace CobaltAHK
 			lexer.PopState();
 
 			return success;
+		}
+
+		private TResult ParseWithState<TResult>(Lexer lexer, Lexer.State state, Func<TResult> fn)
+		{
+			lexer.PushState(state);
+			var expr = fn();
+			lexer.PopState();
+			return expr;
 		}
 
 		private VariableExpression GetVariable(string name, SourcePosition pos)
