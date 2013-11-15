@@ -424,26 +424,50 @@ namespace CobaltAHK.ExpressionTree
 
 		private DLR.Expression GenerateStringConcat(BinaryExpression expr, Scope scope)
 		{
-			return GenerateStringConcat(ExtractConcats(expr, scope));
+			var operands = OptimizeConcat(ExtractConcats(expr));
+
+			if (operands.Count() == 0) {
+				return DLR.Expression.Constant("");
+			} else if (operands.Count() == 1) {
+				return GenerateString(operands.ElementAt(0), scope);
+			}
+
+			return GenerateStringConcat(
+				operands.Select(e => GenerateString(e, scope)).ToArray()
+			);
 		}
 
 		private DLR.Expression GenerateStringConcat(params DLR.Expression[] exprs)
 		{
-			var init = DLR.Expression.ListInit(DLR.Expression.New(typeof(List<string>)), exprs);
-			return DLR.Expression.Call(concat, init);
+			return DLR.Expression.Call(concat, DLR.Expression.NewArrayInit(typeof(string), exprs));
 		}
 
-		private DLR.Expression[] ExtractConcats(Expression expr, Scope scope)
+		private IEnumerable<Expression> ExtractConcats(Expression expr)
 		{
-			var list = new List<DLR.Expression>();
 			var binary = expr as BinaryExpression;
+
 			if (binary != null && binary.Operator == Operator.Concatenate) {
-				list.AddRange(ExtractConcats(binary.Expressions[0], scope));
-				list.AddRange(ExtractConcats(binary.Expressions[1], scope));
-			} else {
-				list.Add(Converter.ConvertToString(Generate(expr, scope)));
+				return ExtractConcats(binary.Expressions[0]).Concat(
+					ExtractConcats(binary.Expressions[1])
+				);
 			}
-			return list.ToArray();
+
+			return new[] { expr };
+		}
+
+		private IEnumerable<Expression> OptimizeConcat(IEnumerable<Expression> exprs)
+		{
+			return exprs.Where(expr => !IsEmptyString(expr));
+		}
+
+		private bool IsEmptyString(Expression expr)
+		{
+			return expr is StringLiteralExpression && ((StringLiteralExpression)expr).String == "";
+		}
+
+		private DLR.Expression GenerateString(Expression expr, Scope scope)
+		{
+			return Converter.ConvertToString(Generate(expr, scope));
 		}
 
 		#endregion
