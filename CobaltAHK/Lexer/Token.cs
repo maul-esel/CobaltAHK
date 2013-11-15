@@ -130,9 +130,17 @@ namespace CobaltAHK
 
 	#endregion
 
-	public class HotkeyToken : Token { }
+	public class HotkeyToken : PositionedToken
+	{
+		public HotkeyToken(SourcePosition pos) : base(pos) { }
+	}
 
-	public class HotstringToken : Token { }
+	public class HotstringToken : PositionedToken
+	{
+		public HotstringToken(SourcePosition pos) : base(pos) { }
+	}
+
+	#region EnumToken
 
 	public abstract class EnumToken<T, TToken> : Token where TToken : EnumToken<T, TToken>
 	{
@@ -199,4 +207,6 @@ namespace CobaltAHK
 
 		public Syntax.ValueKeyword Keyword { get { return value; } }
 	}
+
+	#endregion
 }
