@@ -98,8 +98,9 @@ namespace CobaltAHK
 					reader.Read();
 					return Token.Comma;
 				case ';':
+					var pos = Position;
 					reader.Read();
-					return new SingleCommentToken(ReadUntilTerminators(singleCommentTerminators));
+					return new SingleCommentToken(pos, ReadUntilTerminators(singleCommentTerminators));
 			}
 
 			// state-dependent tokens

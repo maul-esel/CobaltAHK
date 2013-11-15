@@ -51,9 +51,10 @@ namespace CobaltAHK
 
 	#region TextToken
 
-	public abstract class TextToken : Token
+	public abstract class TextToken : PositionedToken
 	{
-		protected TextToken(string str)
+		protected TextToken(SourcePosition pos, string str)
+		: base(pos)
 		{
 			text = str;
 		}
@@ -74,35 +75,35 @@ namespace CobaltAHK
 
 	public abstract class CommentToken : TextToken
 	{
-		public CommentToken(string comment) : base(comment) { }
+		public CommentToken(SourcePosition pos, string comment) : base(pos, comment) { }
 	}
 
 	public class SingleCommentToken : CommentToken
 	{
-		public SingleCommentToken(string comment) : base(comment) { }
+		public SingleCommentToken(SourcePosition pos, string comment) : base(pos, comment) { }
 	}
 
 	public class MultiLineCommentToken : CommentToken
 	{
-		public MultiLineCommentToken (string comment) : base(comment) { }
+		public MultiLineCommentToken(SourcePosition pos, string comment) : base(pos, comment) { }
 	}
 
 	#endregion
 
 	public class QuotedStringToken : TextToken
 	{
-		public QuotedStringToken(string str) : base(str) { }
+		public QuotedStringToken(SourcePosition pos, string str) : base(pos, str) { }
 	}
 
 	public class TraditionalStringToken : TextToken
 	{
-		public TraditionalStringToken(string str) : base(str) { }
+		public TraditionalStringToken(SourcePosition pos, string str) : base(pos, str) { }
 	}
 
 	public class NumberToken : TextToken
 	{
-		public NumberToken(string str, Syntax.NumberType t)
-		: base(str)
+		public NumberToken(SourcePosition pos, string str, Syntax.NumberType t)
+		: base(pos, str)
 		{
 			type = t;
 		}
@@ -114,17 +115,17 @@ namespace CobaltAHK
 
 	public class VariableToken : TextToken // for variables in traditional mode
 	{
-		public VariableToken(string var) : base(var) { }
+		public VariableToken(SourcePosition pos, string var) : base(pos, var) { }
 	}
 
 	public class IdToken : TextToken // for variables, command names, ...
 	{
-		public IdToken(string id) : base(id) { }
+		public IdToken(SourcePosition pos, string id) : base(pos, id) { }
 	}
 
 	public class FunctionToken : TextToken // for function calls or definitions (id followed by opening parenthese)
 	{
-		public FunctionToken(string name) : base(name) { }
+		public FunctionToken(SourcePosition pos, string name) : base(pos, name) { }
 	}
 
 	#endregion
