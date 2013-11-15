@@ -73,6 +73,7 @@
     <Compile Include="Expressions\Keywords.cs" />
     <Compile Include="ScriptException.cs" />
     <Compile Include="ITokenStream.cs" />
+    <Compile Include="ArrayTokenStream.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
