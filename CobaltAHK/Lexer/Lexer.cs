@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace CobaltAHK
 {
-	public partial class Lexer : LexerBase
+	public partial class Lexer : LexerBase, ITokenStream
 	{
 		public Lexer(System.IO.TextReader code)
 		: base(new SourceReader(code))
