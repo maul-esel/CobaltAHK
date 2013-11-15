@@ -6,22 +6,22 @@ namespace CobaltAHK
 	public abstract class Token
 	{
 		#region any state
-		public static readonly Token EOF              = new CharacterToken(unchecked ((char)-1));
-		public static readonly Token Newline          = new CharacterToken('\n');
-		public static readonly Token Comma            = new CharacterToken(',');
+		public static readonly Token EOF              = new PunctuationToken(unchecked ((char)-1));
+		public static readonly Token Newline          = new PunctuationToken('\n');
+		public static readonly Token Comma            = new PunctuationToken(',');
 		#endregion
 
 		// State.Traditional
-		public static readonly Token ForceExpression  = new CharacterToken('%');
+		public static readonly Token ForceExpression  = new PunctuationToken('%');
 
 		#region State.Expression (and others)
-		public static readonly Token Colon            = new CharacterToken(':');
-		public static readonly Token OpenParenthesis  = new CharacterToken('(');
-		public static readonly Token CloseParenthesis = new CharacterToken(')');
-		public static readonly Token OpenBrace        = new CharacterToken('{'); // blocks or object literals
-		public static readonly Token CloseBrace       = new CharacterToken('}');
-		public static readonly Token OpenBracket      = new CharacterToken('['); // object access or array literals
-		public static readonly Token CloseBracket     = new CharacterToken(']');
+		public static readonly Token Colon            = new PunctuationToken(':');
+		public static readonly Token OpenParenthesis  = new PunctuationToken('(');
+		public static readonly Token CloseParenthesis = new PunctuationToken(')');
+		public static readonly Token OpenBrace        = new PunctuationToken('{'); // blocks or object literals
+		public static readonly Token CloseBrace       = new PunctuationToken('}');
+		public static readonly Token OpenBracket      = new PunctuationToken('['); // object access or array literals
+		public static readonly Token CloseBracket     = new PunctuationToken(']');
 		#endregion
 	}
 
@@ -35,6 +35,18 @@ namespace CobaltAHK
 		private readonly SourcePosition position;
 
 		public SourcePosition Position { get { return position; } }
+	}
+
+	public class PunctuationToken : Token
+	{
+		public PunctuationToken(char ch)
+		{
+			character = ch;
+		}
+
+		private readonly char character;
+
+		public char Character { get { return character; } }
 	}
 
 	#region TextToken
@@ -56,11 +68,6 @@ namespace CobaltAHK
 			return string.Format("[" + GetType() + ": Text='{0}']", Text.Escape());
 		}
 #endif
-	}
-
-	public class CharacterToken : TextToken
-	{
-		internal CharacterToken(char ch) : base(ch.ToString()) { }
 	}
 
 	#region comments
