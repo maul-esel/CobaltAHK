@@ -13,6 +13,7 @@ namespace CobaltAHK.ExpressionTree
 		internal static readonly DLR.Expression NULL = DLR.Expression.Constant(null);
 		internal static readonly DLR.Expression TRUE = DLR.Expression.Constant(true);
 		internal static readonly DLR.Expression FALSE = DLR.Expression.Constant(false);
+		internal static readonly DLR.Expression EMPTY_STRING = DLR.Expression.Constant("");
 
 		public Generator(ScriptSettings config)
 		{
@@ -427,7 +428,7 @@ namespace CobaltAHK.ExpressionTree
 			var operands = OptimizeConcat(ExtractConcats(expr));
 
 			if (operands.Count() == 0) {
-				return DLR.Expression.Constant("");
+				return EMPTY_STRING;
 			} else if (operands.Count() == 1) {
 				return GenerateString(operands.ElementAt(0), scope);
 			}

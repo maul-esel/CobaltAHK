@@ -64,7 +64,7 @@ namespace CobaltAHK.ExpressionTree
 
 		private static Expression IsNotEmptyString(Expression expr)
 		{
-			return Expression.NotEqual(expr, Expression.Constant(""));
+			return Expression.NotEqual(expr, Generator.EMPTY_STRING);
 		}
 
 		private static Expression IsNotZero(Expression expr)
@@ -88,7 +88,7 @@ namespace CobaltAHK.ExpressionTree
 		{
 			return Expression.Condition(
 				Expression.Equal(Cast<object>(value), Generator.NULL),
-				Expression.Constant(""),
+				Generator.EMPTY_STRING,
 				Expression.Condition(IsNumber(value),
 					ConvertNumberToString(value),
 					Expression.Condition(Is<bool>(value),
