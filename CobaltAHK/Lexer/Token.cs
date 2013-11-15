@@ -25,6 +25,18 @@ namespace CobaltAHK
 		#endregion
 	}
 
+	public abstract class PositionedToken : Token
+	{
+		protected PositionedToken(SourcePosition pos)
+		{
+			position = pos;
+		}
+
+		private readonly SourcePosition position;
+
+		public SourcePosition Position { get { return position; } }
+	}
+
 	#region TextToken
 
 	public abstract class TextToken : Token
