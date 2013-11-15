@@ -84,10 +84,10 @@ namespace CobaltAHK
 					var chain = new ExpressionChain();
 
 					if (token == OperatorToken.GetToken(Operator.ObjectAccess)) {
-						var acc = ParseObjectAccess(lexer, GetVariable(id.Text, lexer.Position));
+						var acc = ParseObjectAccess(lexer, GetVariable(id.Text, id.Position));
 						chain.Append(acc);
 					} else {
-						chain.Append(GetVariable(id.Text, lexer.Position));
+						chain.Append(GetVariable(id.Text, id.Position));
 					}
 
 					ParseExpressionChain(lexer, chain);
@@ -120,7 +120,7 @@ namespace CobaltAHK
 
 			var parameters = ParseParameters(lexer);
 			lexer.PopState();
-			return new FunctionCallExpression(lexer.Position, command.Text, parameters);
+			return new FunctionCallExpression(command.Position, command.Text, parameters);
 		}
 
 		private BlockExpression ParseIf(Lexer lexer)
@@ -311,7 +311,7 @@ namespace CobaltAHK
 			var parameters = ParseExpressionList(lexer);
 
 			lexer.PopState();
-			return new FunctionCallExpression(lexer.Position, func.Text, parameters);
+			return new FunctionCallExpression(func.Position, func.Text, parameters);
 		}
 
 		private Expression ParseFunctionCallOrDefinition(Lexer lexer)
@@ -334,10 +334,10 @@ namespace CobaltAHK
 				AssertToken(lexer.GetToken(), Token.Newline, Token.EOF);
 
 				var prms = ValidateFunctionDefParams(parameters);
-				result = new FunctionDefinitionExpression(lexer.Position, func.Text, prms, body);
+				result = new FunctionDefinitionExpression(func.Position, func.Text, prms, body);
 
 			} else { // function call
-				var funcExpr = new FunctionCallExpression(lexer.Position, func.Text, parameters);
+				var funcExpr = new FunctionCallExpression(func.Position, func.Text, parameters);
 				bool concat = newline && token is OperatorToken; // todo
 				if (!newline || concat) {
 					var chain = new ExpressionChain();
@@ -460,12 +460,13 @@ namespace CobaltAHK
 					if (str.Text.Trim() == String.Empty && currentParam.Length == 0) {
 						continue; // ignore leading whitespace
 					}
-					var expr = new StringLiteralExpression(lexer.Position, str.Text);
+					var expr = new StringLiteralExpression(str.Position, str.Text);
 					currentParam.Append(expr);
 
 				} else if (token is VariableToken) {
 					// todo: ensure currentParam is not forced expression
-					var expr = GetVariable(((VariableToken)token).Text, lexer.Position);
+					var variable = (VariableToken)token;
+					var expr = GetVariable(variable.Text, variable.Position);
 					currentParam.Append(expr);
 
 				} else {
@@ -567,7 +568,7 @@ namespace CobaltAHK
 							expr = ParseTernary(lexer, expr, terminators);
 						} else if (IsUnaryPostfixOperator(token)) {
 							lexer.GetToken();
-							expr = new UnaryExpression(lexer.Position, ((OperatorToken)token).Operator, expr);
+							expr = new UnaryExpression(expr.Position, ((OperatorToken)token).Operator, expr);
 						}
 						token = lexer.PeekToken();
 					}
@@ -676,7 +677,7 @@ namespace CobaltAHK
 
 			} else if (token is IdToken) {
 				var id = (IdToken)lexer.GetToken();
-				return GetVariable(id.Text, lexer.Position);
+				return GetVariable(id.Text, id.Position);
 			
 			} else if (token is ValueKeywordToken) {
 				var value = (ValueKeywordToken)lexer.GetToken();
@@ -684,11 +685,11 @@ namespace CobaltAHK
 
 			} else if (token is QuotedStringToken) {
 				var str = (QuotedStringToken)lexer.GetToken();
-				return new StringLiteralExpression(lexer.Position, str.Text);
+				return new StringLiteralExpression(str.Position, str.Text);
 
 			} else if (token is NumberToken) {
 				var number = (NumberToken)lexer.GetToken();
-				return new NumberLiteralExpression(lexer.Position, number.Text, number.Type);
+				return new NumberLiteralExpression(number.Position, number.Text, number.Type);
 			
 			} else if (token == Token.OpenBracket) {
 				var arr = ParseExpressionList(lexer, Token.OpenBracket, Token.CloseBracket);
@@ -710,7 +711,7 @@ namespace CobaltAHK
 			AssertToken(lexer.GetToken(), Token.Colon);
 			var ifFalse = ParseExpressionChain(lexer, terminators != null ? terminators.ToArray() : null);
 
-			return new TernaryExpression(lexer.Position,
+			return new TernaryExpression(cond.Position,
 			                             cond,
 			                             ifTrue.ToExpression(),
 			                             ifFalse.ToExpression());
