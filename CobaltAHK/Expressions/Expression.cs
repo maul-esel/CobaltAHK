@@ -88,30 +88,30 @@ namespace CobaltAHK.Expressions
 
 	public abstract class MemberExpression : ValueExpression
 	{
-		public MemberExpression(SourcePosition pos, ValueExpression o, ValueExpression k)
+		public MemberExpression(SourcePosition pos, ValueExpression o, string m)
 		: base(pos)
 		{
 			obj = o;
-			key = k;
+			member = m;
 		}
 
 		private readonly ValueExpression obj;
 
 		public ValueExpression Object { get { return obj; } }
 
-		private readonly ValueExpression key;
+		private readonly string member;
 
-		public ValueExpression Key { get { return key; } }
+		public string Member { get { return member; } }
 	}
 
 	public class MemberAccessExpression : MemberExpression
 	{
-		public MemberAccessExpression(SourcePosition pos, ValueExpression o, ValueExpression k) : base(pos, o, k) { }
+		public MemberAccessExpression(SourcePosition pos, ValueExpression o, string member) : base(pos, o, member) { }
 	}
 
-	public class MemberInvokeExpression : MemberExpression
+	public class MemberInvokeExpression : MemberExpression // todo: arguments
 	{
-		public MemberInvokeExpression(SourcePosition pos, ValueExpression o, ValueExpression k) : base(pos, o, k) { }
+		public MemberInvokeExpression(SourcePosition pos, ValueExpression o, string member) : base(pos, o, member) { }
 	}
 
 	#endregion

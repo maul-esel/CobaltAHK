@@ -747,12 +747,11 @@ namespace CobaltAHK
 
 			AssertToken(stream.PeekToken(), typeof(TextToken));
 			var token = (TextToken)stream.GetToken();
-			var member = new StringLiteralExpression(token.Position, token.Text);
 
 			if (token is IdToken) {
-				return new MemberAccessExpression(obj.Position, obj, member);
+				return new MemberAccessExpression(obj.Position, obj, token.Text);
 			} else if (token is FunctionToken) {
-				return new MemberInvokeExpression(obj.Position, obj, member);
+				return new MemberInvokeExpression(obj.Position, obj, token.Text);
 			}
 
 			throw new Exception(); // todo

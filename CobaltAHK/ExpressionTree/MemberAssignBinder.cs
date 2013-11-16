@@ -1,42 +1,37 @@
 using System;
 using System.Dynamic;
-using System.Linq;
 #if CustomDLR
 using Microsoft.Scripting.Ast;
 #else
 using System.Linq.Expressions;
 #endif
-using System.Reflection;
 
 namespace CobaltAHK.ExpressionTree
 {
-	public class MemberAssignBinder : SetIndexBinder
+	public class MemberAssignBinder : SetMemberBinder
 	{
-		private static readonly CallInfo MemberCallInfo = new CallInfo(2);
+		public MemberAssignBinder(string member) : base(member, true) { }
 
-		public MemberAssignBinder() : base(MemberCallInfo) { }
-
-		public override DynamicMetaObject FallbackSetIndex(DynamicMetaObject target, DynamicMetaObject[] args, DynamicMetaObject value, DynamicMetaObject errorSuggestion)
+		public override DynamicMetaObject FallbackSetMember(DynamicMetaObject target, DynamicMetaObject value, DynamicMetaObject errorSuggestion)
 		{
-			if (args.Length != 1) {
-				throw new InvalidOperationException();
-			}
-
-			if (!target.HasValue || args.Any(a => !a.HasValue) || !value.HasValue) {
-				return Defer(target, args.Concat(new[] { value }).ToArray());
+			if (!target.HasValue || !value.HasValue) {
+				return Defer(target, value);
 			}
 
 			// todo: special properties like base, builtin obj functions etc.
 			// todo: .NET types
 
 			return errorSuggestion ?? new DynamicMetaObject(
-				ThrowOnFailure(target.Expression, args[0].Expression, value.Expression),
+				ThrowOnFailure(target.Expression, value.Expression),
 				BindingRestrictions.GetTypeRestriction(target.Expression, target.LimitType));
 		}
 
-		private static Expression ThrowOnFailure(Expression target, Expression key, Expression value)
+		private Expression ThrowOnFailure(Expression target, Expression value)
 		{
-			return Expression.Throw(Expression.Constant(""), typeof(InvalidOperationException)); // todo: supply message
+			return Expression.Block(
+				Expression.Throw(Expression.New(typeof(InvalidOperationException))), // todo: supply message
+			        Generator.NULL
+			);
 		}
 	}
 }

@@ -264,7 +264,7 @@ namespace CobaltAHK.ExpressionTree
 			foreach (var method in expr.Methods) {
 				exprs.Add(
 					GenerateMemberAssign(obj,
-				                     DLR.Expression.Constant(method.Name),
+				                     method.Name,
 				                     Generate(method, scope)
 				        )
 				);
@@ -289,27 +289,25 @@ namespace CobaltAHK.ExpressionTree
 
 		private DLR.Expression GenerateMemberAccess(MemberAccessExpression expr, Scope scope)
 		{
-			return DLR.Expression.Dynamic(new MemberAccessBinder(),
+			return DLR.Expression.Dynamic(new MemberAccessBinder(expr.Member),
 			                              typeof(object),
-			                              Generate(expr.Object, scope),
-			                              Generate(expr.Key, scope)
+			                              Generate(expr.Object, scope)
 			);
 		}
 
 		private DLR.Expression GenerateMemberAssign(MemberAccessExpression expr, DLR.Expression value, Scope scope)
 		{
 			return GenerateMemberAssign(Generate(expr.Object, scope),
-			                            Generate(expr.Key, scope),
+			                            expr.Member,
 			                            value
 			);
 		}
 
-		private DLR.Expression GenerateMemberAssign(DLR.Expression obj, DLR.Expression member, DLR.Expression value)
+		private DLR.Expression GenerateMemberAssign(DLR.Expression obj, string member, DLR.Expression value)
 		{
-			return DLR.Expression.Dynamic(new MemberAssignBinder(),
+			return DLR.Expression.Dynamic(new MemberAssignBinder(member),
 			                              typeof(object),
 			                              obj,
-			                              member,
 			                              value);
 		}
 
