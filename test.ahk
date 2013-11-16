@@ -19,6 +19,8 @@ five() {
 	return(5)
 }
 
+Assert(@System.Console.WindowHeight, "Retrieval of static property failed")
+
 Assert(five() "" == "5", "Return value failed")
 Assert(5 ** 2 == 25.0, "Power failed")
 
