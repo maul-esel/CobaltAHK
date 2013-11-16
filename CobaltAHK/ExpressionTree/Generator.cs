@@ -50,6 +50,8 @@ namespace CobaltAHK.ExpressionTree
 					case Syntax.ValueKeyword.True:  return TRUE;
 					case Syntax.ValueKeyword.Null:  return NULL;
 				}
+			} else if (expr is CLRNameExpression) {
+				return GenerateCLRWrapper((CLRNameExpression)expr, scope);
 			} else if (expr is UnaryExpression) {
 				return GenerateUnaryExpression((UnaryExpression)expr, scope);
 			} else if (expr is BinaryExpression) {
@@ -108,6 +110,23 @@ namespace CobaltAHK.ExpressionTree
 		{
 			return DLR.Expression.NewArrayInit(typeof(object),
 			                                   exprs.Select(e => Converter.ConvertToObject(Generate(e, scope))));
+		}
+
+		private DLR.Expression GenerateCLRWrapper(CLRNameExpression expr, Scope scope)
+		{
+			Type type;
+			CLRInterop.CLRWrapper.TryFindType(expr.Name, out type);
+			bool isNamespace = CLRInterop.CLRWrapper.NamespaceExists(expr.Name);
+
+			if (isNamespace && type != null) {
+				throw new Exception(); // todo
+			} else if (isNamespace) {
+				return DLR.Expression.Constant(new CLRInterop.NamespaceWrapper(expr.Name));
+			} else if (type != null) {
+				return DLR.Expression.Constant(new CLRInterop.TypeWrapper(type));
+			} else {
+				throw new Exception(); // todo
+			}
 		}
 
 		private DLR.Expression GenerateIfElse(BlockExpression block, Scope scope)
