@@ -28,9 +28,9 @@ namespace CobaltAHK.ExpressionTree
 				BindingRestrictions.GetTypeRestriction(target.Expression, target.LimitType));
 		}
 
-		private static Expression ThrowOnFailure(Expression target, Expression value)
+		private Expression ThrowOnFailure(Expression target, Expression value)
 		{
-			return Expression.Throw(Expression.Constant(""), typeof(InvalidOperationException)); // todo: supply message
+			return Expression.Throw(Expression.New(typeof(InvalidOperationException))); // todo: supply message
 		}
 	}
 }
