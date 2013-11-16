@@ -1,6 +1,7 @@
 language: C
 
 env:
+  - FRAMEWORK_VERSION=v3.0
   - FRAMEWORK_VERSION=v3.5
   - FRAMEWORK_VERSION=v4.0
   - FRAMEWORK_VERSION=v4.5
@@ -11,7 +12,7 @@ before_install:
 
 install:
   - sudo apt-get install mono-devel mono-mcs nunit-console
-  - "if [ $FRAMEWORK_VERSION = 'v3.5' ]; then ./build-DLR.sh; fi;"
+  - "if [ $FRAMEWORK_VERSION \\< 'v4.0' ]; then ./build-DLR.sh; fi;"
 
 before_script:
   - xbuild /target:Travis /property:TargetFrameworkVersion=$FRAMEWORK_VERSION CobaltAHK.proj
