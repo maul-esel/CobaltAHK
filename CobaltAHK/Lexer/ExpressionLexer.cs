@@ -154,6 +154,8 @@ namespace CobaltAHK
 
 		private Token ReadIdOrOperator()
 		{
+			var pos = reader.Position;
+
 			char ch = reader.Peek();
 			if (IsDigit(ch)) {
 				throw new LexerException(reader.Position); // todo: type
@@ -166,13 +168,13 @@ namespace CobaltAHK
 			}
 
 			if (reader.Peek() == '(') {
-				return new FunctionToken(name);
+				return new FunctionToken(pos, name);
 			} else if (Syntax.IsValueKeyword(name)) {
 				return ValueKeywordToken.GetToken(Syntax.GetValueKeyword(name));
 			} else if (Operator.IsOperator(name)) {
 				return OperatorToken.GetToken(Operator.GetOperator(name));
 			} else { // variables
-				return new IdToken(name);
+				return new IdToken(pos, name);
 			}
 		}
 
@@ -183,6 +185,7 @@ namespace CobaltAHK
 
 		private QuotedStringToken ReadQuotedString()
 		{
+			var pos = reader.Position;
 			ExpectString("\"");
 
 			bool escape = false;
@@ -193,7 +196,7 @@ namespace CobaltAHK
 				}
 				escape = ch == '`';
 			});
-			return new QuotedStringToken(Unescape(str));
+			return new QuotedStringToken(pos, Unescape(str));
 		}
 
 		private static readonly char[] numberTerminators = { ' ', '\t', '\n', ',', ')', ']', Lexer.charEOF };
@@ -209,6 +212,8 @@ namespace CobaltAHK
 			 */
 			// todo: support binary and octal, as #AHKv2 does
 			// todo: support scientific without decimal, as #AHKv2 does
+
+			var pos = reader.Position;
 
 			char first = reader.Peek();
 			if (!IsDigit(first)) {
@@ -239,7 +244,8 @@ namespace CobaltAHK
 				throw new InvalidNumberException(reader.Position);
 			}
 
-			return new NumberToken(number,
+			return new NumberToken(pos,
+			                       number,
 			                       hex ? Syntax.NumberType.Hexadecimal
 			                       : exp > -1 ? Syntax.NumberType.Scientific
 			                       : dec > -1 ? Syntax.NumberType.Decimal

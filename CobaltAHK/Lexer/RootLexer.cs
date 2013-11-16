@@ -68,6 +68,8 @@ namespace CobaltAHK
 
 		private Token ReadTextToken()
 		{
+			var pos = reader.Position;
+
 			char ch = reader.Peek();
 			if (!IsIdChar(ch) || IsDigit(ch)) {
 				throw new LexerException(reader.Position, ch.ToString()); // todo: type
@@ -83,14 +85,14 @@ namespace CobaltAHK
 				return KeywordToken.GetToken(Syntax.GetKeyword(name));
 
 			} else if (reader.Peek() == '(') { // only function calls or definitions are followed by opening parentheses
-				return new FunctionToken(name);
+				return new FunctionToken(pos, name);
 
 			} else if (Operator.IsOperator(name)) {
 				return OperatorToken.GetToken(Operator.GetOperator(name));
 			}
 
 			// todo: handle hotkeys here as well!
-			return new IdToken(name);
+			return new IdToken(pos, name);
 		}
 
 		private Token ReadHotstringDefinition()
@@ -127,6 +129,8 @@ namespace CobaltAHK
 
 		private CommentToken ReadMultiComment()
 		{
+			var pos = reader.Position;
+
 			ExpectString("/*");
 			string comment = ReadUntilString("\n*/");
 
@@ -134,7 +138,7 @@ namespace CobaltAHK
 			SkipWhitespace();
 			ExpectString("\n");
 
-			return new MultiLineCommentToken(comment);
+			return new MultiLineCommentToken(pos, comment);
 		}
 	}
 }

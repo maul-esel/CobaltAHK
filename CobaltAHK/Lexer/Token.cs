@@ -6,30 +6,55 @@ namespace CobaltAHK
 	public abstract class Token
 	{
 		#region any state
-		public static readonly Token EOF              = new CharacterToken(unchecked ((char)-1));
-		public static readonly Token Newline          = new CharacterToken('\n');
-		public static readonly Token Comma            = new CharacterToken(',');
+		public static readonly Token EOF              = new PunctuationToken(unchecked ((char)-1));
+		public static readonly Token Newline          = new PunctuationToken('\n');
+		public static readonly Token Comma            = new PunctuationToken(',');
 		#endregion
 
 		// State.Traditional
-		public static readonly Token ForceExpression  = new CharacterToken('%');
+		public static readonly Token ForceExpression  = new PunctuationToken('%');
 
 		#region State.Expression (and others)
-		public static readonly Token Colon            = new CharacterToken(':');
-		public static readonly Token OpenParenthesis  = new CharacterToken('(');
-		public static readonly Token CloseParenthesis = new CharacterToken(')');
-		public static readonly Token OpenBrace        = new CharacterToken('{'); // blocks or object literals
-		public static readonly Token CloseBrace       = new CharacterToken('}');
-		public static readonly Token OpenBracket      = new CharacterToken('['); // object access or array literals
-		public static readonly Token CloseBracket     = new CharacterToken(']');
+		public static readonly Token Colon            = new PunctuationToken(':');
+		public static readonly Token OpenParenthesis  = new PunctuationToken('(');
+		public static readonly Token CloseParenthesis = new PunctuationToken(')');
+		public static readonly Token OpenBrace        = new PunctuationToken('{'); // blocks or object literals
+		public static readonly Token CloseBrace       = new PunctuationToken('}');
+		public static readonly Token OpenBracket      = new PunctuationToken('['); // object access or array literals
+		public static readonly Token CloseBracket     = new PunctuationToken(']');
 		#endregion
+	}
+
+	public abstract class PositionedToken : Token
+	{
+		protected PositionedToken(SourcePosition pos)
+		{
+			position = pos;
+		}
+
+		private readonly SourcePosition position;
+
+		public SourcePosition Position { get { return position; } }
+	}
+
+	public class PunctuationToken : Token
+	{
+		public PunctuationToken(char ch)
+		{
+			character = ch;
+		}
+
+		private readonly char character;
+
+		public char Character { get { return character; } }
 	}
 
 	#region TextToken
 
-	public abstract class TextToken : Token
+	public abstract class TextToken : PositionedToken
 	{
-		protected TextToken(string str)
+		protected TextToken(SourcePosition pos, string str)
+		: base(pos)
 		{
 			text = str;
 		}
@@ -46,44 +71,39 @@ namespace CobaltAHK
 #endif
 	}
 
-	public class CharacterToken : TextToken
-	{
-		internal CharacterToken(char ch) : base(ch.ToString()) { }
-	}
-
 	#region comments
 
 	public abstract class CommentToken : TextToken
 	{
-		public CommentToken(string comment) : base(comment) { }
+		public CommentToken(SourcePosition pos, string comment) : base(pos, comment) { }
 	}
 
 	public class SingleCommentToken : CommentToken
 	{
-		public SingleCommentToken(string comment) : base(comment) { }
+		public SingleCommentToken(SourcePosition pos, string comment) : base(pos, comment) { }
 	}
 
 	public class MultiLineCommentToken : CommentToken
 	{
-		public MultiLineCommentToken (string comment) : base(comment) { }
+		public MultiLineCommentToken(SourcePosition pos, string comment) : base(pos, comment) { }
 	}
 
 	#endregion
 
 	public class QuotedStringToken : TextToken
 	{
-		public QuotedStringToken(string str) : base(str) { }
+		public QuotedStringToken(SourcePosition pos, string str) : base(pos, str) { }
 	}
 
 	public class TraditionalStringToken : TextToken
 	{
-		public TraditionalStringToken(string str) : base(str) { }
+		public TraditionalStringToken(SourcePosition pos, string str) : base(pos, str) { }
 	}
 
 	public class NumberToken : TextToken
 	{
-		public NumberToken(string str, Syntax.NumberType t)
-		: base(str)
+		public NumberToken(SourcePosition pos, string str, Syntax.NumberType t)
+		: base(pos, str)
 		{
 			type = t;
 		}
@@ -95,24 +115,32 @@ namespace CobaltAHK
 
 	public class VariableToken : TextToken // for variables in traditional mode
 	{
-		public VariableToken(string var) : base(var) { }
+		public VariableToken(SourcePosition pos, string var) : base(pos, var) { }
 	}
 
 	public class IdToken : TextToken // for variables, command names, ...
 	{
-		public IdToken(string id) : base(id) { }
+		public IdToken(SourcePosition pos, string id) : base(pos, id) { }
 	}
 
 	public class FunctionToken : TextToken // for function calls or definitions (id followed by opening parenthese)
 	{
-		public FunctionToken(string name) : base(name) { }
+		public FunctionToken(SourcePosition pos, string name) : base(pos, name) { }
 	}
 
 	#endregion
 
-	public class HotkeyToken : Token { }
+	public class HotkeyToken : PositionedToken
+	{
+		public HotkeyToken(SourcePosition pos) : base(pos) { }
+	}
 
-	public class HotstringToken : Token { }
+	public class HotstringToken : PositionedToken
+	{
+		public HotstringToken(SourcePosition pos) : base(pos) { }
+	}
+
+	#region EnumToken
 
 	public abstract class EnumToken<T, TToken> : Token where TToken : EnumToken<T, TToken>
 	{
@@ -179,4 +207,6 @@ namespace CobaltAHK
 
 		public Syntax.ValueKeyword Keyword { get { return value; } }
 	}
+
+	#endregion
 }

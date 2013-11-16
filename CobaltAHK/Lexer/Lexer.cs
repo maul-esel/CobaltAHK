@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace CobaltAHK
 {
-	public partial class Lexer : LexerBase
+	public partial class Lexer : LexerBase, ITokenStream
 	{
 		public Lexer(System.IO.TextReader code)
 		: base(new SourceReader(code))
@@ -98,8 +98,9 @@ namespace CobaltAHK
 					reader.Read();
 					return Token.Comma;
 				case ';':
+					var pos = Position;
 					reader.Read();
-					return new SingleCommentToken(ReadUntilTerminators(singleCommentTerminators));
+					return new SingleCommentToken(pos, ReadUntilTerminators(singleCommentTerminators));
 			}
 
 			// state-dependent tokens

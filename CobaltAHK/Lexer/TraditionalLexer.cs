@@ -27,12 +27,13 @@ namespace CobaltAHK
 		private VariableToken ReadVariable()
 		{
 			// ExpectString("%"); // already consumed by GetToken()
+			var pos = reader.Position;
 			var variable = ReadUntilTerminators(variableTerminators, true, ch => {
 				if (!IsIdChar(ch)) {
 					throw new Exception(); // todo
 				}
 			});
-			return new VariableToken(variable);
+			return new VariableToken(pos, variable);
 		}
 		
 		private static readonly char[] definiteStringTerminators  = { '\n', Lexer.charEOF };
@@ -40,6 +41,7 @@ namespace CobaltAHK
 
 		private TraditionalStringToken ReadString()
 		{
+			var pos = reader.Position;
 			bool escape = false;
 			var str = ReadUntilTerminators(definiteStringTerminators, false, ch => {
 				if (escapableStringTerminators.Contains(ch) && !escape) {
@@ -47,7 +49,7 @@ namespace CobaltAHK
 				}
 				escape = ch == '`';
 			});
-			return new TraditionalStringToken(Unescape(str));
+			return new TraditionalStringToken(pos, Unescape(str));
 		}
 	}
 }

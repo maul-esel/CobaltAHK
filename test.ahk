@@ -68,12 +68,12 @@ Assert(obj.a "" == 9 "", "+= on obj member failed")
 obj.a := "a"
 Assert(obj.a == "a", "obj member assignment failed")
 
+arr := [2, 4, 9]
+Assert(arr != null, "Array literal failed")
+
 ; just testing for errors on empty literals
 obj := {}
 arr := []
-
-arr := [2, 4, 9]
-Assert(arr != null, "Array literal failed")
 
 a := 0
 b := "b"
