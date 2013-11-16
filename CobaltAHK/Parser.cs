@@ -51,8 +51,7 @@ namespace CobaltAHK
 				throw new Exception(); // todo
 
 			} else if (token is CLRNameToken) {
-				var clr = (CLRNameToken)token;
-				return new CLRNameExpression(clr.Position, clr.Text);
+				return ParseWithState(lexer, Lexer.State.Expression, () => ParseExpressionChain(lexer).ToExpression());
 
 			} else if (token is FunctionToken) {
 				return ParseFunctionCallOrDefinition(lexer);
@@ -709,6 +708,10 @@ namespace CobaltAHK
 			} else if (token is ValueKeywordToken) {
 				var value = (ValueKeywordToken)stream.GetToken();
 				return new ValueKeywordExpression(stream.Position, value.Keyword);
+
+			} else if (token is CLRNameToken) {
+				var clr = (CLRNameToken)stream.GetToken();
+				return new CLRNameExpression(clr.Position, clr.Text);
 
 			} else if (token is QuotedStringToken) {
 				var str = (QuotedStringToken)stream.GetToken();
