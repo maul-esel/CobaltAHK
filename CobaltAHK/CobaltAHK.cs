@@ -2,7 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+#if CustomDLR
+using Microsoft.Scripting.Ast;
+#else
 using System.Linq.Expressions;
+#endif
 using CobaltAHK.ExpressionTree;
 
 namespace CobaltAHK
