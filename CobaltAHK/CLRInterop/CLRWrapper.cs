@@ -46,5 +46,10 @@ namespace CobaltAHK.CLRInterop
 		}
 
 		private static readonly HashSet<Assembly> assemblies = new HashSet<Assembly>();
+
+		public override string ToString()
+		{
+			return "@" + name;
+		}
 	}
 }
