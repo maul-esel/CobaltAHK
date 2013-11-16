@@ -2,9 +2,11 @@
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <CLR35 Condition=" '$(TargetFrameworkVersion)' == 'v3.5' Or '$(TargetFrameworkVersion)' == 'v3.0' ">true</CLR35>
     <CustomDLR Condition=" '$(CustomDLR)' == '' ">false</CustomDLR>
-    <CustomDLR Condition=" '$(TargetFrameworkVersion)' == 'v3.5' Or  '$(TargetFrameworkVersion)' == 'v3.0' ">true</CustomDLR>
+    <CustomDLR Condition=" '$(CLR35)' == 'true' ">true</CustomDLR>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+
     <ProductVersion>10.0.0</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{27920BA7-FA6A-4AC5-9972-F205267BCCC4}</ProjectGuid>
@@ -36,10 +38,10 @@
   <PropertyGroup Condition=" '$(CustomDLR)|$(Configuration)' == 'true|Debug' ">
     <DefineConstants>CustomDLR;DEBUG</DefineConstants>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(CustomDLR)|$(TargetFrameworkVersion)' == 'true|v3.5' ">
+  <PropertyGroup Condition=" '$(CustomDLR)|$(CLR35)' == 'true|true' ">
     <DefineConstants>CustomDLR;CLR_35</DefineConstants>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(CustomDLR)|$(TargetFrameworkVersion)|$(Configuration)' == 'true|v3.5|Debug' ">
+  <PropertyGroup Condition=" '$(CustomDLR)|$(CLR35)|$(Configuration)' == 'true|true|Debug' ">
     <DefineConstants>CustomDLR;CLR_35;DEBUG</DefineConstants>
   </PropertyGroup>
   <ItemGroup Condition=" '$(CustomDLR)' == 'true' ">
