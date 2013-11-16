@@ -431,7 +431,7 @@ namespace CobaltAHK.ExpressionTree
 
 		#region optimized string concat
 
-		private static readonly MethodInfo concat = typeof(String).GetMethod("Concat", new[] { typeof(IEnumerable<string>) });
+		private static readonly MethodInfo concat = typeof(String).GetMethod("Concat", new[] { typeof(string[]) });
 
 		private DLR.Expression GenerateStringConcat(BinaryExpression expr, Scope scope)
 		{
