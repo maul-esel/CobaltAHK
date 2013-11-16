@@ -28,7 +28,10 @@ namespace CobaltAHK.ExpressionTree
 
 		private Expression ThrowOnFailure(Expression target, Expression value)
 		{
-			return Expression.Throw(Expression.New(typeof(InvalidOperationException))); // todo: supply message
+			return Expression.Block(
+				Expression.Throw(Expression.New(typeof(InvalidOperationException))), // todo: supply message
+			        Generator.NULL
+			);
 		}
 	}
 }
