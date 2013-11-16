@@ -11,7 +11,6 @@ namespace CobaltAHK.CLRInterop
 		public override bool TryGetMember(GetMemberBinder binder, out object result)
 		{
 			string name = FullName(binder.Name);
-			Console.WriteLine("getting type/namespace " + name + "...");
 
 			Type type;
 			TryFindType(name, out type);
