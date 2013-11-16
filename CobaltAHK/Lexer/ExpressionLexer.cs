@@ -3,6 +3,10 @@ using System.Collections.Generic;
 using System.Text;
 using System.Linq;
 
+#if CLR_35
+using CobaltAHK.v35Compat;
+#endif
+
 namespace CobaltAHK
 {
 	public class ExpressionLexer : LexerBase

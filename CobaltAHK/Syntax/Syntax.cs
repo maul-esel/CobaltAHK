@@ -1,12 +1,12 @@
 using System;
 using System.Linq;
 
-namespace CobaltAHK
-{
 #if CLR_35
-	using Enum = CobaltAHK.v35Compat.EnumHelper;
+using Enum = CobaltAHK.v35Compat.EnumHelper;
 #endif
 
+namespace CobaltAHK
+{
 	public static partial class Syntax
 	{
 		private static bool IsEnumName<TEnum>(string name) where TEnum : struct

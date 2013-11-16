@@ -3,7 +3,7 @@ namespace CobaltAHK.v35Compat
 {
 	using System;
 
-	internal class EnumHelper
+	internal static class EnumHelper
 	{
 		public static bool HasFlag(this Enum combination, Enum flag)
 		{

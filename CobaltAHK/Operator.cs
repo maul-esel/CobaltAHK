@@ -2,6 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
+#if CLR_35
+using CobaltAHK.v35Compat;
+#endif
+
 namespace CobaltAHK
 {
 	public abstract class Operator

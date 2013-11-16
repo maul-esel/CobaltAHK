@@ -3,11 +3,17 @@ using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
 using System.Reflection;
+
 #if CustomDLR
 using DLR = Microsoft.Scripting.Ast;
 #else
 using DLR = System.Linq.Expressions;
 #endif
+
+#if CLR_35
+using CobaltAHK.v35Compat;
+#endif
+
 using CobaltAHK.Expressions;
 
 namespace CobaltAHK.ExpressionTree
