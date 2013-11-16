@@ -33,7 +33,7 @@ namespace CobaltAHK
 
 		#endregion
 
-		protected static ISet<Operator> set = new HashSet<Operator>();
+		protected static HashSet<Operator> set = new HashSet<Operator>();
 
 		internal static IEnumerable<Operator> Operators { get { return set; } }
 

@@ -94,7 +94,7 @@ namespace CobaltAHK.ExpressionTree
 		}
 
 		[Obsolete]
-		private DLR.Expression ExpressionArray(IEnumerable<Expression> exprs, Scope scope)
+		private DLR.Expression ExpressionArray(IEnumerable<ValueExpression> exprs, Scope scope)
 		{
 			return DLR.Expression.NewArrayInit(typeof(object),
 			                                   exprs.Select(e => Converter.ConvertToObject(Generate(e, scope))));

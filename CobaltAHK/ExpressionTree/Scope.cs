@@ -130,7 +130,7 @@ namespace CobaltAHK.ExpressionTree
 
 		#region variables
 
-		protected readonly ISet<ParameterExpression> allVariables = new HashSet<ParameterExpression>();
+		protected readonly HashSet<ParameterExpression> allVariables = new HashSet<ParameterExpression>();
 
 		protected readonly IDictionary<string, ParameterExpression> variables = new Dictionary<string, ParameterExpression>();
 
