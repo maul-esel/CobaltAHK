@@ -59,7 +59,7 @@ namespace CobaltAHK.ExpressionTree
 			} else if (expr is MemberAccessExpression) {
 				return GenerateMemberAccess((MemberAccessExpression)expr, scope);
 			} else if (expr is StringLiteralExpression) {
-				return DLR.Expression.Constant(((StringLiteralExpression)expr).String);
+				return DLR.Expression.Constant(((StringLiteralExpression)expr).Value);
 			} else if (expr is NumberLiteralExpression) {
 				return DLR.Expression.Constant(((NumberLiteralExpression)expr).GetValue());
 			} else if (expr is ObjectLiteralExpression) {
@@ -84,8 +84,8 @@ namespace CobaltAHK.ExpressionTree
 
 		private DLR.Expression GenerateObjectLiteral(ObjectLiteralExpression obj, Scope scope)
 		{
-			var keys = ExpressionArray(obj.Dictionary.Keys, scope);
-			var values = ExpressionArray(obj.Dictionary.Values, scope);
+			var keys = ExpressionArray(obj.Value.Keys, scope);
+			var values = ExpressionArray(obj.Value.Values, scope);
 
 			return DLR.Expression.New(ObjConstructor, keys, values);
 		}
@@ -93,13 +93,13 @@ namespace CobaltAHK.ExpressionTree
 		private DLR.Expression GenerateArrayLiteral(ArrayLiteralExpression arr, Scope scope)
 		{
 			var create = DLR.Expression.New(typeof(List<object>));
-			if (arr.List.Length == 0) {
+			if (arr.Value.Length == 0) {
 				return create;
 			}
 
 			return DLR.Expression.ListInit(
 				create,
-				arr.List.Select(e => Converter.ConvertToObject(Generate(e, scope)))
+				arr.Value.Select(e => Converter.ConvertToObject(Generate(e, scope)))
 			);
 		}
 
@@ -473,7 +473,7 @@ namespace CobaltAHK.ExpressionTree
 
 		private bool IsEmptyString(Expression expr)
 		{
-			return expr is StringLiteralExpression && ((StringLiteralExpression)expr).String == "";
+			return expr is StringLiteralExpression && ((StringLiteralExpression)expr).Value == "";
 		}
 
 		private DLR.Expression GenerateString(Expression expr, Scope scope)

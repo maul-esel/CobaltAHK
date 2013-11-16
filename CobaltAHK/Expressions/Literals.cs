@@ -3,34 +3,32 @@ using System.Globalization;
 
 namespace CobaltAHK.Expressions
 {
-	public abstract class ValueLiteralExpression : ValueExpression
+	public abstract class ValueLiteralExpression<T> : ValueExpression
 	{
-		protected ValueLiteralExpression(SourcePosition pos) : base(pos) { }
+		protected ValueLiteralExpression(SourcePosition pos, T val)
+		: base(pos)
+		{
+			value = val;
+		}
+
+		private readonly T value;
+
+		public T Value { get { return value; } }
 	}
 
-	public class StringLiteralExpression : ValueLiteralExpression
+	public class StringLiteralExpression : ValueLiteralExpression<string>
 	{
 		public StringLiteralExpression(SourcePosition pos, string val)
-		: base(pos)
-		{
-			str = val;
-		}
-
-		private readonly string str;
-
-		public string String { get { return str; } }
+		: base(pos, val) { }
 	}
 
-	public class NumberLiteralExpression : ValueLiteralExpression
+	public class NumberLiteralExpression : ValueLiteralExpression<string>
 	{
 		public NumberLiteralExpression(SourcePosition pos, string val, Syntax.NumberType type)
-		: base(pos)
+		: base(pos, val)
 		{
-			strVal = val;
 			numType = type;
 		}
-
-		private readonly string strVal;
 
 		private readonly Syntax.NumberType numType;
 
@@ -38,41 +36,27 @@ namespace CobaltAHK.Expressions
 		{
 			switch (numType) {
 				case Syntax.NumberType.Integer:
-					return uint.Parse(strVal);
+					return uint.Parse(Value);
 				case Syntax.NumberType.Hexadecimal:
-					return uint.Parse(strVal.Substring(2), NumberStyles.AllowHexSpecifier);
+					return uint.Parse(Value.Substring(2), NumberStyles.AllowHexSpecifier);
 				case Syntax.NumberType.Decimal:
-					return double.Parse(strVal, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture.NumberFormat);
+					return double.Parse(Value, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture.NumberFormat);
 				case Syntax.NumberType.Scientific:
-					return double.Parse(strVal, NumberStyles.AllowDecimalPoint | NumberStyles.AllowExponent, CultureInfo.InvariantCulture.NumberFormat);
+					return double.Parse(Value, NumberStyles.AllowDecimalPoint | NumberStyles.AllowExponent, CultureInfo.InvariantCulture.NumberFormat);
 			}
 			throw new System.Exception(); // todo
 		}
 	}
 
-	public class ObjectLiteralExpression : ValueLiteralExpression
+	public class ObjectLiteralExpression : ValueLiteralExpression<IDictionary<ValueExpression, ValueExpression>>
 	{
 		public ObjectLiteralExpression(SourcePosition pos, IDictionary<ValueExpression, ValueExpression> obj)
-		: base(pos)
-		{
-			dict = obj;
-		}
-
-		private readonly IDictionary<ValueExpression, ValueExpression> dict;
-
-		public IDictionary<ValueExpression, ValueExpression> Dictionary { get { return dict; } }
+		: base(pos, obj) { }
 	}
 
-	public class ArrayLiteralExpression : ValueLiteralExpression
+	public class ArrayLiteralExpression : ValueLiteralExpression<ValueExpression[]>
 	{
 		public ArrayLiteralExpression(SourcePosition pos, ValueExpression[] arr)
-		: base(pos)
-		{
-			list = arr;
-		}
-
-		private readonly ValueExpression[] list;
-
-		public ValueExpression[] List { get { return list; } }
+		: base(pos, arr) { }
 	}
 }
