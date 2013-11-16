@@ -1,6 +1,4 @@
-using System;
 using System.Dynamic;
-using System.Linq;
 #if CustomDLR
 using Microsoft.Scripting.Ast;
 #else

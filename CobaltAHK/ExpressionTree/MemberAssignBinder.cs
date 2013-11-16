@@ -1,12 +1,10 @@
 using System;
 using System.Dynamic;
-using System.Linq;
 #if CustomDLR
 using Microsoft.Scripting.Ast;
 #else
 using System.Linq.Expressions;
 #endif
-using System.Reflection;
 
 namespace CobaltAHK.ExpressionTree
 {
