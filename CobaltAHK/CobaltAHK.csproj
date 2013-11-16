@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <CustomDLR Condition=" '$(CustomDLR)' == '' ">false</CustomDLR>
-    <CustomDLR Condition=" '$(TargetFrameworkVersion)' == 'v3.5' ">true</CustomDLR>
+    <CustomDLR Condition=" '$(TargetFrameworkVersion)' == 'v3.5' Or  '$(TargetFrameworkVersion)' == 'v3.0' ">true</CustomDLR>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>10.0.0</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
