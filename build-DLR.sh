@@ -9,7 +9,7 @@ cd ..
 sed -i 's/444;//g' IronDLR/Solutions/Common.proj
 
 cp DLR.Core.sln IronDLR/Runtime/DLR.Core.sln
-xbuild /t:Build /p:Configuration=v2Release IronDLR/Runtime/DLR.Core.sln
+xbuild /t:Build /p:Configuration=v2Release /property:TargetFrameworkVersion=$FRAMEWORK_VERSION IronDLR/Runtime/DLR.Core.sln
 
 ls IronDLR/bin/v2Release
 
