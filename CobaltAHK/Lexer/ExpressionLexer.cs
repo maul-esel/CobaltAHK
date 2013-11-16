@@ -64,6 +64,7 @@ namespace CobaltAHK
 						return OperatorToken.GetToken(Operator.Ternary);
 					}
 					throw new Exception(); // todo
+				case '@': return ReadCLRName();
 			}
 
 			if (IsDigit(ch)) {

@@ -128,6 +128,11 @@ namespace CobaltAHK
 		public FunctionToken(SourcePosition pos, string name) : base(pos, name) { }
 	}
 
+	public class CLRNameToken : TextToken
+	{
+		public CLRNameToken(SourcePosition pos, string name) : base(pos, name) { }
+	}
+
 	#endregion
 
 	public class HotkeyToken : PositionedToken
