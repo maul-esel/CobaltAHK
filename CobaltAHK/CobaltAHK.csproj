@@ -2,6 +2,8 @@
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <CustomDLR Condition=" '$(CustomDLR)' == '' ">false</CustomDLR>
+    <CustomDLR Condition=" '$(TargetFrameworkVersion)' == 'v3.5' ">true</CustomDLR>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>10.0.0</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
@@ -28,6 +30,21 @@
     <WarningLevel>4</WarningLevel>
     <ConsolePause>false</ConsolePause>
   </PropertyGroup>
+  <PropertyGroup Condition=" '$(CustomDLR)' == 'true' ">
+    <DefineConstants>CustomDLR</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(CustomDLR)|$(Configuration)' == 'true|Debug' ">
+    <DefineConstants>CustomDLR;DEBUG</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(CustomDLR)|$(TargetFrameworkVersion)' == 'true|v3.5' ">
+    <DefineConstants>CustomDLR;CLR_35</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(CustomDLR)|$(TargetFrameworkVersion)|$(Configuration)' == 'true|v3.5|Debug' ">
+    <DefineConstants>CustomDLR;CLR_35;DEBUG</DefineConstants>
+  </PropertyGroup>
+  <ItemGroup Condition=" '$(CustomDLR)' == 'true' ">
+    <Reference Include="Microsoft.Scripting.Core" />
+  </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -72,6 +89,7 @@
     <Compile Include="ExpressionTree\MemberAssignBinder.cs" />
     <Compile Include="Expressions\Keywords.cs" />
     <Compile Include="ScriptException.cs" />
+    <Compile Include="v35Compat.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

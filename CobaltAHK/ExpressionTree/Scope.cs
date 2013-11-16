@@ -1,7 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+#if CustomDLR
+using Microsoft.Scripting.Ast;
+#else
 using System.Linq.Expressions;
+#endif
 using System.Reflection;
 
 namespace CobaltAHK.ExpressionTree
@@ -130,7 +134,7 @@ namespace CobaltAHK.ExpressionTree
 
 		#region variables
 
-		protected readonly ISet<ParameterExpression> allVariables = new HashSet<ParameterExpression>();
+		protected readonly HashSet<ParameterExpression> allVariables = new HashSet<ParameterExpression>();
 
 		protected readonly IDictionary<string, ParameterExpression> variables = new Dictionary<string, ParameterExpression>();
 

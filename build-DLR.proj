@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+	<Target Name="Build">
+		<MSBuild Projects="Codeplex-DLR-1.0/Src/Runtime/Microsoft.Dynamic/Microsoft.Dynamic.Build.csproj" />
+	</Target>
+</Project>

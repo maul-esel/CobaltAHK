@@ -3,7 +3,17 @@ using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
 using System.Reflection;
+
+#if CustomDLR
+using DLR = Microsoft.Scripting.Ast;
+#else
 using DLR = System.Linq.Expressions;
+#endif
+
+#if CLR_35
+using CobaltAHK.v35Compat;
+#endif
+
 using CobaltAHK.Expressions;
 
 namespace CobaltAHK.ExpressionTree
@@ -94,7 +104,7 @@ namespace CobaltAHK.ExpressionTree
 		}
 
 		[Obsolete]
-		private DLR.Expression ExpressionArray(IEnumerable<Expression> exprs, Scope scope)
+		private DLR.Expression ExpressionArray(IEnumerable<ValueExpression> exprs, Scope scope)
 		{
 			return DLR.Expression.NewArrayInit(typeof(object),
 			                                   exprs.Select(e => Converter.ConvertToObject(Generate(e, scope))));
@@ -421,7 +431,7 @@ namespace CobaltAHK.ExpressionTree
 
 		#region optimized string concat
 
-		private static readonly MethodInfo concat = typeof(String).GetMethod("Concat", new[] { typeof(IEnumerable<string>) });
+		private static readonly MethodInfo concat = typeof(String).GetMethod("Concat", new[] { typeof(string[]) });
 
 		private DLR.Expression GenerateStringConcat(BinaryExpression expr, Scope scope)
 		{

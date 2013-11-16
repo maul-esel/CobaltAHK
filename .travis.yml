@@ -1,20 +1,22 @@
 language: C
 
+env:
+  - FRAMEWORK_VERSION=v3.5
+  - FRAMEWORK_VERSION=v4.0
+  - FRAMEWORK_VERSION=v4.5
+
 before_install:
   - sudo add-apt-repository -y ppa:directhex/monoxide
   - sudo apt-get update
 
 install:
-  - sudo apt-get install mono-devel mono-gmcs nunit-console
-
-env:
-#  - FRAMEWORK_VERSION=v3.5
-  - FRAMEWORK_VERSION=v4.0
-  - FRAMEWORK_VERSION=v4.5
+  - sudo apt-get install mono-devel mono-mcs nunit-console
+  - "if [ $FRAMEWORK_VERSION = 'v3.5' ]; then ./build-DLR.sh; fi;"
 
 before_script:
   - xbuild /target:Travis /property:TargetFrameworkVersion=$FRAMEWORK_VERSION CobaltAHK.proj
 
 script:
+  - export COMPLUS_Version=$FRAMEWORK_VERSION
   - nunit-console ./Tests/bin/Debug/Tests.dll
   - ./CobaltAHK-app/bin/Debug/CobaltAHK-app.exe test.ahk

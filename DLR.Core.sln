@@ -1,0 +1,22 @@
+
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Scripting.Core", "Microsoft.Scripting.Core\Microsoft.Scripting.Core.csproj", "{2AE75F5A-CD1F-4925-9647-AF4D1C282FB4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Scripting", "Microsoft.Scripting\Microsoft.Scripting.csproj", "{02FF0909-F5AD-48CF-A86A-345E721B7E40}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Dynamic", "Microsoft.Dynamic\Microsoft.Dynamic.csproj", "{EB66B766-6354-4208-A3D4-AACBDCB5C3B3}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		v2Release|Any CPU = v2Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{02FF0909-F5AD-48CF-A86A-345E721B7E40}.v2Release|Any CPU.ActiveCfg = v2Release|Any CPU
+		{02FF0909-F5AD-48CF-A86A-345E721B7E40}.v2Release|Any CPU.Build.0 = v2Release|Any CPU
+		{2AE75F5A-CD1F-4925-9647-AF4D1C282FB4}.v2Release|Any CPU.ActiveCfg = v2Release|Any CPU
+		{2AE75F5A-CD1F-4925-9647-AF4D1C282FB4}.v2Release|Any CPU.Build.0 = v2Release|Any CPU
+		{EB66B766-6354-4208-A3D4-AACBDCB5C3B3}.v2Release|Any CPU.ActiveCfg = v2Release|Any CPU
+		{EB66B766-6354-4208-A3D4-AACBDCB5C3B3}.v2Release|Any CPU.Build.0 = v2Release|Any CPU
+	EndGlobalSection
+EndGlobal

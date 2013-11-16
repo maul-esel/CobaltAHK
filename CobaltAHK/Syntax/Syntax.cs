@@ -1,6 +1,10 @@
 using System;
 using System.Linq;
 
+#if CLR_35
+using Enum = CobaltAHK.v35Compat.EnumHelper;
+#endif
+
 namespace CobaltAHK
 {
 	public static partial class Syntax
