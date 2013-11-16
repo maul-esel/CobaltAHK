@@ -50,6 +50,10 @@ namespace CobaltAHK
 
 				throw new Exception(); // todo
 
+			} else if (token is CLRNameToken) {
+				var clr = (CLRNameToken)token;
+				return new CLRNameExpression(clr.Position, clr.Text);
+
 			} else if (token is FunctionToken) {
 				return ParseFunctionCallOrDefinition(lexer);
 
