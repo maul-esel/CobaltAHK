@@ -9,20 +9,14 @@ using System.Linq.Expressions;
 
 namespace CobaltAHK.ExpressionTree
 {
-	public class MemberAccessBinder : GetIndexBinder
+	public class MemberAccessBinder : GetMemberBinder
 	{
-		private static readonly CallInfo MemberCallInfo = new CallInfo(1);
+		public MemberAccessBinder(string member) : base(member, true) { }
 
-		public MemberAccessBinder() : base(MemberCallInfo) { }
-
-		public override DynamicMetaObject FallbackGetIndex(DynamicMetaObject target, DynamicMetaObject[] args, DynamicMetaObject errorSuggestion)
+		public override DynamicMetaObject FallbackGetMember(DynamicMetaObject target, DynamicMetaObject errorSuggestion)
 		{
-			if (args.Length != 1) {
-				throw new InvalidOperationException();
-			}
-
-			if (!target.HasValue || args.Any(a => !a.HasValue)) {
-				return Defer(target, args);
+			if (!target.HasValue) {
+				return Defer(target);
 			}
 
 			// todo: special properties like base
