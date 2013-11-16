@@ -28,6 +28,11 @@ namespace CobaltAHK
 
 		public Action Compile(TextReader code)
 		{
+#if DEBUG
+			// workaround
+			CLRInterop.CLRWrapper.AddAssembly(typeof(Console).Assembly);
+#endif
+
 			var scope = new ExpressionTree.Scope();
 			var settings = new ScriptSettings();
 

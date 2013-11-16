@@ -94,6 +94,8 @@
     <Compile Include="v35Compat.cs" />
     <Compile Include="ITokenStream.cs" />
     <Compile Include="ArrayTokenStream.cs" />
+    <Compile Include="CLRInterop\CLRWrapper.cs" />
+    <Compile Include="CLRInterop\NamespaceWrapper.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
@@ -101,6 +103,7 @@
     <Folder Include="Expressions\" />
     <Folder Include="Syntax\" />
     <Folder Include="ExpressionTree\" />
+    <Folder Include="CLRInterop\" />
   </ItemGroup>
   <ProjectExtensions>
     <MonoDevelop>
