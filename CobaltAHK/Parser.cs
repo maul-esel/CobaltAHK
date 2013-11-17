@@ -561,10 +561,10 @@ namespace CobaltAHK
 						ParseAltObjAccess(stream, chain);
 
 					} else if (op is UnaryOperator) {
-						if (((UnaryOperator)op).Position != Position.prefix) {
+						prefixOp = (UnaryOperator)op;
+						if (prefixOp.Position != Position.prefix) {
 							throw new Exception(); // todo
 						}
-						prefixOp = (UnaryOperator)op;
 
 					} else if (op is BinaryOperator) {
 						chain.Append((BinaryOperator)op);
