@@ -52,12 +52,12 @@ namespace CobaltAHK
 		}
 
 		#region instances
-		// todo: New
 		[Obsolete]
 		public static readonly Operator Deref                   = new   UnaryOperator("%",  13, Position.undefined); // todo
 		public static readonly Operator ObjectAccess            = new  BinaryOperator(".", 13,
 		                                                                              BinaryOperationType.Other,
 		                                                                              Whitespace.neither);
+		public static readonly Operator New                     = new   UnaryOperator("new", 12, Position.undefined);
 
 		public static readonly Operator PrefixIncrement         = new   UnaryOperator("++", 12, Position.prefix);
 		public static readonly Operator PostfixIncrement        = new   UnaryOperator("++", 12, Position.postfix);
