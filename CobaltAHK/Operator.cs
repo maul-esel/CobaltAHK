@@ -19,7 +19,7 @@ namespace CobaltAHK
 
 		public virtual bool Matches(string op)
 		{
-			return Code == op.ToUpper();
+			return Code.ToUpper() == op.ToUpper();
 		}
 
 		#region fields
