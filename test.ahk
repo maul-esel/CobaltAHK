@@ -29,6 +29,16 @@ cond() {
 }
 Assert(cond(), "function return in if failed")
 
+glob := "var"
+local_func() {
+	Assert(local == null, "Uninit var in func was not null")
+	local := true
+	Assert(local, "Initialized local var in func failed")
+
+	Assert(glob == null, "Global var was visible in function")
+}
+local_func()
+
 c := 5
 c += 8.2
 Assert(c == 13.2, "+= failed")
