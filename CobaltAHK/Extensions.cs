@@ -6,7 +6,7 @@ namespace CobaltAHK
 	internal static class Extensions
 	{
 #if DEBUG
-		private static readonly System.Collections.Generic.IDictionary<string, string> map = new System.Collections.Generic.Dictionary<string, string>() {
+		private static readonly IDictionary<string, string> map = new Dictionary<string, string>() {
 			{ "\n", "\\n" },
 			{ "\r", "\\r" },
 			{ "\t", "\\t" }
