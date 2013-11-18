@@ -122,7 +122,7 @@ namespace CobaltAHK.ExpressionTree
 			}
 			var ifExpr  = (IfExpression)branches[0];
 			var ifCond  = Converter.ConvertToBoolean(Generate(ifExpr.Condition, scope));
-			var ifBlock = DLR.Expression.Block(ifExpr.Body.Select(e => Generate(e, scope)).Concat(new[] { DLR.Expression.Empty() }));
+			var ifBlock = DLR.Expression.Block(ifExpr.Body.Select(e => Generate(e, scope)).Append(DLR.Expression.Empty()));
 
 			if (branches.Length == 1) {
 				return DLR.Expression.IfThen(ifCond, ifBlock);
@@ -199,8 +199,8 @@ namespace CobaltAHK.ExpressionTree
 			}
 			types.Add(typeof(object)); // return value
 
-			var funcBody = func.Body.Select(e => Generate(e, funcScope)).Concat(
-				new[] { DLR.Expression.Label(funcScope.Return, NULL) } // default return value is null
+			var funcBody = func.Body.Select(e => Generate(e, funcScope)).Append(
+				DLR.Expression.Label(funcScope.Return, NULL) // default return value is null
 			);
 
 			var function = DLR.Expression.Lambda(
@@ -220,8 +220,8 @@ namespace CobaltAHK.ExpressionTree
 		private DLR.Expression GenerateReturnExpression(ReturnExpression expr, Scope scope)
 		{
 			if (expr.OtherExpressions.Count() > 0) {
-				var blockBody = expr.OtherExpressions.Select(e => Generate(e, scope)).Concat(
-					new[] { MakeReturn(expr, scope) }
+				var blockBody = expr.OtherExpressions.Select(e => Generate(e, scope)).Append(
+					MakeReturn(expr, scope)
 				);
 				return DLR.Expression.Block(blockBody); // todo: vars?
 			}

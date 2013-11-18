@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 
 namespace CobaltAHK
 {
@@ -29,6 +30,11 @@ namespace CobaltAHK
 			foreach (var item in list) {
 				e.Remove(item);
 			}
+		}
+
+		public static IEnumerable<T> Append<T>(this IEnumerable<T> list, params T[] elements)
+		{
+			return list.Concat(elements);
 		}
 	}
 }

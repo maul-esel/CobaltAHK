@@ -42,7 +42,7 @@ namespace CobaltAHK
 
 			var end = Expression.Label(scope.Return);
 
-			var lambda = Expression.Lambda<Action>(Expression.Block(scope.GetVariables(), et.Concat(new[] { end })));
+			var lambda = Expression.Lambda<Action>(Expression.Block(scope.GetVariables(), et.Append(end)));
 			Debug("Generated lambda wrapper.");
 
 			return lambda.Compile();
