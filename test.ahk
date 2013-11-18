@@ -95,6 +95,8 @@ Assert(arr != null, "Array literal failed")
 obj := {}
 arr := []
 
+Assert(obj.Base, "Object base was false / null")
+
 a := 0
 b := "b"
 c := "c"

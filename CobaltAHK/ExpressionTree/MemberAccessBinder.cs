@@ -11,13 +11,23 @@ namespace CobaltAHK.ExpressionTree
 	{
 		public MemberAccessBinder(string member) : base(member, true) { }
 
+		private static readonly System.Reflection.MethodInfo baseProperty
+			= typeof(CobaltAHKObject).GetProperty("Base", typeof(IDynamicMetaObjectProvider)).GetGetMethod();
+
 		public override DynamicMetaObject FallbackGetMember(DynamicMetaObject target, DynamicMetaObject errorSuggestion)
 		{
 			if (!target.HasValue) {
 				return Defer(target);
 			}
 
-			// todo: special properties like base
+			// special object property: base
+			if (target.LimitType.TypeIs<CobaltAHKObject>() && Name.ToLower() == CobaltAHKObject.BasePropertyName) {
+				return new DynamicMetaObject(
+					Expression.Property(target.Expression, baseProperty),
+					BindingRestrictions.GetTypeRestriction(target.Expression, typeof(CobaltAHKObject))
+				);
+			}
+
 			// todo: .NET types
 
 			return errorSuggestion ?? new DynamicMetaObject(

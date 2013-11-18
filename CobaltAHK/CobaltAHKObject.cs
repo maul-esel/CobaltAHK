@@ -8,6 +8,8 @@ namespace CobaltAHK
 {
 	public class CobaltAHKObject : DynamicObject, IDictionary<object, object>
 	{
+		public const string BasePropertyName = "base";
+
 		internal CobaltAHKObject(IEnumerable<object> keys, IEnumerable<object> values)
 		: this()
 		{
