@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -5,6 +6,21 @@ namespace CobaltAHK
 {
 	internal static class Extensions
 	{
+		public static bool TypeIs<T>(this Type type)
+		{
+			return type.TypeIs(typeof(T));
+		}
+
+		public static bool TypeIs(this Type type, Type other)
+		{
+			return type == other || type.IsSubclassOf(other) || type.Implements(other);
+		}
+
+		public static bool Implements(this Type type, Type other)
+		{
+			return type.GetInterface(other.FullName) != null;
+		}
+
 #if DEBUG
 		private static readonly IDictionary<string, string> map = new Dictionary<string, string>() {
 			{ "\n", "\\n" },

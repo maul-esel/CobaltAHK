@@ -978,7 +978,7 @@ namespace CobaltAHK
 
 		private void AssertToken(Token actual, Type expected)
 		{
-			if (actual.GetType() != expected && !actual.GetType().IsSubclassOf(expected)) {
+			if (!actual.GetType().TypeIs(expected)) {
 				throw new UnexpectedTokenException("Expected token of type '" + expected.ToString() + "' but was '" + actual.ToString() + "'");
 			}
 		}
