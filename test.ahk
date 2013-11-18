@@ -32,10 +32,20 @@ Assert(cond(), "function return in if failed")
 glob := "var"
 local_func() {
 	Assert(local == null, "Uninit var in func was not null")
+	if (true) {
+		Assert(local == null, "Uninit var in if in func was not null")
+	}
+
 	local := true
 	Assert(local, "Initialized local var in func failed")
+	if (true) {
+		Assert(local, "Initialized local var in if in func failed")
+	}
 
 	Assert(glob == null, "Global var was visible in function")
+	if (true) {
+		Assert(glob == null, "Global var was visible in if in function")
+	}
 }
 local_func()
 
