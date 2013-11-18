@@ -205,7 +205,7 @@ namespace CobaltAHK.ExpressionTree
 
 			var function = DLR.Expression.Lambda(
 				DLR.Expression.GetFuncType(types.ToArray()),
-				DLR.Expression.Block(funcBody),
+				DLR.Expression.Block(funcScope.GetVariables().Except(prms), funcBody),
 				func.Name,
 				prms
 			);
