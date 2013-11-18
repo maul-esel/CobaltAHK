@@ -60,6 +60,7 @@ namespace CobaltAHK
 						default:
 							throw new UnexpectedCodeException(reader.Position, ": or =", reader.Peek().ToString());
 					}
+				case '@': return ReadCLRName();
 				case '#': return ReadDirectiveOrHotkey();
 				// todo: hotkey chars, such as ^!...
 				default: return ReadTextToken();

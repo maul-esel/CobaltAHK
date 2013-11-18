@@ -19,6 +19,17 @@ five() {
 	return(5)
 }
 
+Assert(@System.Console.WindowHeight, "Retrieval of static property failed")
+
+alias := @System
+Assert(alias.Console.WindowHeight, "Namespace alias failed")
+
+alias := alias.Console
+Assert(alias.WindowHeight, "Class alias failed")
+
+alias := alias.WindowHeight
+Assert(alias "" == @System.Console.WindowHeight "", "Assign to static property failed")
+
 Assert(five() "" == "5", "Return value failed")
 Assert(5 ** 2 == 25.0, "Power failed")
 

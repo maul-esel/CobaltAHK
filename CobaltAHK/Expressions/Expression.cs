@@ -84,6 +84,20 @@ namespace CobaltAHK.Expressions
 		public Syntax.ValueKeyword Keyword { get { return keyword; } }
 	}
 
+	public class CLRNameExpression : ValueExpression
+	{
+		public CLRNameExpression(SourcePosition pos, string n)
+		: base(pos)
+		{
+			name = n;
+		}
+
+		private readonly string name;
+
+		public string Name { get { return name; } }
+
+	}
+
 	#region members
 
 	public abstract class MemberExpression : ValueExpression

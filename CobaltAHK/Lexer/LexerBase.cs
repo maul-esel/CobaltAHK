@@ -164,5 +164,24 @@ namespace CobaltAHK
 		}
 
 		#endregion
+
+		// shared by RootLexer and ExpressionLexer
+		protected Token ReadCLRName()
+		{
+			if (reader.Read() != '@') {
+				throw new LexerException(reader.Position);
+			}
+
+			string name = "";
+			while (IsIdChar(reader.Peek())) {
+				name += reader.Read();
+			}
+
+			if (name == "") {
+				throw new LexerException(reader.Position);
+			}
+
+			return new CLRNameToken(reader.Position, name);
+		}
 	}
 }
