@@ -120,6 +120,11 @@ if (false) {
 	Assert(g, "Assertion in else-Block failed")
 }
 
+class MyClass extends obj
+{
+}
+
+Assert(MyClass, "Class was null")
 ; todo: fix parsing so it works without parentheses
 result := (a ? b ? c : d : e ? f : g)
 Assert(result == "f", "Chained ternary failed")
