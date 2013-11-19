@@ -275,11 +275,21 @@ namespace CobaltAHK
 
 			AssertToken(lexer.PeekToken(), typeof(IdToken));
 			var name = (IdToken)lexer.GetToken();
+			ValueExpression baseObj = null;
 
-			SkipNewline(lexer);
 			var token = lexer.PeekToken();
 
-			AssertToken(token, Token.OpenBrace);
+			if (token is IdToken && ((IdToken)token).Text.ToLower() == "extends") {
+				lexer.GetToken();
+				AssertToken(lexer.PeekToken(), typeof(IdToken));
+
+				var baseId = (IdToken)lexer.GetToken();
+				baseObj = GetVariable(baseId.Text, baseId.Position);
+			}
+
+			SkipNewline(lexer);
+
+			AssertToken(lexer.PeekToken(), Token.OpenBrace);
 			var expressions = ParseBlock(lexer, e => ValidateExpressionInDefinition(e));
 			AssertToken(lexer.GetToken(), Token.Newline, Token.EOF);
 
@@ -287,7 +297,7 @@ namespace CobaltAHK
 			FilterClassBodyExpressions(expressions, out methods);
 
 			lexer.PopState();
-			return new ClassDefinitionExpression(lexer.Position, name.Text, methods);
+			return new ClassDefinitionExpression(lexer.Position, baseObj, name.Text, methods);
 		}
 
 		/// <summary>

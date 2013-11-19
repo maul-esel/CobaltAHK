@@ -8,6 +8,8 @@ namespace CobaltAHK
 {
 	public class CobaltAHKObject : DynamicObject, IDictionary<object, object>
 	{
+		public const string BasePropertyName = "base";
+
 		internal CobaltAHKObject(IEnumerable<object> keys, IEnumerable<object> values)
 		: this()
 		{
@@ -19,9 +21,29 @@ namespace CobaltAHK
 			}
 		}
 
-		public CobaltAHKObject() { }
+		public CobaltAHKObject()
+		: this(defaultBase)
+		{
+		}
+
+		public CobaltAHKObject(IDynamicMetaObjectProvider baseObj)
+		{
+			baseObject = baseObj;
+		}
+
+		protected static readonly IDynamicMetaObjectProvider defaultBase = new CobaltAHKObject(null);
+
+		private IDynamicMetaObjectProvider baseObject;
+
+		public IDynamicMetaObjectProvider Base
+		{
+			get { return baseObject; }
+			set { baseObject = value; }
+		}
 
 		private readonly IDictionary<object, object> dict = new Dictionary<object, object>();
+
+		#region DynamicObject
 
 		public override bool TryGetIndex(GetIndexBinder binder, object[] args, out object result)
 		{
@@ -60,6 +82,8 @@ namespace CobaltAHK
 			dict[binder.Name] = value;
 			return true;
 		}
+
+		#endregion
 
 		#region IDictionary<object, object>
 

@@ -95,6 +95,11 @@ Assert(arr != null, "Array literal failed")
 obj := {}
 arr := []
 
+Assert(obj.Base, "Object base was false / null")
+
+obj.base := { "a" : "test" }
+Assert(obj.Base.a == "test", "Object base change not reflected")
+
 a := 0
 b := "b"
 c := "c"
@@ -114,6 +119,16 @@ if (false) {
 } else {
 	Assert(g, "Assertion in else-Block failed")
 }
+
+obj := { "a" : "just text" }
+
+class MyClass extends obj
+{
+}
+
+Assert(MyClass, "Class was null")
+Assert(MyClass.base == obj, "Class inheritance failed")
+Assert(MyClass.base.a == "just text", "Class inheritance member access failed")
 
 ; todo: fix parsing so it works without parentheses
 result := (a ? b ? c : d : e ? f : g)
