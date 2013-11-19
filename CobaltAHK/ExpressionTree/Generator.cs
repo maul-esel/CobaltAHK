@@ -112,8 +112,31 @@ namespace CobaltAHK.ExpressionTree
 			                                   exprs.Select(e => Converter.ConvertToObject(Generate(e, scope))));
 		}
 
+		// lists all C# aliases, but enables only commonly used
+		private static readonly IDictionary<string, Type> abbrevTypes = new Dictionary<string, Type>() {
+			{ "bool",    typeof(bool) },
+			//{ "byte",    typeof(byte) },
+			{ "char",    typeof(char) },
+			//{ "decimal", typeof(decimal) },
+			{ "double",  typeof(double) },
+			//{ "float",   typeof(float) },
+			{ "int",     typeof(int) },
+			//{ "long",    typeof(long) },
+			{ "object",  typeof(object) },
+			//{ "sbyte",   typeof(sbyte) },
+			//{ "short",   typeof(short) },
+			{ "string",  typeof(string) },
+			{ "uint",    typeof(uint) },
+			//{ "ulong",   typeof(ulong) },
+			//{ "ushort",  typeof(ushort) }
+		};
+
 		private DLR.Expression GenerateCLRWrapper(CLRNameExpression expr, Scope scope)
 		{
+			if (abbrevTypes.ContainsKey(expr.Name.ToLower())) {
+				return DLR.Expression.Constant(new CLRInterop.TypeWrapper(abbrevTypes[expr.Name.ToLower()]));
+			}
+
 			Type type;
 			CLRInterop.CLRWrapper.TryFindType(expr.Name, out type);
 			bool isNamespace = CLRInterop.CLRWrapper.NamespaceExists(expr.Name);
