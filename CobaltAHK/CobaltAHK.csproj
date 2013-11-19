@@ -6,7 +6,6 @@
     <CustomDLR Condition=" '$(CustomDLR)' == '' ">false</CustomDLR>
     <CustomDLR Condition=" '$(CLR35)' == 'true' ">true</CustomDLR>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-
     <ProductVersion>10.0.0</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{27920BA7-FA6A-4AC5-9972-F205267BCCC4}</ProjectGuid>
@@ -94,6 +93,7 @@
     <Compile Include="v35Compat.cs" />
     <Compile Include="ITokenStream.cs" />
     <Compile Include="ArrayTokenStream.cs" />
+    <Compile Include="ExpressionTree\BinderCache.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
