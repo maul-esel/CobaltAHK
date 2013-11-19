@@ -261,6 +261,10 @@ namespace CobaltAHK.ExpressionTree
 				DLR.Expression.Assign(obj, DLR.Expression.New(typeof(CobaltAHKObject)))
 			};
 
+			if (expr.Base != null) {
+				exprs.Add(GenerateMemberAssign(obj, CobaltAHKObject.BasePropertyName, Generate(expr.Base, scope)));
+			}
+
 			foreach (var method in expr.Methods) {
 				exprs.Add(
 					GenerateMemberAssign(obj,
