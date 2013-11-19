@@ -30,6 +30,8 @@ Assert(alias.WindowHeight, "Class alias failed")
 alias := alias.WindowHeight
 Assert(alias "" == @System.Console.WindowHeight "", "Assign to static property failed")
 
+Assert(@System.UInt32.MaxValue, "failed to get constant")
+
 Assert(five() "" == "5", "Return value failed")
 Assert(5 ** 2 == 25.0, "Power failed")
 
