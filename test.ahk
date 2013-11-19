@@ -97,6 +97,9 @@ arr := []
 
 Assert(obj.Base, "Object base was false / null")
 
+obj.base := { "a" : "test" }
+Assert(obj.Base.a == "test", "Object base change not reflected")
+
 a := 0
 b := "b"
 c := "c"
